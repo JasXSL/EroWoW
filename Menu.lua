@@ -94,6 +94,9 @@ function EroWoW.Menu:ini()
 	f:SetScript("OnDragStart", f.StartMoving)
 	f:SetScript("OnDragStop", f.StopMovingOrSizing)
 
+	PanelTemplates_SetNumTabs(f, 2);
+    PanelTemplates_SetTab(f, 1);
+
 	if not EroWoW.Menu.open then
 		f:Hide();
 	end
@@ -113,10 +116,10 @@ function EroWoW.Menu:ini()
 		end
 	end
 
-
+	--[[
 	EroWoWSettingsFrame_close:SetScript("OnMouseUp", function (self, button)
 		EroWoW.Menu:toggle();
-	end)
+	end)]]
 
 
 	EroWoWSettingsFrameTab1:SetScript("OnMouseUp", function (self, button)
