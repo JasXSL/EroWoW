@@ -41,12 +41,14 @@ function EroWoW.Action:new(data)
 	self.description = data.description or ""					-- Description of action
 	self.texture = data.texture or ""							-- Texture, does not need a path
 	self.cooldown = data.cooldown or 0							-- Internal cooldown
-	self.global_cooldown = data.global_cooldown or true			-- Affected by global cooldown
+	self.global_cooldown = getVar(data.global_cooldown, true)			-- Affected by global cooldown
 	
 	self.cast_time = data.cast_time or 0						-- Cast time of spell
 	self.cast_sound_loop = data.cast_sound_loop or false		-- Cast loop sound
 	self.cast_sound_start = data.cast_sound_start or false		-- Start cast sound, played once
 	self.cast_sound_success = data.cast_sound_success or false	-- Cast success sound, played once
+
+	self.suppress_all_errors = data.suppress_all_errors or false
 
 	-- Functions
 	self.fn_send = data.fn_send									-- Function to execute on the sender when sending
@@ -206,12 +208,12 @@ end
 -- Returns boolean true on success
 function EroWoW.Action:validate(unitCaster, unitTarget, suppressErrors)
 
+	if self.suppress_all_errors then suppressErrors = true end -- Allow actions to suppress errors - 
+	
 	-- Make sure it's not on cooldown
 	if unitCaster == "player" and (self.on_cooldown or (self.global_cooldown and EroWoW.Action.GCD)) then
 		return EroWoW:reportError("Can't do that yet", suppressErrors);
 	end
-
-	
 
 	local inInstance = IsInInstance()
 	if inInstance and not self.allow_instance then

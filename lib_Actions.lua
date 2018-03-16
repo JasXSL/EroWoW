@@ -1,5 +1,31 @@
 -- Library for Actions --
 
+-- Meta action that checks if target has erowow --
+table.insert(EroWoW.Action.LIB, EroWoW.Action:new({
+	id = "A",
+	global_cooldown = false,
+	suppress_all_errors = true,
+	party_restricted = false,
+	allow_stunned = true,
+	allow_instance = true,
+	allow_caster_dead = true,
+	allow_targ_dead = true,
+	hidden = true,
+	-- Custom sending logic
+	fn_send = function(self, sender, target, suppressErrors)
+		-- Return no data, but one callback
+		return nil, function(se, success, data)
+			if success then
+				EroWoW.Character.targetHasEroWoWFrame:Show();
+			end
+		end
+	end,
+	-- Handle the receiving end here
+	fn_receive = function(self, sender, target, suppressErrors)
+		return true
+	end
+
+}))
 
 -- Disrobe --
 table.insert(EroWoW.Action.LIB, EroWoW.Action:new({

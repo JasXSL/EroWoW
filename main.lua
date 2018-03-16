@@ -2,7 +2,6 @@
 	 /console scriptErrors 1
 
 	 TODO:
-	 - Ping EroWoW when you target a player and show a heart or something on the target frame
 	 - Sort abilities on favorite, priority, name (so rest and detect can have higher priorities)
 	 - Allow ability favorites by shift clicking
 	 - Disrobe should remove random piece of clothing

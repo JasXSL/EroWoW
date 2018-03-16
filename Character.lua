@@ -4,6 +4,7 @@ EroWoW.Character.__index = EroWoW.Character;
 EroWoW.Character.evtFrame = CreateFrame("Frame");
 EroWoW.Character.eventBindings = {};		-- {id:(int)id, evt:(str)evt, fn:(func)function, numTriggers:(int)numTriggers=inf}
 EroWoW.Character.eventBindingIndex = 0;	
+EroWoW.Character.targetHasEroWoWFrame = nil;
 
 -- Consts
 EroWoW.Character.AROUSAL_FADE_PER_SEC = 0.05;
@@ -25,8 +26,10 @@ function EroWoW.Character:ini()
 	EroWoW.Character.evtFrame:RegisterEvent("UNIT_SPELLCAST_SENT");
 	EroWoW.Character.evtFrame:RegisterEvent("SOUNDKIT_FINISHED");
 	EroWoW.Character.evtFrame:RegisterEvent("COMBAT_LOG_EVENT")
+	EroWoW.Character.evtFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
 	
 		
+	-- Main timer, ticking once per second
 	EroWoW.Timer:set(function()
 		
 		-- Owner meditation
@@ -68,6 +71,13 @@ function EroWoW.Character:onEvent(event, ...)
 		end
 	end
 
+	if event == "PLAYER_TARGET_CHANGED" then
+		EroWoW.Character.targetHasEroWoWFrame:Hide();
+		if UnitName("target") then
+			-- Query for the addon
+			EroWoW.Action:useOnTarget("A", "target", true);
+		end
+	end
 	
 	-- Handle combat log
 	if event == "COMBAT_LOG_EVENT" then
@@ -297,6 +307,19 @@ function EroWoW.Character:buildCharacterPortrait()
 		EroWoW.Menu:toggle();
 	end);
 	   
+
+	-- BUILD THE TARGET PORTRAIT --
+	bg = CreateFrame("Button",nil,TargetFrame); --frameType, frameName, frameParent, frameTemplate   
+	bg:SetFrameStrata("HIGH");
+	bg:SetSize(16,16);
+	bg:SetPoint("TOPRIGHT",-88,-10);
+	t = bg:CreateTexture(nil, "BACKGROUND");
+	t:SetTexture("Interface/AddOns/EroWoW/media/icons/heart.blp");
+	t:SetVertexColor(1,0.5,1);
+	t:SetAlpha(0.75);
+	t:SetAllPoints(bg);
+	EroWoW.Character.targetHasEroWoWFrame = bg;
+	bg:Hide();
 
 	--[[
 	t = ol:CreateFontString(nil,"OVERLAY","GameFontNormalSmall")
