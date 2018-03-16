@@ -1,0 +1,18 @@
+## Interface: 70300
+## Title: EroWoW
+## Notes: Adds arousal to WoW!
+## Version: 0.0.1
+
+panel.xml
+
+main.lua
+Settings.lua
+Action.lua
+Character.lua
+Timer.lua
+Callbacks.lua
+json.lua
+Menu.lua
+
+lib_Actions.lua
+
