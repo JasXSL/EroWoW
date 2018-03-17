@@ -171,7 +171,6 @@ end
 
 function EroWoW.Action:resetCooldown()
 
-	print("Resetting cooldown on ", self.id)
 	self.on_cooldown = false;
 	EroWoW.Timer:clear(self.cooldown_timer);
 	self.cooldown_started = 0;

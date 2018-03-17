@@ -16,6 +16,8 @@ Timer.lua
 Callbacks.lua
 json.lua
 Menu.lua
+RPText.lua
 
+lib_RPText.lua
 lib_Actions.lua
 

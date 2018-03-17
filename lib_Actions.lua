@@ -31,10 +31,10 @@ table.insert(EroWoW.Action.LIB, EroWoW.Action:new({
 table.insert(EroWoW.Action.LIB, EroWoW.Action:new({
 	id = "DISROBE",
 	name = "Disrobe",
-	description = "Removes your target's pants.",
+	description = "Removes a piece of armor from your target.",
 	texture = "ability_rogue_plunderarmor",
 	--cooldown = 120,
-	cooldown = 20,
+	cooldown = 10,
 	require_stealth = true,
 	allow_targ_combat = false,
 	party_restricted = true,
@@ -54,21 +54,44 @@ table.insert(EroWoW.Action.LIB, EroWoW.Action:new({
 				self:resetCooldown();
 			else
 				PlaySound(1202, "SFX");
-				EroWoW:reportError(EroWoW:unitRpName(sender) .. " pulled "..Ambiguate(UnitName(target), "all").."'s pants off!");
+				EroWoW:reportError(EroWoW:unitRpName(sender) .. " successfully removed "..Ambiguate(UnitName(target), "all").."'s "..EroWoW:itemSlotToname(data.slot).."!");
 			end
 		end
 	end,
 	-- Handle the receiving end here
 	fn_receive = function(self, sender, target, suppressErrors)
-		if GetInventoryItemID(target, 7) == nil then 
-			return false, {Ambiguate(UnitName("player"), "all") .. " is not wearing pants!"}
+		local all_slots = {
+			1, -- Head
+			3, -- Shoulder
+			4, -- Shirt
+			5, -- Chest
+			6, -- Belt
+			7, -- Pants
+			8, -- Boots
+			10, -- Gloves
+			15, -- Cloak
+			19 -- Tabard
+		}
+		local equipped_slots = {};
+		for k,v in pairs(all_slots) do
+			local item = GetInventoryItemID(target, v)
+			local transmog, _, _, _, _, _, hidden = C_Transmog.GetSlotInfo(v, 0);
+			if item ~= nil and not hidden then
+				table.insert( equipped_slots, v )
+			end
 		end
-		EroWoW:removeEquipped(7);
-		EroWoW:reportError(EroWoW:unitRpName(sender) .. " pulled your pants down!");
+
+		if next(equipped_slots) == nil then
+			return false, {Ambiguate(UnitName("player"), "all") .. " has no strippable slots!"}
+		end
+
+		local slot = equipped_slots[ math.random( #equipped_slots ) ];
+		EroWoW:removeEquipped(slot);
+		EroWoW:reportError(EroWoW:unitRpName(sender) .. " tugged off your "..EroWoW:itemSlotToname(slot).."!");
 		if not UnitIsUnit(sender, "player") then 
 			PlaySound(1202, "SFX");
 		end
-		return true, {}
+		return true, {slot=slot}
 	end
 
 }))
@@ -137,5 +160,39 @@ table.insert(EroWoW.Action.LIB, EroWoW.Action:new({
 		return nil, function(se, success, data) EroWoW.Action:handleArousalCallback(target, success, data) end
 	end,
 	fn_receive = EroWoW.Action.returnArousal
+}));
+
+-- Fondle (Public) --
+table.insert(EroWoW.Action.LIB, EroWoW.Action:new({
+	id = "FONDLE",
+	name = "Fondle",
+	description = "Fondle a player.",
+	texture = "ability_paladin_handoflight",
+	--cooldown = 1.5,
+	cast_sound_success = 57179,
+	allow_instance = true,
+	max_distance = EroWoW.Action.MELEE_RANGE,
+	fn_send = function(self, sender, target, suppressErrors)
+		local text = "Some RP text";
+		-- We only need a callback for this
+		return {text=text}, 
+		function(se, success, data) 
+			if success then
+				print(text)
+			end
+		end
+	end,
+	fn_receive = function(self, sender, target, args)
+
+		if args.text then
+			print("Received text", args.text)
+		end
+		
+		-- Play receiving sound if not self cast
+		if not UnitIsUnit(sender, "player") then 
+			PlaySound(self.cast_sound_success, "SFX");
+		end
+		return true
+	end
 }));
 

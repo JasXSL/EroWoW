@@ -152,14 +152,19 @@ function EroWoW.Character:new(unitid, settings)
 	self.hasControl = true;
 	self.meditating = false;			-- Losing arousal 
 	self.masochism = 0.25;
-
+	
+	-- Use EroWoW.Character:getnSize
+	-- If all these are false, size will be set to 2 for penis/breasts, 0 for vagina. Base on character sex in WoW 
+	self.penis_size = false;				-- False or range between 0 and 4
+	self.vagina_size = false;				-- False or 0
+	self.breast_size = false;				-- False or range between 0 and 4
 
 	
 	-- Build the portrait
 	self:buildCharacterPortrait();
 
 	-- Feature tests
-	self:addArousal(1.1);
+	--self:addArousal(1.1);
 
 	return self
 end
@@ -332,5 +337,46 @@ function EroWoW.Character:buildCharacterPortrait()
 
 end
 
+function EroWoW.Character:isGenderless()
+	if self.penis_size == false and self.vagina_size == false and self.breast_size == false then
+		return true
+	end
+	return false; 
+end
 
+function EroWoW.Character:getPenisSize()
+	
+	if self:isGenderless() then
+		if UnitSex("player") == 2 
+		then return 2
+		else return false end
+	end
+
+	return self.penis_size
+
+end
+
+function EroWoW.Character:getBreastSize()
+	
+	if self:isGenderless() ~= "number" then
+		if UnitSex("player") == 3
+		then return 2
+		else return false end
+	end
+
+	return self.breast_size
+
+end
+
+function EroWoW.Character:getVaginaSize()
+	
+	if self:isGenderless() ~= "number" then
+		if UnitSex("player") == 3
+		then return 0
+		else return false end
+	end
+
+	return self.vagina_size
+
+end
 

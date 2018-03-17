@@ -2,18 +2,22 @@
 	 /console scriptErrors 1
 
 	 TODO:
-	 - Ability favs need to be stored serverside
-	 - Disrobe should remove random piece of clothing
-	 - Add settings
+		 - Fetch playerdata when targeting a player, this needs to be stashed also when using a duration cast
+			 - Genital settings
+		- Write RPText.lua
+		- Integrate RPText into lib_Actions.lua to test Fondle
+
+	 - Add settings toggles
 		 - Masochism: Translate 1% of damage taken into n% arousal (between 1-5)
-		 - Genitals: Should default to player sex
-	 - Store CD data on file
+		 - Genital sliders and checkboxes
 	 - Add in more abilities
 	 - Add pagination if you manage to fill up the whole first page
 	 - Add global settings
 		 - Use VH Connector
 	 - Add VH connector
 	 - Common spell on player tracker (like root tickle etc)
+	 - Alt click = create macro
+	 
 	 
 ]]
 
@@ -27,10 +31,17 @@ local gDefaults = {
 };
 -- LocalStorage defaults
 local lDefaults = {
-	sex = 0,
+	penis_size = false,
+	vagina_size = false,
+	breast_size = false,
 	masochism = 0.1,
 	abilities = {}
 };
+
+-- Constants
+EroWoW.GENITALS_PENIS = 1;
+EroWoW.GENITALS_VAGINA = 2;
+EroWoW.GENITALS_BREASTS = 4;
 
 -- Register main frame
 EroWoW.MAIN = CreateFrame("Frame")
@@ -48,6 +59,11 @@ function EroWoW:ini()
 
 	-- Add character
 	EroWoW.ME = EroWoW.Character:new("player");
+
+	EroWoW.ME.penis_size = EroWoW.LS.penis_size;
+	EroWoW.ME.vagina_size = EroWoW.LS.vagina_size;
+	EroWoW.ME.breast_size = EroWoW.LS.breast_size;
+	EroWoW.ME.masochism = EroWoW.LS.masochism;
 
 	-- Initialize timer and character
 	EroWoW.Timer.ini();
@@ -78,6 +94,9 @@ function EroWoW:onEvent(self, event, prefix, message, channel, sender)
 		
 		if not EroWoWLocalStorage then EroWoWLocalStorage = {} end
 		if not EroWoWGlobalStorage then EroWoWGlobalStorage = {} end
+		-- handy shortcuts
+		EroWoW.LS = EroWoWLocalStorage;
+		EroWoW.GS = EroWoWGlobalStorage;
 
 		-- Loading
 		for k,v in pairs(gDefaults) do
@@ -90,9 +109,7 @@ function EroWoW:onEvent(self, event, prefix, message, channel, sender)
 		-- From here we can initialize
 		EroWoW:ini();
 
-		-- handy shortcuts
-		EroWoW.LS = EroWoWLocalStorage;
-		EroWoW.GS = EroWoWGlobalStorage;
+		
 
 		-- Load in abilities
 		for k,v in pairs(EroWoW.LS.abilities) do
@@ -225,4 +242,19 @@ function EroWoW:Set(list)
 	local set = {}
 	for _, l in ipairs(list) do set[l] = true end
 	return set
+end
+
+function EroWoW:itemSlotToname(slot)
+	local all_slots = {}
+	all_slots[1] = "head armor"
+	all_slots[3] = "shoulder armor"
+	all_slots[4] = "shirt"
+	all_slots[5] = "chestpiece"
+	all_slots[6] = "belt"
+	all_slots[7] = "pants"
+	all_slots[8] = "boots"
+	all_slots[10] = "gloves"
+	all_slots[15] = "cloak"
+	all_slots[19] = "tabard"
+	return all_slots[slot]
 end
