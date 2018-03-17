@@ -33,7 +33,8 @@ table.insert(EroWoW.Action.LIB, EroWoW.Action:new({
 	name = "Disrobe",
 	description = "Removes your target's pants.",
 	texture = "ability_rogue_plunderarmor",
-	cooldown = 120,
+	--cooldown = 120,
+	cooldown = 20,
 	require_stealth = true,
 	allow_targ_combat = false,
 	party_restricted = true,
@@ -82,6 +83,7 @@ table.insert(EroWoW.Action.LIB, EroWoW.Action:new({
 	cooldown = 0,
 	allow_caster_moving = false,
 	allow_targ_combat = false,
+	important = true,
 	-- Handle the receiving end here
 	fn_receive = function(self, sender, target, suppressErrors)
 
@@ -106,6 +108,7 @@ table.insert(EroWoW.Action.LIB, EroWoW.Action:new({
 table.insert(EroWoW.Action.LIB, EroWoW.Action:new({
 	id = "SPOT_AROUSAL",
 	name = "Spot Arousal",
+	important = true,
 	description = "Spot arousal of a nearby player.",
 	texture = "sha_ability_rogue_bloodyeye_nightborne",
 	cooldown = 0,
@@ -135,3 +138,4 @@ table.insert(EroWoW.Action.LIB, EroWoW.Action:new({
 	end,
 	fn_receive = EroWoW.Action.returnArousal
 }));
+

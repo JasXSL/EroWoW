@@ -88,8 +88,9 @@ function EroWoW.Action:new(data)
 
 	-- Custom
 	self.hidden = data.hidden or false;								-- Hides action from action window
-	self.learned = data.learned or true;							-- This spell needs to be learned
-	
+	self.learned = getVar(data.learned, true);						-- This spell needs to be learned
+	self.favorite = data.favorite or false;							-- Gets priority above the rest
+	self.important = data.important or false;						-- Gets priority below favorite
 
 	-- Internal
 	self.on_cooldown = false
@@ -100,22 +101,57 @@ function EroWoW.Action:new(data)
 	return self;
 end
 
--- Methods
-function EroWoW.Action:setCooldown()
 
-	if self.global_cooldown then
+		-- Methods --
+-- Saving & Loading --
+
+function EroWoW.Action:import(data)
+
+	-- Importable args
+	if data.learned ~= nil and not self.learned then self.learned = not not data.learned end
+	if data.favorite ~= nil then self.favorite = not not data.favorite end
+	if data.cooldown_started and data.cooldown_started+self.cooldown > GetTime() then 
+		self:setCooldown(self.cooldown+data.cooldown_started-GetTime(), true);
+		self.cooldown_started = data.cooldown_started;
+	end
+	if data.charges ~= nil then self.charges = data.charges end
+
+end
+
+function EroWoW.Action:export()
+
+	return {
+		id = self.id,
+		learned = self.learned,
+		favorite = self.favorite,
+		cooldown_started = self.cooldown_started
+	};
+
+end
+
+
+
+function EroWoW.Action:setCooldown(overrideTime, ignoreGlobal)
+
+	-- This action is completely excempt from cooldowns
+	if (ignoreGlobal or not self.global_cooldown) and self.cooldown <= 0 then return end
+
+	if self.global_cooldown and not ignoreGlobal then
 		EroWoW.Action:setGlobalCooldown();
 	end
 
+	local cd = self.cooldown;
+	if overrideTime then cd = overrideTime end;
+
 	self:resetCooldown();
-	if self.cooldown > 0 then
+	if cd > 0 then
 		self.on_cooldown = true;
 		self.cooldown_started = GetTime();
-		EroWoW.Timer:set(self.resetCooldown, self.cooldown);
+		EroWoW.Timer:set(function(se)
+			self:resetCooldown();
+		end, cd);
 	end
 	EroWoW.Menu:refreshSpellsPage();
-
-	
 
 
 end
@@ -135,6 +171,7 @@ end
 
 function EroWoW.Action:resetCooldown()
 
+	print("Resetting cooldown on ", self.id)
 	self.on_cooldown = false;
 	EroWoW.Timer:clear(self.cooldown_timer);
 	self.cooldown_started = 0;
@@ -489,8 +526,9 @@ end
 
 function EroWoW.Action:ini()
 
+	EroWoW.Action:libSort()
 	EroWoW.Menu:refreshSpellsPage()
-
+	
 	EroWoW.Action.FRAME_CASTBAR = CreateFrame("StatusBar", "EroWoWCastBar", UIParent, "CastingBarFrameTemplate");
 	local sb = EroWoW.Action.FRAME_CASTBAR;
 	CastingBarFrame_OnLoad(sb, false, false, false);
@@ -501,6 +539,18 @@ function EroWoW.Action:ini()
 
 end
 
+function EroWoW.Action:libSort()
+	table.sort(EroWoW.Action.LIB, function(a,b)
+
+		local aimportance = (a.favorite and 1 or 0)*2+(a.important and 1 or 0);
+		local bimportance = (b.favorite and 1 or 0)*2+(b.important and 1 or 0);
+	
+		if aimportance > bimportance then return true end
+		if aimportance < bimportance then return false end
+		return a.name < b.name;
+	
+	end)	
+end
 
 -- Useful stuff for actions --
 function EroWoW.Action:handleArousalCallback(target, success, data)
@@ -612,7 +662,7 @@ function EroWoW.Action:beginSpellCast(action, target)
 	
 	EroWoW.Action:endSpellCast(false);
 	EroWoW.Action.CASTING_SPELL = action;
-	EroWoW.Action.CASTING_TARGET = target;
+	EroWoW.Action.CASTING_TARGET = Ambiguate( UnitName(target), "all" );
 	EroWoW.Action.CASTING_TIMER = EroWoW.Timer:set(function()
 		EroWoW.Action:endSpellCast(true);
 	end, action.cast_time);

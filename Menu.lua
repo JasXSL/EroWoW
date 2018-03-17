@@ -44,7 +44,13 @@ function EroWoW.Menu:refreshSpellsPage()
 			local f = _G["EroWoWActionButton_"..i]
 
 			f:SetScript("OnMouseUp", function (self, button)
-				EroWoW.Action:useOnTarget(v.id, "target")
+				if IsShiftKeyDown() then
+					v.favorite = not v.favorite;
+					EroWoW.Action:libSort();
+					EroWoW.Menu:refreshSpellsPage()
+				else
+					EroWoW.Action:useOnTarget(v.id, "target")
+				end
 				PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON);
 			end)
 
@@ -54,6 +60,11 @@ function EroWoW.Menu:refreshSpellsPage()
 			local started, duration = v:getCooldown();
 			f.cooldown:SetCooldown(started, duration);
 
+			if v.favorite then 
+				f.star:Show();
+			else
+				f.star:Hide();
+			end
 			-- Generate tooltip
 			f:SetScript("OnEnter", function(self)
 				v:onTooltip(self);
@@ -112,6 +123,16 @@ function EroWoW.Menu:ini()
 			ab:SetSize(50,50);
 			ab.cooldown:SetSwipeTexture('', 0, 0, 0, 0.75)
 			ab:Hide();
+
+			local s = CreateFrame("Frame", nil, ab);
+			ab.star = s;
+			s:SetPoint("TOPLEFT", -5,5);
+			s:SetSize(16,16);
+			local tx = s:CreateTexture(nil, "OVERLAY");
+			tx:SetTexture("Interface/COMMON/ReputationStar");
+			tx:SetTexCoord(0,0.5,0,0.5)
+			tx:SetAllPoints();
+			s:Hide();
 
 		end
 	end

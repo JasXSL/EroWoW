@@ -3,6 +3,9 @@
 ## Notes: Adds arousal to WoW!
 ## Version: 0.0.1
 
+## SavedVariables: EroWoWGlobalStorage
+## SavedVariablesPerCharacter: EroWoWLocalStorage
+
 panel.xml
 
 main.lua

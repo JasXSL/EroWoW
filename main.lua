@@ -2,8 +2,7 @@
 	 /console scriptErrors 1
 
 	 TODO:
-	 - Sort abilities on favorite, priority, name (so rest and detect can have higher priorities)
-	 - Allow ability favorites by shift clicking
+	 - Ability favs need to be stored serverside
 	 - Disrobe should remove random piece of clothing
 	 - Add settings
 		 - Masochism: Translate 1% of damage taken into n% arousal (between 1-5)
@@ -22,10 +21,21 @@ EroWoW = {};
 EroWoW.APP_NAME = "EroWoW"
 EroWoW.ME = nil					-- My character
 EroWoW.PARTY = {};				-- Party characters (TODO)
+-- GlobalStorage defaults
+local gDefaults = {
+	vh = true
+};
+-- LocalStorage defaults
+local lDefaults = {
+	sex = 0,
+	masochism = 0.1,
+	abilities = {}
+};
 
 -- Register main frame
 EroWoW.MAIN = CreateFrame("Frame")
 EroWoW.MAIN:RegisterEvent("ADDON_LOADED");
+EroWoW.MAIN:RegisterEvent("PLAYER_LOGOUT");
 EroWoW.MAIN:RegisterEvent("CHAT_MSG_ADDON")
 EroWoW.MAIN:SetScript("OnEvent", function(self, event, prefix, message, channel, sender)
 	EroWoW:onEvent(self, event, prefix, message, channel, sender)
@@ -65,8 +75,48 @@ function EroWoW:onEvent(self, event, prefix, message, channel, sender)
 
 
 	if event == "ADDON_LOADED" and prefix == EroWoW.APP_NAME then
+		
+		if not EroWoWLocalStorage then EroWoWLocalStorage = {} end
+		if not EroWoWGlobalStorage then EroWoWGlobalStorage = {} end
+
+		-- Loading
+		for k,v in pairs(gDefaults) do
+			if EroWoWGlobalStorage[k] == nil then EroWoWGlobalStorage[k] = v end
+		end
+		for k,v in pairs(lDefaults) do
+			if EroWoWLocalStorage[k] == nil then EroWoWLocalStorage[k] = v end
+		end
+		
+		-- From here we can initialize
 		EroWoW:ini();
-		return
+
+		-- handy shortcuts
+		EroWoW.LS = EroWoWLocalStorage;
+		EroWoW.GS = EroWoWGlobalStorage;
+
+		-- Load in abilities
+		for k,v in pairs(EroWoW.LS.abilities) do
+			local abil = EroWoW.Action:get(v.id)
+			if abil then abil:import(v) end
+		end
+
+		-- Redraw with cooldowns
+		EroWoW.Action:libSort();
+		EroWoW.Menu:refreshSpellsPage();
+
+	end
+
+	if event == "PLAYER_LOGOUT" then
+
+		-- Saving
+		local l = EroWoW.LS;
+		l.abilities = {};
+		for k,v in pairs(EroWoW.Action.LIB) do
+			if not v.hidden then
+				table.insert( l.abilities, v:export() )
+			end
+		end
+		
 	end
 
 	-- Action received
