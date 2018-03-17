@@ -137,10 +137,9 @@ function EroWoW.Menu:ini()
 		end
 	end
 
-	--[[
 	EroWoWSettingsFrame_close:SetScript("OnMouseUp", function (self, button)
 		EroWoW.Menu:toggle();
-	end)]]
+	end)
 
 
 	EroWoWSettingsFrameTab1:SetScript("OnMouseUp", function (self, button)
