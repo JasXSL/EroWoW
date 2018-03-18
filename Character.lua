@@ -355,7 +355,6 @@ end
 function EroWoW.Character:addArousal(amount, set, multiplyMasochism)
 
 	if multiplyMasochism then amount = amount*self.masochism end
-
 	local pre = self.arousal >= 1
 	if not set then
 		self.arousal = self.arousal+tonumber(amount);

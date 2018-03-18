@@ -11,10 +11,10 @@ function EroWoW.RPText:buildLibrary()
 		EroWoW.ME:addArousal(0.3, false, true);
 	end
 	local template_addArousalDefault = function(self)
-		EroWoW.ME:addArousal(0.05, false, true);
+		EroWoW.ME:addArousal(0.1);
 	end
 	local template_addArousalCrit = function(self)
-		EroWoW.ME:addArousal(0.1, false, true);
+		EroWoW.ME:addArousal(0.2);
 	end
 	
 
@@ -162,7 +162,7 @@ function EroWoW.RPText:buildLibrary()
 		}))
 		table.insert(EroWoW.R.rpTexts, EroWoW.RPText:new({
 			id = "SPELL_Entangling Roots",
-			text_receiver = "A vine from the roots slips inside your clothes and wrap around %Tbreasts, squeezing them rigorously!",
+			text_receiver = "A vine from the roots slips inside your clothes and wrap around your %Tbreasts, squeezing them rigorously!",
 			sound = 48289,
 			requirements = {template_condSpellAdd, template_condVictimBreasts},
 			fn = template_addArousalPain

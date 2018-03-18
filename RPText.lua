@@ -69,6 +69,10 @@ function EroWoW.RPText:convertAndReceive(sender, receiver, noSound)
 	local text = EroWoW.RPText:convert(self.text_receiver, sender, receiver);
 	EroWoW.RPText:print(text)
 
+	if type(self.fn) == "function" then
+		self:fn(sender, receiver);
+	end
+
 	if self.sound and not noSound then
 		PlaySound(self.sound, "SFX");
 	end
@@ -146,7 +150,7 @@ function EroWoW.RPText:getSynonym(tag, target, isReceiver)
 	elseif tag == TAG_SUFFIXES.GROIN then
 		return getRandom("groin", "crotch")
 	elseif tag == TAG_SUFFIXES.VAGINA then
-		return getRandom("vagina", "pussy", "cunt", "beaver")
+		return getRandom("vagina", "pussy", "cunt")
 	elseif tag == TAG_SUFFIXES.BREASTS then
 		return getSizeTag(target:getBreastSize())..getRandom("boobs", "tits", "breasts", "knockers")
 	elseif tag == TAG_SUFFIXES.BUTT then

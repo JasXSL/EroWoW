@@ -25,8 +25,8 @@ function EroWoW.SpellBinding:new(data)
 end
 
 -- Runs (and returns if found) an RP text bound to a this spellbinding
-function EroWoW.SpellBinding:runRpText(sender, data)
-	self:getRpText(sender, data, EroWoW.RPText.Req.Types.RTYPE_SPELL_ADD)
+function EroWoW.SpellBinding:runRpText(sender, data, type)
+	local rpText = self:getRpText(sender, data, type)
 	if rpText then
 		rpText:convertAndReceive(sender, EroWoW.ME)
 		return rpText
@@ -59,7 +59,7 @@ end
 
 function EroWoW.SpellBinding:onAdd(sender, data)
 	EroWoW.SpellBinding:runOnThese(data.name, function(self)
-		local rpText = self:runRpText(sender, data);
+		local rpText = self:runRpText(sender, data, EroWoW.RPText.Req.Types.RTYPE_SPELL_ADD);
 		if self.fnOnAdd then
 			self:fnOnAdd(rpText, data);
 		end
@@ -68,7 +68,7 @@ end
 
 function EroWoW.SpellBinding:onTick(sender, data)
 	EroWoW.SpellBinding:runOnThese(data.name, function(self)
-		local rpText = self:runRpText(sender, data);
+		local rpText = self:runRpText(sender, data, EroWoW.RPText.Req.Types.RTYPE_SPELL_TICK);
 		if self.fnOnTick then
 			self:fnOnTick(rpText, data);
 		end
@@ -77,7 +77,7 @@ end
 
 function EroWoW.SpellBinding:onRemove(sender, data)
 	EroWoW.SpellBinding:runOnThese(data.name, function(self)
-		local rpText = self:runRpText(sender, data);
+		local rpText = self:runRpText(sender, data, EroWoW.RPText.Req.Types.RTYPE_SPELL_REM);
 		if self.fnOnRemove then
 			self:fnOnRemove(rpText, data);
 		end
