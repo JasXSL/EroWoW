@@ -102,6 +102,9 @@ function EroWoW.Action:new(data)
 end
 
 
+
+
+
 		-- Methods --
 -- Saving & Loading --
 
@@ -598,11 +601,8 @@ function EroWoW.Action:useOnTarget(id, target, castFinish)
 	end
 
 	-- Self cast actions don't need to send a message
-	if action.self_only then
-		if EroWoW.Action:receive(id, "player", {}, true) then 
-			action:setCooldown();
-		end
-		return
+	if action.self_only or not UnitExists("target") then
+		target = "player"
 	end
 
 	
@@ -622,7 +622,7 @@ function EroWoW.Action:useOnTarget(id, target, castFinish)
 
 	-- Default send logic
 
-
+	EroWoW.CAST_TARGET = EroWoW.TARGET
 	if action.cast_time <= 0 or castFinish then 
 		-- Finish cast
 		action:setCooldown();
@@ -643,7 +643,9 @@ function EroWoW.Action:receive(id, sender, args, allowErrors)
 	if not action then return false end			-- Received Action not found
 
 	-- Received action is invalid
-	if not action:validate(sender, "player", not allowErrors) then return false end
+	if not action:validate(sender, "player", not allowErrors) then 
+		return false 
+	end
 
 	-- Returns (bool)success, (var)data
 	return action:fn_receive(sender, "player", args);
@@ -658,7 +660,6 @@ end
 
 function EroWoW.Action:beginSpellCast(action, target)
 
-	
 	EroWoW.Action:endSpellCast(false);
 	EroWoW.Action.CASTING_SPELL = action;
 	EroWoW.Action.CASTING_TARGET = Ambiguate( UnitName(target), "all" );

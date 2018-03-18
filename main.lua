@@ -1,40 +1,47 @@
 --[[
-	 /console scriptErrors 1
+	/console scriptErrors 1
 
-	 TODO:
-		 - Fetch playerdata when targeting a player, this needs to be stashed also when using a duration cast
-			 - Genital settings
-		- Write RPText.lua
-		- Integrate RPText into lib_Actions.lua to test Fondle
+	TODO:
+	- Genital settings
+	- Is there a way to measure height in WoW?
 
-	 - Add settings toggles
-		 - Masochism: Translate 1% of damage taken into n% arousal (between 1-5)
-		 - Genital sliders and checkboxes
-	 - Add in more abilities
-	 - Add pagination if you manage to fill up the whole first page
-	 - Add global settings
-		 - Use VH Connector
-	 - Add VH connector
-	 - Common spell on player tracker (like root tickle etc)
-	 - Alt click = create macro
+	- Add settings toggles
+		- Masochism: Translate 1% of damage taken into n% arousal (between 1-5)
+		- Genital sliders and checkboxes
+	- Add in more abilities
+	- Add pagination if you manage to fill up the whole first page
+	- Add global settings
+		- Use VH Connector
+	- Add VH connector
+	- Custom text import packages via JSON import
+	- Common spell on player tracker (like root tickle etc)
+	- Alt click = create macro
 	 
 	 
 ]]
 
 EroWoW = {};
 EroWoW.APP_NAME = "EroWoW"
+EroWoW.R = nil					-- Root extension
+
+-- Targets
 EroWoW.ME = nil					-- My character
-EroWoW.PARTY = {};				-- Party characters (TODO)
+EroWoW.TARGET = nil				-- Target character, do not use in actions
+EroWoW.CAST_TARGET = nil		-- Cast target character, use this in actions
+
+
 -- GlobalStorage defaults
 local gDefaults = {
-	vh = true
+	vh = true,
+	swing_text_freq = 0.15,		-- Percent chance of a swing triggering a special text
+	spell_text_freq = 0.3,		-- Percent chance of spell damage triggering a special text
 };
 -- LocalStorage defaults
 local lDefaults = {
 	penis_size = false,
 	vagina_size = false,
 	breast_size = false,
-	masochism = 0.1,
+	masochism = 0.25,			-- Value between 0 and 1
 	abilities = {}
 };
 
@@ -56,9 +63,10 @@ end)
 function EroWoW:ini()
 
 	--EroWoW.Menu.ini();
+	EroWoW.R = EroWoW.Extension:import({id="ROOT"}, true);	-- Build the main extension for assets
 
 	-- Add character
-	EroWoW.ME = EroWoW.Character:new("player");
+	EroWoW.ME = EroWoW.Character:new();
 
 	EroWoW.ME.penis_size = EroWoW.LS.penis_size;
 	EroWoW.ME.vagina_size = EroWoW.LS.vagina_size;
@@ -73,9 +81,15 @@ function EroWoW:ini()
 	-- Action slash command
 	SLASH_EWACT1 = '/ewact'
 	function SlashCmdList.EWACT(msg, editbox) EroWoW.Action:useOnTarget(msg, "target") end
+	SLASH_EWRESET1 = '/ewreset'
+	function SlashCmdList.EWRESET(msg, editbox) EroWoW:resetSettings() end
 
-	-- Build action library
 	EroWoW.Action:ini()
+
+	-- Build libraries
+	EroWoW.RPText:buildLibrary()
+	EroWoW.Action:buildLibrary()
+	EroWoW.Extension:index() -- Update the built libraries
 
 	-- Bind listener
 	RegisterAddonMessagePrefix(EroWoW.APP_NAME.."_act")		-- Sends an action	 {cb:cbToken, id:action_id, data:(var)data}
@@ -84,6 +98,18 @@ function EroWoW:ini()
 
 	print("EroWoW online!");
 end
+
+
+
+-- Reset settings
+function EroWoW:resetSettings()
+	local s = EroWoW.GS;
+	for k,v in pairs(gDefaults) do s[k] = v end
+	s = EroWoW.LS;
+	for k,v in pairs(lDefaults) do s[k] = v end
+	print("Settings reset")
+end
+
 
 	-- Primary event handler --
 	-- Handles addon commands and loading --
@@ -156,9 +182,8 @@ function EroWoW:onEvent(self, event, prefix, message, channel, sender)
 
 			local sname = Ambiguate(sender, "all")
 			local data = EroWoW.json.decode(message);
-
 			local cb = data.cb
-			EroWoW.Callbacks:trigger(cb, data.success, data.data);
+			EroWoW.Callbacks:trigger(cb, data.success, data.data, sender);
 
 		end
 

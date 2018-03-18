@@ -33,11 +33,11 @@ function EroWoW.Callbacks:remove(token)
 	end
 end
 
-function EroWoW.Callbacks:trigger(token, success, args)
+function EroWoW.Callbacks:trigger(token, success, args, sender)
 	for k,v in pairs(EroWoW.Callbacks.WAITING) do
 		if v.id == token then
 			if type(v.callback) == "function" then
-				v:callback(success, args);
+				v:callback(success, args, sender);
 			end
 			EroWoW.Callbacks:remove(token);
 			return;

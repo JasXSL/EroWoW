@@ -4,7 +4,8 @@ EroWoW.Character.__index = EroWoW.Character;
 EroWoW.Character.evtFrame = CreateFrame("Frame");
 EroWoW.Character.eventBindings = {};		-- {id:(int)id, evt:(str)evt, fn:(func)function, numTriggers:(int)numTriggers=inf}
 EroWoW.Character.eventBindingIndex = 0;	
-EroWoW.Character.targetHasEroWoWFrame = nil;
+EroWoW.Character.targetHasEroWoWFrame = nil;	-- Gender display
+EroWoW.Character.portraitArousalBar = false; 	-- Arousal bar frame thing
 
 -- Consts
 EroWoW.Character.AROUSAL_FADE_PER_SEC = 0.05;
@@ -73,7 +74,7 @@ function EroWoW.Character:onEvent(event, ...)
 
 	if event == "PLAYER_TARGET_CHANGED" then
 		EroWoW.Character.targetHasEroWoWFrame:Hide();
-		if UnitName("target") then
+		if UnitExists("target") then
 			-- Query for the addon
 			EroWoW.Action:useOnTarget("A", "target", true);
 		end
@@ -81,21 +82,61 @@ function EroWoW.Character:onEvent(event, ...)
 	
 	-- Handle combat log
 	if event == "COMBAT_LOG_EVENT" then
-		local timestamp, combatEvent, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags =  ...; -- Those arguments appear for all combat event variants.
+		local timestamp, combatEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags =  ...; -- Those arguments appear for all combat event variants.
 		local eventPrefix, eventSuffix = combatEvent:match("^(.-)_?([^_]*)$");
 		if eventSuffix == "DAMAGE" then
 
-			
+			local crit = ""
+			if arguments[18] then crit = "_CRIT" end
+
+
 			local damage = 0
 			if eventPrefix == "SPELL" then
 				damage = arguments[15]
+				print("Spell was", arguments[13])
 			elseif eventPrefix == "SWING" then
 				damage = arguments[12]
+
+				-- See if a viable unit exists
+				local u = false
+				if sourceGUID == UnitGUID("target") then u = "target"
+				elseif sourceGUID == UnitGUID("focus") then u = "focus"
+				elseif sourceGUID == UnitGUID("mouseover") then u = "mouseover"
+				end
+
+				local chance = EroWoW.GS.swing_text_freq;
+				local rand = math.random()
+				if rand < chance and u and not UnitIsPlayer(u) then
+
+					local npc = EroWoW.Character:new({}, sourceName);
+					npc.type = UnitCreatureType(u);
+					--npc.race = UnitRace(u);
+					npc.class = UnitClass(u);
+
+					local sex = UnitSex(u);
+					if sex == 2 then npc.penis_size = 2
+					elseif sex == 3 then 
+						npc.breast_size = 2;
+						npc.vagina_size = 0;
+					end
+
+					local rp = EroWoW.RPText:get(eventPrefix..crit, npc, EroWoW.ME)
+					if rp then 
+						EroWoW.RPText:print(EroWoW.RPText:convert(rp.text_receiver, npc, EroWoW.ME))
+						if rp.sound then
+							PlaySound(rp.sound, "SFX");
+						end
+						if type(rp.fn) == "function" then
+							rp:fn();
+						end
+					end
+
+				end
 			end
 
 			if damage <= 0 then return end
 			local percentage = damage/UnitHealthMax("player");
-			EroWoW.ME:addArousal(percentage*EroWoW.ME.masochism);
+			EroWoW.ME:addArousal(percentage*0.1, false, true);
 			
 
 	   end
@@ -133,12 +174,19 @@ end
 
 
 -- Class declaration
-function EroWoW.Character:new(unitid, settings)
+function EroWoW.Character:new(settings, name)
 	local self = {}
 	setmetatable(self, EroWoW.Character); 
+	if type(settings) ~= "table" then
+		settings = {}
+	end
 	
+	local getVar = function(v, def)
+		if v == nil then return def end
+		return v
+	end
+
 	-- Visuals
-	self.portraitArousalBar = false; -- Arousal bar frame thing
 	self.capFlashTimer = 0			-- Timer event of arousal cap
 	self.capFlashPow = 0
 	self.portraitBorder = false;
@@ -147,18 +195,29 @@ function EroWoW.Character:new(unitid, settings)
 	self.restingPow = 0;
 
 	-- Stats & Conf
-	self.unitID = unitid;
+	self.name = name;					-- Nil for player self
 	self.arousal = 0;
 	self.hasControl = true;
 	self.meditating = false;			-- Losing arousal 
 	self.masochism = 0.25;
 	
+	-- These are automatically set on export if full is set.
+	-- They still need to be fetched from settings though when received by a unit for an RP text
+	self.class = settings.class or UnitClass("player");
+	self.race = settings.race or UnitRace("player");
+
+	-- These are not sent on export, but can be used locally for NPC events
+	self.type = "player";				-- Can be overridden like humanoid etc. 
+	
+	-- 
+
+	-- Importable properties
 	-- Use EroWoW.Character:getnSize
 	-- If all these are false, size will be set to 2 for penis/breasts, 0 for vagina. Base on character sex in WoW 
-	self.penis_size = false;				-- False or range between 0 and 4
-	self.vagina_size = false;				-- False or 0
-	self.breast_size = false;				-- False or range between 0 and 4
-
+	self.penis_size = getVar(settings.penis_size, false);				-- False or range between 0 and 4
+	self.vagina_size = getVar(settings.vagina_size, false);				-- False or 0
+	self.breast_size = getVar(settings.breast_size, false);				-- False or range between 0 and 4
+	self.butt_size = getVar(settings.butt_size, 2);						-- Always a number
 	
 	-- Build the portrait
 	self:buildCharacterPortrait();
@@ -167,6 +226,23 @@ function EroWoW.Character:new(unitid, settings)
 	--self:addArousal(1.1);
 
 	return self
+end
+
+-- Exporting
+function EroWoW.Character:export(full)
+	local out = {
+		arousal = self.arousal,
+		penis_size = self.penis_size,
+		vagina_size = self.vagina_size,
+		breast_size = self.breast_size,
+		butt_size = self.butt_size,
+	};
+	-- Should only be used for "player"
+	if full then
+		out.class = UnitClass("player");
+		out.race = UnitRace("player");
+	end
+	return out;
 end
 
 -- Gets a clamped arousal value
@@ -193,7 +269,9 @@ function EroWoW.Character:onCapChange()
 
 end
 
-function EroWoW.Character:addArousal(amount, set)
+function EroWoW.Character:addArousal(amount, set, multiplyMasochism)
+
+	if multiplyMasochism then amount = amount*self.masochism end
 
 	local pre = self.arousal >= 1
 	if not set then
@@ -230,7 +308,7 @@ end
 
 function EroWoW.Character:updateArousalDisplay()
 
-	self.portraitArousalBar:SetHeight(self.PORTRAIT_FRAME_HEIGHT*max(self:getArousalPerc(), 0.00001));
+	EroWoW.Character.portraitArousalBar:SetHeight(self.PORTRAIT_FRAME_HEIGHT*max(self:getArousalPerc(), 0.00001));
 
 end
 
@@ -270,7 +348,7 @@ function EroWoW.Character:buildCharacterPortrait()
 	t:SetRotation(-math.pi/2);
 	t:SetVertexColor(1,0.75,1)
 	t:AddMaskTexture(mask);
-	self.portraitArousalBar = t;
+	EroWoW.Character.portraitArousalBar = t;
 	self:updateArousalDisplay();
 
 	-- Border
@@ -311,18 +389,20 @@ function EroWoW.Character:buildCharacterPortrait()
 	ol:SetScript("OnClick", function (self, button, down)
 		EroWoW.Menu:toggle();
 	end);
-	   
+	
 
 	-- BUILD THE TARGET PORTRAIT --
 	bg = CreateFrame("Button",nil,TargetFrame); --frameType, frameName, frameParent, frameTemplate   
 	bg:SetFrameStrata("HIGH");
-	bg:SetSize(16,16);
+	bg:SetSize(20,20);
 	bg:SetPoint("TOPRIGHT",-88,-10);
 	t = bg:CreateTexture(nil, "BACKGROUND");
-	t:SetTexture("Interface/AddOns/EroWoW/media/icons/heart.blp");
+	t:SetTexture("Interface/AddOns/EroWoW/media/icons/genders.blp");
 	t:SetVertexColor(1,0.5,1);
+	t:SetTexCoord(0,0.25,0,1);
 	t:SetAlpha(0.75);
 	t:SetAllPoints(bg);
+	bg.genderTexture = t;
 	EroWoW.Character.targetHasEroWoWFrame = bg;
 	bg:Hide();
 
@@ -338,7 +418,7 @@ function EroWoW.Character:buildCharacterPortrait()
 end
 
 function EroWoW.Character:isGenderless()
-	if self.penis_size == false and self.vagina_size == false and self.breast_size == false then
+	if self.penis_size == false and self.vagina_size == false and self.breast_size == false and self.type == "player" then
 		return true
 	end
 	return false; 
@@ -378,5 +458,31 @@ function EroWoW.Character:getVaginaSize()
 
 	return self.vagina_size
 
+end
+
+function EroWoW.Character:getButtSize()
+	
+	if type(self.butt_size) ~= "number" then
+		return 2
+	end
+
+	return self.butt_size
+
+end
+
+-- Returns an Ambiguate name
+function EroWoW.Character:getName()
+	if self.name == nil then
+		return Ambiguate(UnitName("player"), "all") 
+	end
+	return Ambiguate(self.name, "all");
+end
+
+function EroWoW.Character:isMale()
+	return self:getPenisSize() ~= false and self:getBreastSize() == false and self:getVaginaSize() == false
+end
+
+function EroWoW.Character:isFemale()
+	return self:getPenisSize() == false and self:getBreastSize() ~= false and self:getVaginaSize() ~= false
 end
 

@@ -17,6 +17,7 @@ Callbacks.lua
 json.lua
 Menu.lua
 RPText.lua
+Extension.lua
 
 lib_RPText.lua
 lib_Actions.lua
