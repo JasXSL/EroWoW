@@ -181,7 +181,7 @@ function EroWoW.RPText:getSynonym(tag, target, isReceiver)
 end
 
 function EroWoW.RPText:print(text)
-	ChatFrame2:AddMessage(text, 1,0.8,1);
+	ChatFrame1:AddMessage(text, 1,0.8,1);
 	UIErrorsFrame:AddMessage(text, 1, 0.8, 1, 53, 6);
 end
 

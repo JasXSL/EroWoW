@@ -26,6 +26,12 @@ EroWoW.ME = nil					-- My character
 EroWoW.TARGET = nil				-- Target character, do not use in actions
 EroWoW.CAST_TARGET = nil		-- Cast target character, use this in actions
 
+EroWoW.Frames = {}
+EroWoW.Frames.targetHasEroWoWFrame = nil;	-- Gender display
+EroWoW.Frames.portraitArousalBar = false; 	-- Arousal bar frame thing
+EroWoW.Frames.PORTRAIT_FRAME_WIDTH = 19;
+EroWoW.Frames.PORTRAIT_FRAME_HEIGHT = 19;
+EroWoW.Frames.PORTRAIT_PADDING = 7;
 
 -- GlobalStorage defaults
 local gDefaults = {
@@ -69,6 +75,8 @@ function EroWoW:ini()
 	EroWoW.ME.vagina_size = EroWoW.LS.vagina_size;
 	EroWoW.ME.breast_size = EroWoW.LS.breast_size;
 	EroWoW.ME.masochism = EroWoW.LS.masochism;
+
+	EroWoW:buildUnitFrames();
 
 	-- Initialize timer and character
 	EroWoW.Timer.ini();
@@ -280,4 +288,111 @@ function EroWoW:itemSlotToname(slot)
 	all_slots[15] = "cloak"
 	all_slots[19] = "tabard"
 	return all_slots[slot]
+end
+
+
+-- Unit Frames -
+function EroWoW:buildUnitFrames()
+
+	local frameWidth = EroWoW.Frames.PORTRAIT_FRAME_WIDTH;
+	local frameHeight = EroWoW.Frames.PORTRAIT_FRAME_HEIGHT;
+	local padding = EroWoW.Frames.PORTRAIT_PADDING;
+
+	-- Icon
+	local bg = CreateFrame("Button",nil,PlayerFrame); --frameType, frameName, frameParent, frameTemplate   
+	bg:SetFrameStrata("HIGH");
+	bg:SetSize(frameWidth,frameHeight);
+	bg:SetPoint("TOPLEFT",80,-5);
+
+	local mask = bg:CreateMaskTexture()
+	mask:SetTexture("Interface\\CHARACTERFRAME\\TempPortraitAlphaMaskSmall", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
+	mask:SetPoint("CENTER")
+
+	-- Background
+	local t = bg:CreateTexture(nil, "BACKGROUND");
+	t:SetColorTexture(0,0,0,0.5);
+	t:AddMaskTexture(mask)
+	t:SetAllPoints(bg);
+
+
+	-- Status bar
+	local bar = CreateFrame("Frame", nil, bg);
+	bar:SetPoint("TOPLEFT")
+	bar:SetSize(frameWidth,frameHeight)
+
+	t = bar:CreateTexture(nil, "BORDER");
+	t:SetPoint("BOTTOM");
+	t:SetSize(frameWidth,frameHeight);
+	t:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
+	--t:SetHeight(frameHeight*max(self.arousal, 0.00001)); -- Setting to 0 doesn't work
+	t:SetRotation(-math.pi/2);
+	t:SetVertexColor(1,0.75,1)
+	t:AddMaskTexture(mask);
+	EroWoW.Frames.portraitArousalBar = t;
+	EroWoW.ME:updateArousalDisplay();
+
+	-- Border
+
+	local ol = CreateFrame("Button", nil, bar);
+	ol:SetPoint("TOPLEFT", -padding+1, padding-1)
+	ol:SetSize(frameWidth+padding*2,frameHeight+padding*2)
+
+	-- Inner
+	t = ol:CreateTexture(nil, "BACKGROUND");
+	t:SetTexture("Interface/common/portrait-ring-withbg-highlight");
+	t:SetPoint("CENTER", 2);
+	t:SetVertexColor(0.75,1,0.75);
+	t:SetTexCoord(0.3,0.7,0.3,0.7);
+	t:SetAlpha(0);
+	t:SetSize(frameWidth,frameHeight);
+	self.portraitResting = t;
+
+	-- Outer
+	
+	t = ol:CreateTexture(nil, "ARTWORK");
+	t:SetTexture("Interface\\MINIMAP\\MiniMap-TrackingBorder");
+	t:SetTexCoord(0.01,0.61,0,0.6);
+	t:SetPoint("CENTER", 1,4);
+	t:SetAllPoints(ol);
+	self.portraitBorder = t;
+	
+	-- Overlay
+	t = ol:CreateTexture(nil, "HIGHLIGHT");
+	t:SetTexture("Interface/MINIMAP/UI-Minimap-ZoomButton-Highlight");
+	t:SetVertexColor(1,1,0.7);
+	t:SetPoint("CENTER", 0,0);
+	t:SetBlendMode("ADD");
+	t:SetSize(frameWidth+15,frameHeight+15);
+
+	-- Bind events
+	ol:RegisterForClicks("AnyUp");
+	ol:SetScript("OnClick", function (self, button, down)
+		EroWoW.Menu:toggle();
+	end);
+	
+
+	-- BUILD THE TARGET PORTRAIT --
+	bg = CreateFrame("Button",nil,TargetFrame); --frameType, frameName, frameParent, frameTemplate   
+	bg:SetFrameStrata("HIGH");
+	bg:SetSize(20,20);
+	bg:SetPoint("TOPRIGHT",-88,-10);
+	t = bg:CreateTexture(nil, "BACKGROUND");
+	t:SetTexture("Interface/AddOns/EroWoW/media/icons/genders.blp");
+	t:SetVertexColor(1,0.5,1);
+	t:SetTexCoord(0,0.25,0,1);
+	t:SetAlpha(0.75);
+	t:SetAllPoints(bg);
+	bg.genderTexture = t;
+	EroWoW.Frames.targetHasEroWoWFrame = bg;
+	bg:Hide();
+
+	--[[
+	t = ol:CreateFontString(nil,"OVERLAY","GameFontNormalSmall")
+	t:SetAllPoints(ol)
+	t:SetJustifyH("CENTER")
+	t:SetJustifyV("MIDDLE")
+	t:SetTextColor(0.75,0.5,0.75,1)
+	t:SetText(floor(self.arousal*100))
+	]]
+
 end

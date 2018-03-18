@@ -4,18 +4,11 @@ EroWoW.Character.__index = EroWoW.Character;
 EroWoW.Character.evtFrame = CreateFrame("Frame");
 EroWoW.Character.eventBindings = {};		-- {id:(int)id, evt:(str)evt, fn:(func)function, numTriggers:(int)numTriggers=inf}
 EroWoW.Character.eventBindingIndex = 0;	
-EroWoW.Character.targetHasEroWoWFrame = nil;	-- Gender display
-EroWoW.Character.portraitArousalBar = false; 	-- Arousal bar frame thing
 
 -- Consts
 EroWoW.Character.AROUSAL_FADE_PER_SEC = 0.05;
 EroWoW.Character.AROUSAL_MAX = 1.25;				-- You can overshoot max arousal and have to wait longer
 EroWoW.Character.AROUSAL_FADE_IDLE = 0.001;
-
-EroWoW.Character.PORTRAIT_FRAME_WIDTH = 19;
-EroWoW.Character.PORTRAIT_FRAME_HEIGHT = 19;
-EroWoW.Character.PORTRAIT_PADDING = 7;
-
 EroWoW.Character.AURAS = {}
 
 -- Static
@@ -80,7 +73,7 @@ function EroWoW.Character:onEvent(event, ...)
 	end
 
 	if event == "PLAYER_TARGET_CHANGED" then
-		EroWoW.Character.targetHasEroWoWFrame:Hide();
+		EroWoW.Frames.targetHasEroWoWFrame:Hide();
 		if UnitExists("target") then
 			-- Query for the addon
 			EroWoW.Action:useOnTarget("A", "target", true);
@@ -302,9 +295,6 @@ function EroWoW.Character:new(settings, name)
 	self.breast_size = getVar(settings.breast_size, false);				-- False or range between 0 and 4
 	self.butt_size = getVar(settings.butt_size, 2);						-- Always a number
 	
-	-- Build the portrait
-	self:buildCharacterPortrait();
-
 	-- Feature tests
 	--self:addArousal(1.1);
 
@@ -390,114 +380,11 @@ end
 
 function EroWoW.Character:updateArousalDisplay()
 
-	EroWoW.Character.portraitArousalBar:SetHeight(self.PORTRAIT_FRAME_HEIGHT*max(self:getArousalPerc(), 0.00001));
+	EroWoW.Frames.portraitArousalBar:SetHeight(EroWoW.Frames.PORTRAIT_FRAME_HEIGHT*max(self:getArousalPerc(), 0.00001));
 
 end
 
-function EroWoW.Character:buildCharacterPortrait()
 
-	local frameWidth = EroWoW.Character.PORTRAIT_FRAME_WIDTH;
-	local frameHeight = EroWoW.Character.PORTRAIT_FRAME_HEIGHT;
-	local padding = EroWoW.Character.PORTRAIT_PADDING;
-
-	-- Icon
-	local bg = CreateFrame("Button",nil,PlayerFrame); --frameType, frameName, frameParent, frameTemplate   
-	bg:SetFrameStrata("HIGH");
-	bg:SetSize(frameWidth,frameHeight);
-	bg:SetPoint("TOPLEFT",80,-5);
-
-	local mask = bg:CreateMaskTexture()
-	mask:SetTexture("Interface\\CHARACTERFRAME\\TempPortraitAlphaMaskSmall", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
-	mask:SetPoint("CENTER")
-
-	-- Background
-	local t = bg:CreateTexture(nil, "BACKGROUND");
-	t:SetColorTexture(0,0,0,0.5);
-	t:AddMaskTexture(mask)
-	t:SetAllPoints(bg);
-
-
-	-- Status bar
-	local bar = CreateFrame("Frame", nil, bg);
-	bar:SetPoint("TOPLEFT")
-	bar:SetSize(frameWidth,frameHeight)
-
-	t = bar:CreateTexture(nil, "BORDER");
-	t:SetPoint("BOTTOM");
-	t:SetSize(frameWidth,frameHeight);
-	t:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
-	--t:SetHeight(frameHeight*max(self.arousal, 0.00001)); -- Setting to 0 doesn't work
-	t:SetRotation(-math.pi/2);
-	t:SetVertexColor(1,0.75,1)
-	t:AddMaskTexture(mask);
-	EroWoW.Character.portraitArousalBar = t;
-	self:updateArousalDisplay();
-
-	-- Border
-
-	local ol = CreateFrame("Button", nil, bar);
-	ol:SetPoint("TOPLEFT", -padding+1, padding-1)
-	ol:SetSize(frameWidth+padding*2,frameHeight+padding*2)
-
-	-- Inner
-	t = ol:CreateTexture(nil, "BACKGROUND");
-	t:SetTexture("Interface/common/portrait-ring-withbg-highlight");
-	t:SetPoint("CENTER", 2);
-	t:SetVertexColor(0.75,1,0.75);
-	t:SetTexCoord(0.3,0.7,0.3,0.7);
-	t:SetAlpha(0);
-	t:SetSize(frameWidth,frameHeight);
-	self.portraitResting = t;
-
-	-- Outer
-	
-	t = ol:CreateTexture(nil, "ARTWORK");
-	t:SetTexture("Interface\\MINIMAP\\MiniMap-TrackingBorder");
-	t:SetTexCoord(0.01,0.61,0,0.6);
-	t:SetPoint("CENTER", 1,4);
-	t:SetAllPoints(ol);
-	self.portraitBorder = t;
-	
-	-- Overlay
-	t = ol:CreateTexture(nil, "HIGHLIGHT");
-	t:SetTexture("Interface/MINIMAP/UI-Minimap-ZoomButton-Highlight");
-	t:SetVertexColor(1,1,0.7);
-	t:SetPoint("CENTER", 0,0);
-	t:SetBlendMode("ADD");
-	t:SetSize(frameWidth+15,frameHeight+15);
-
-	-- Bind events
-	ol:RegisterForClicks("AnyUp");
-	ol:SetScript("OnClick", function (self, button, down)
-		EroWoW.Menu:toggle();
-	end);
-	
-
-	-- BUILD THE TARGET PORTRAIT --
-	bg = CreateFrame("Button",nil,TargetFrame); --frameType, frameName, frameParent, frameTemplate   
-	bg:SetFrameStrata("HIGH");
-	bg:SetSize(20,20);
-	bg:SetPoint("TOPRIGHT",-88,-10);
-	t = bg:CreateTexture(nil, "BACKGROUND");
-	t:SetTexture("Interface/AddOns/EroWoW/media/icons/genders.blp");
-	t:SetVertexColor(1,0.5,1);
-	t:SetTexCoord(0,0.25,0,1);
-	t:SetAlpha(0.75);
-	t:SetAllPoints(bg);
-	bg.genderTexture = t;
-	EroWoW.Character.targetHasEroWoWFrame = bg;
-	bg:Hide();
-
-	--[[
-	t = ol:CreateFontString(nil,"OVERLAY","GameFontNormalSmall")
-	t:SetAllPoints(ol)
-	t:SetJustifyH("CENTER")
-	t:SetJustifyV("MIDDLE")
-	t:SetTextColor(0.75,0.5,0.75,1)
-	t:SetText(floor(self.arousal*100))
-	]]
-
-end
 
 function EroWoW.Character:isGenderless()
 	if self.penis_size == false and self.vagina_size == false and self.breast_size == false and self.type == "player" then

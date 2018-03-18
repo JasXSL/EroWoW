@@ -68,8 +68,8 @@ function EroWoW.Action:buildLibrary()
 					local offset = 0;
 					if EroWoW.TARGET:isFemale() then offset = 0.25;
 					elseif not EroWoW.TARGET:isMale() then offset = 0.5; end
-					EroWoW.Character.targetHasEroWoWFrame.genderTexture:SetTexCoord(offset,offset+0.25,0,1);
-					EroWoW.Character.targetHasEroWoWFrame:Show();
+					EroWoW.Frames.targetHasEroWoWFrame.genderTexture:SetTexCoord(offset,offset+0.25,0,1);
+					EroWoW.Frames.targetHasEroWoWFrame:Show();
 				end
 			end
 		end,
