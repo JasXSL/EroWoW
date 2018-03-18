@@ -300,9 +300,23 @@ function EroWoW:buildUnitFrames()
 
 	-- Icon
 	local bg = CreateFrame("Button",nil,PlayerFrame); --frameType, frameName, frameParent, frameTemplate   
+	bg:SetMovable(true)
+	bg:RegisterForDrag("LeftButton")
+	bg:SetScript("OnDragStart", bg.StartMoving)
+	bg:SetScript("OnDragStop", bg.StopMovingOrSizing)
+	
+	
+
+	-- Bind events
+	bg:RegisterForClicks("AnyUp");
+	bg:SetScript("OnClick", function (self, button, down)
+		EroWoW.Menu:toggle();
+	end);
+
 	bg:SetFrameStrata("HIGH");
 	bg:SetSize(frameWidth,frameHeight);
 	bg:SetPoint("TOPLEFT",80,-5);
+	
 
 	local mask = bg:CreateMaskTexture()
 	mask:SetTexture("Interface\\CHARACTERFRAME\\TempPortraitAlphaMaskSmall", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
@@ -333,10 +347,9 @@ function EroWoW:buildUnitFrames()
 
 	-- Border
 
-	local ol = CreateFrame("Button", nil, bar);
+	local ol = CreateFrame("Frame", nil, bar);
 	ol:SetPoint("TOPLEFT", -padding+1, padding-1)
 	ol:SetSize(frameWidth+padding*2,frameHeight+padding*2)
-
 	-- Inner
 	t = ol:CreateTexture(nil, "BACKGROUND");
 	t:SetTexture("Interface/common/portrait-ring-withbg-highlight");
@@ -357,22 +370,26 @@ function EroWoW:buildUnitFrames()
 	self.portraitBorder = t;
 	
 	-- Overlay
-	t = ol:CreateTexture(nil, "HIGHLIGHT");
+	t = ol:CreateTexture(nil, "OVERLAY");
 	t:SetTexture("Interface/MINIMAP/UI-Minimap-ZoomButton-Highlight");
 	t:SetVertexColor(1,1,0.7);
 	t:SetPoint("CENTER", 0,0);
 	t:SetBlendMode("ADD");
 	t:SetSize(frameWidth+15,frameHeight+15);
-
-	-- Bind events
-	ol:RegisterForClicks("AnyUp");
-	ol:SetScript("OnClick", function (self, button, down)
-		EroWoW.Menu:toggle();
-	end);
+	t:SetAlpha(0);
+	bg.highlight = t;
+	bg:SetScript("OnEnter", function(self) self.highlight:SetAlpha(1) end)
+	bg:SetScript("OnLeave", function(self) self.highlight:SetAlpha(0) end)
 	
 
 	-- BUILD THE TARGET PORTRAIT --
 	bg = CreateFrame("Button",nil,TargetFrame); --frameType, frameName, frameParent, frameTemplate   
+	bg:SetMovable(true)
+	bg:EnableMouse(true);
+	bg:RegisterForDrag("LeftButton")
+	bg:SetScript("OnDragStart", bg.StartMoving)
+	bg:SetScript("OnDragStop", bg.StopMovingOrSizing)
+
 	bg:SetFrameStrata("HIGH");
 	bg:SetSize(20,20);
 	bg:SetPoint("TOPRIGHT",-88,-10);
@@ -392,7 +409,6 @@ function EroWoW:buildUnitFrames()
 	t:SetJustifyH("CENTER")
 	t:SetJustifyV("MIDDLE")
 	t:SetTextColor(0.75,0.5,0.75,1)
-	t:SetText(floor(self.arousal*100))
-	]]
-
+	t:SetText(floor(EroWoW.ME.arousal*100))
+]]
 end
