@@ -13,13 +13,21 @@ local TAG_SUFFIXES = {
 	PENIS = "penis",
 	VAGINA = "vagina",
 	BREASTS = "breasts",
+	BREAST = "breast",			-- Singular version
 	BUTT = "butt",
+	BUTTCHEEK = "buttcheek", 	-- Singular version
+	RACETAG = "rtag",			-- Fuzzy for worgen and pandas, automatically included in breast(s), butt(cheek)
 	RACE = "race",
 	CLASS = "class",
 	-- These are converted into somewhat applicable pronouns, him->her->their etc 
 	HIM = "him",
 	HIS = "his",
 	HE = "he"
+}
+-- These are generic tags you can use
+local TAG_GENERIC = {
+	LEFTRIGHT = "leftright",			-- Returns left or right
+
 }
 
 -- RPText CLASS
@@ -61,6 +69,10 @@ function EroWoW.RPText:convert(text, sender, receiver)
 		text = string.gsub(text, "%%T"..v, EroWoW.RPText:getSynonym(v, receiver))
 	end
 
+	for k,v in pairs(TAG_GENERIC) do
+		text = string.gsub(text, "%%"..v, EroWoW.RPText:getSynonym(v))
+	end
+	
 	-- Default names must go last because they're subsets
 	text = string.gsub(text, "%%S", sender:getName())
 	text = string.gsub(text, "%%T", receiver:getName())
@@ -134,7 +146,7 @@ function EroWoW.RPText:getSynonym(tag, target, isReceiver)
 		elseif size < 3 then 
 			tags = {}
 		elseif size < 4 then 
-			tags = {"large", "hefty", "big", "impressive"}
+			tags = {"large", "big", "sizeable"}
 		end
 
 		if next(tags) == nil or math.random(2)==1 then 
@@ -144,14 +156,33 @@ function EroWoW.RPText:getSynonym(tag, target, isReceiver)
 		
 	end
 
+	local function getRaceTag()
+		if math.random() < 0.5 then return "" end
+		local tags = {}
+		if string.lower(target.race) == "worgen" or lower(target.race) == "pandaren" then
+			tags = {"fuzzy", "furry"}
+		end
+		if next(tags) then
+			return tags[math.random(#tags)].." "
+		end
+		return "";
+	end
+
 	local getRandom = function(...)
 		local input = {...}
 		return input[math.random(#input)]
 	end
 
+	local name = "";
+	if target then name = target:getName(); end
+	
+	-- Generic tags
+	if tag == TAG_GENERIC.LEFTRIGHT then
+		if math.random() < 0.5 then return "left" end
+		return "right"
+	end
 
-	local name = target:getName();
-
+	-- Specific tags
 	if tag == TAG_SUFFIXES.PENIS then
 		return getSizeTag(target:getPenisSize())..getRandom("penis", "dick", "member", "cock", "manhood")
 	elseif tag == TAG_SUFFIXES.GROIN then
@@ -159,9 +190,15 @@ function EroWoW.RPText:getSynonym(tag, target, isReceiver)
 	elseif tag == TAG_SUFFIXES.VAGINA then
 		return getRandom("vagina", "pussy", "cunt")
 	elseif tag == TAG_SUFFIXES.BREASTS then
-		return getSizeTag(target:getBreastSize())..getRandom("boobs", "tits", "breasts", "knockers")
+		return getSizeTag(target:getBreastSize())..getRaceTag()..getRandom("boobs", "tits", "breasts", "knockers")
+	elseif tag == TAG_SUFFIXES.RACETAG then
+		return getRaceTag()
 	elseif tag == TAG_SUFFIXES.BUTT then
 		return getSizeTag(target:getButtSize())..getRandom("butt", "rear", "rump", "backside", "bottom")
+	elseif tag == TAG_SUFFIXES.BREAST then
+		return getSizeTag(target:getBreastSize())..getRandom("boob", "tit", "breast")
+	elseif tag == TAG_SUFFIXES.BUTTCHEEK then
+		return getSizeTag(target:getButtSize())..getRaceTag().."buttcheek"
 	elseif tag == TAG_SUFFIXES.RACE then
 		return string.lower(target.race)
 	elseif tag == TAG_SUFFIXES.CLASS then
@@ -204,8 +241,9 @@ RTYPE_PENIS_GREATER = "penis_greater",		-- (int)size :: Penis greater than size.
 RTYPE_BREASTS_GREATER = "breasts_greater",	-- (int)size :: Breasts greater than size.
 RTYPE_BUTT_GREATER = "butt_greater",			-- (int)size :: Butt greater than size.
 RTYPE_RACE = "race",							-- {raceEN=true, raceEn=true...} Table of races that are accepted. Example: {Gnome=true, HighmountainTauren=true}
-RTYPE_CLASS = "class",						-- {englishClass=true, englishClass=true...} Table of classes that are accepted. Example: {DEATHKNIGHT=true, MONK=true}
+RTYPE_CLASS = "class",							-- {englishClass=true, englishClass=true...} Table of classes that are accepted. Example: {DEATHKNIGHT=true, MONK=true}
 RTYPE_TYPE = "type",							-- {typeOne=true, typeTwo=true...} For players this is always "player", otherwise refer to the type of NPC, such as "Humanoid"
+RTYPE_NAME = "name",							-- {nameOne=true, nameTwo=true...} Primairly useful for NPCs
 -- The following will only validate from spells received --
 RTYPE_CRIT = "crit",						-- Spell was a critical hit
 RTYPE_DETRIMENTAL = "detrimental",			-- Spell was detrimental
@@ -248,6 +286,8 @@ function EroWoW.RPText.Req:validate(sender, receiver, spelldata, spelltype)
 		out = targ:getVaginaSize() ~= false;
 	elseif t == ty.RTYPE_HAS_BREASTS then 
 		out = targ:getBreastSize() ~= false;
+	elseif t == ty.RTYPE_NAME then
+		out = data[name] == true
 	elseif t == ty.RTYPE_PENIS_GREATER then 
 		out = targ:getPenisSize() ~= false and targ:getPenisSize() > data[1];
 	elseif t == ty.RTYPE_BREASTS_GREATER then 

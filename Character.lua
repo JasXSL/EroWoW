@@ -5,11 +5,16 @@ EroWoW.Character.evtFrame = CreateFrame("Frame");
 EroWoW.Character.eventBindings = {};		-- {id:(int)id, evt:(str)evt, fn:(func)function, numTriggers:(int)numTriggers=inf}
 EroWoW.Character.eventBindingIndex = 0;	
 
+EroWoW.Character.takehitCD = nil			-- Cooldown for takehit texts
+
+
 -- Consts
 EroWoW.Character.AROUSAL_FADE_PER_SEC = 0.05;
 EroWoW.Character.AROUSAL_MAX = 1.25;				-- You can overshoot max arousal and have to wait longer
 EroWoW.Character.AROUSAL_FADE_IDLE = 0.001;
 EroWoW.Character.AURAS = {}
+
+
 
 -- Static
 function EroWoW.Character:ini()
@@ -23,7 +28,8 @@ function EroWoW.Character:ini()
 	EroWoW.Character.evtFrame:RegisterEvent("COMBAT_LOG_EVENT")
 	EroWoW.Character.evtFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
 	EroWoW.Character.evtFrame:RegisterUnitEvent("UNIT_AURA", "player")
-		
+	EroWoW.Character.evtFrame:RegisterEvent("PLAYER_DEAD");
+
 	-- Main timer, ticking once per second
 	EroWoW.Timer:set(function()
 		
@@ -78,6 +84,10 @@ function EroWoW.Character:onEvent(event, ...)
 			-- Query for the addon
 			EroWoW.Action:useOnTarget("A", "target", true);
 		end
+	end
+
+	if event == "PLAYER_DEAD" then
+		EroWoW.ME:addArousal(0, true);
 	end
 	
 	if event == "UNIT_AURA" then
@@ -149,7 +159,7 @@ function EroWoW.Character:onEvent(event, ...)
 		end
 
 		-- These only work for healing or damage
-		if (eventPrefix == "SPELL" or eventPrefix == "SPELL_PERIODIC") and (eventSuffix == "DAMAGE" or eventSuffix=="HEAL") then
+		if not EroWoW.Character.takehitCD and (eventPrefix == "SPELL" or eventPrefix == "SPELL_PERIODIC") and (eventSuffix == "DAMAGE" or eventSuffix=="HEAL") then
 
 			local npc = EroWoW.Character:new({}, sourceName);
 			if u then npc = EroWoW.Character:buildNPC(u, sourceName) end
@@ -182,19 +192,20 @@ function EroWoW.Character:onEvent(event, ...)
 
 			
 			local chance = EroWoW.GS.swing_text_freq;
-			if crit ~= "" then chance = chance*2 end -- Crits have double chance for swing text
+			if crit ~= "" then chance = chance*3 end -- Crits have 3x chance for swing text
 
 			local rand = math.random()
-			if rand < chance and u and not UnitIsPlayer(u) then
+			if not EroWoW.Character.takehitCD and rand < chance and u and not UnitIsPlayer(u) then
 
 				local npc = EroWoW.Character:buildNPC(u, sourceName)
-
 				local rp = EroWoW.RPText:get(eventPrefix..crit, npc, EroWoW.ME)
 				if rp then
+					EroWoW.Character:setTakehitTimer();
 					rp:convertAndReceive(npc, EroWoW.ME)
 				end
 
 			end
+
 			if damage <= 0 then return end
 			local percentage = damage/UnitHealthMax("player");
 			EroWoW.ME:addArousal(percentage*0.1, false, true);
@@ -249,9 +260,19 @@ function EroWoW.Character:buildNPC(u, name)
 end
 
 
+function EroWoW.Character:setTakehitTimer()
+	local rate = EroWoW.GS.takehit_rp_rate;
+	EroWoW.Timer:clear(EroWoW.Character.takehitCD);
+	EroWoW.Character.takehitCD = EroWoW.Timer:set(function()
+		EroWoW.Character.takehitCD = nil;
+	end, rate)
+end
 
 
--- Class declaration
+
+
+
+	-- Class declaration --
 function EroWoW.Character:new(settings, name)
 	local self = {}
 	setmetatable(self, EroWoW.Character); 

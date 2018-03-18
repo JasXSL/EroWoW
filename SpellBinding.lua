@@ -36,6 +36,7 @@ function EroWoW.SpellBinding:runRpText(sender, data, type)
 	local rpText = EroWoW.SpellBinding:getRpText(sender, data, type)
 	if rpText then
 		rpText:convertAndReceive(sender, EroWoW.ME)
+		EroWoW.Character:setTakehitTimer();
 		return rpText
 	end
 end

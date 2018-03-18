@@ -14,4 +14,10 @@ function EroWoW.SpellBinding:buildLibrary()
 
 	
 
+	-- ROGUE --
+	table.insert(R, sb:new({
+		name = "Crimson Vial",
+		procChance = 0.25
+	}))
+
 end
