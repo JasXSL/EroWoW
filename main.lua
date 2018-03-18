@@ -2,19 +2,16 @@
 	/console scriptErrors 1
 
 	TODO:
-	- Genital settings
-	- Is there a way to measure height in WoW?
-
 	- Add settings toggles
 		- Masochism: Translate 1% of damage taken into n% arousal (between 1-5)
 		- Genital sliders and checkboxes
+	- Common spell on player tracker (like root tickle etc) (get a hold of a druid)
 	- Add in more abilities
 	- Add pagination if you manage to fill up the whole first page
 	- Add global settings
 		- Use VH Connector
 	- Add VH connector
 	- Custom text import packages via JSON import
-	- Common spell on player tracker (like root tickle etc)
 	- Alt click = create macro
 	 
 	 

@@ -91,9 +91,13 @@ function EroWoW.Character:onEvent(event, ...)
 
 
 			local damage = 0
-			if eventPrefix == "SPELL" then
+			if eventPrefix == "SPELL" or eventPrefix == "SPELL_PERIODIC" then
+
+				-- Todo: Add spell triggers
 				damage = arguments[15]
 				print("Spell was", arguments[13])
+
+
 			elseif eventPrefix == "SWING" then
 				damage = arguments[12]
 
