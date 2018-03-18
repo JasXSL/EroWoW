@@ -1,5 +1,5 @@
 EroWoW.Menu = {}
-EroWoW.Menu.open = true -- Set to false when done debugging. Setting to false by default will have it visible by default
+EroWoW.Menu.open = false -- Set to false when done debugging. Setting to false by default will have it visible by default
 EroWoW.Menu.FRAME = false
 
 -- Action page
@@ -106,12 +106,15 @@ function EroWoW.Menu:ini()
 	f:SetScript("OnDragStop", f.StopMovingOrSizing)
 
 	PanelTemplates_SetNumTabs(f, 2);
-    PanelTemplates_SetTab(f, 1);
+	PanelTemplates_SetTab(f, 1);
+	--EroWoWSettingsFrame_page_settings:Show();
+	--EroWoWSettingsFrame_page_actions:Hide();
 
 	if not EroWoW.Menu.open then
 		f:Hide();
 	end
 
+	-- Build actions page
 	f = EroWoWSettingsFrame_page_actions;
 	for row=0,BUTTON_ROWS-1 do
 		for col=0,BUTTON_COLS-1 do
@@ -137,6 +140,142 @@ function EroWoW.Menu:ini()
 		end
 	end
 
+
+
+	-- Build settings frame --
+	f = EroWoWSettingsFrame_page_settings;
+
+	local psize = EroWoW.ME:getPenisSize();
+	local tsize = EroWoW.ME:getBreastSize();
+	local bsize = EroWoW.ME:getButtSize();
+	local vsize = EroWoW.ME:getVaginaSize();
+	
+	if psize == false then psize = -1 end
+	if tsize == false then tsize = -1 end
+	if vsize == false then vsize = -1 end
+	psize = psize+1;
+	tsize = tsize+1;
+	vsize = vsize+1;
+	
+	local top = -50;
+	local spacing = -40;
+
+	-- Masochism slider
+	local item = 0
+	local sl = CreateFrame("Slider", "EroWoWSettingsFrame_page_settings_masochism", f, "OptionsSliderTemplate")
+	sl:SetWidth(200)
+	sl:SetHeight(20)
+	sl:SetPoint("TOP", 0, -50);
+	sl:SetOrientation('HORIZONTAL')
+	sl.tooltipText = "Affects amount of arousal you gain from taking hits or masochistic actions and spells.";
+	getglobal(sl:GetName()..'Low'):SetText('0');
+	getglobal(sl:GetName()..'High'):SetText('100');
+	getglobal(sl:GetName()..'Text'):SetText('Masochism');
+	sl:SetMinMaxValues(0, 100)
+	sl:SetValue(math.floor(EroWoW.ME.masochism*100))
+	sl:SetValueStep(1)
+	sl:SetObeyStepOnDrag(true)
+	sl:Show();
+	sl:SetScript("OnValueChanged", function(self,arg1) 
+		EroWoW.ME.masochism = arg1/100;
+		EroWoW.LS.masochism = EroWoW.ME.masochism;
+	end)
+
+	-- Penis size slider
+	item = item+1
+	sl = CreateFrame("Slider", "EroWoWSettingsFrame_page_settings_penis_size", f, "OptionsSliderTemplate")
+	sl:SetWidth(200)
+	sl:SetHeight(20)
+	sl:SetPoint("TOP", 0, top+spacing*item);
+	sl:SetOrientation('HORIZONTAL')
+	sl.tooltipText = "How well endowed is your character?";
+	getglobal(sl:GetName()..'Text'):SetText('Penis Size');
+	getglobal(sl:GetName()..'Low'):SetText('Off');
+	getglobal(sl:GetName()..'High'):SetText('Huge');
+	sl:SetMinMaxValues(0, 5)
+	sl:SetValueStep(1)
+	sl:SetValue(psize)
+	sl:SetObeyStepOnDrag(true)
+	sl:Show();
+	sl:SetScript("OnValueChanged", function(self,arg1) 
+		arg1 = arg1-1;
+		if arg1 == -1 then arg1 = false end
+		EroWoW.ME.penis_size = arg1;
+		EroWoW.LS.penis_size = EroWoW.ME.penis_size;
+	end)
+
+	-- Breast size slider
+	item = item+1
+	sl = CreateFrame("Slider", "EroWoWSettingsFrame_page_settings_breast_size", f, "OptionsSliderTemplate")
+	sl:SetWidth(200)
+	sl:SetHeight(20)
+	sl:SetPoint("TOP", 0, top+spacing*item);
+	sl:SetOrientation('HORIZONTAL')
+	sl.tooltipText = "How large are your breasts?";
+	getglobal(sl:GetName()..'Text'):SetText('Breast Size');
+	getglobal(sl:GetName()..'Low'):SetText('Off');
+	getglobal(sl:GetName()..'High'):SetText('Huge');
+	sl:SetMinMaxValues(0, 5)
+	sl:SetValueStep(1)
+	sl:SetValue(tsize)
+	sl:SetObeyStepOnDrag(true)
+	sl:Show();
+	sl:SetScript("OnValueChanged", function(self,arg1) 
+		arg1 = arg1-1;
+		if arg1 == -1 then arg1 = false end
+		EroWoW.ME.breast_size = arg1;
+		EroWoW.LS.breast_size = EroWoW.ME.breast_size;
+	end)
+
+	-- Butt size
+	item = item+1
+	sl = CreateFrame("Slider", "EroWoWSettingsFrame_page_settings_butt_size", f, "OptionsSliderTemplate")
+	sl:SetWidth(200)
+	sl:SetHeight(20)
+	sl:SetPoint("TOP", 0, top+spacing*item);
+	sl:SetOrientation('HORIZONTAL')
+	sl.tooltipText = "How large is your butt?";
+	getglobal(sl:GetName()..'Text'):SetText('Butt Size');
+	getglobal(sl:GetName()..'Low'):SetText('Tiny');
+	getglobal(sl:GetName()..'High'):SetText('Huge');
+	sl:SetMinMaxValues(0, 4)
+	sl:SetValueStep(1)
+	sl:SetValue(bsize)
+	sl:SetObeyStepOnDrag(true)
+	sl:Show();
+	sl:SetScript("OnValueChanged", function(self,arg1) 
+		EroWoW.ME.butt_size = arg1;
+		EroWoW.LS.butt_size = EroWoW.ME.butt_size;
+	end)
+
+	-- Toggle vagina
+	item = item+1
+	sl = CreateFrame("Slider", "EroWoWSettingsFrame_page_settings_vagina_size", f, "OptionsSliderTemplate")
+	sl:SetWidth(60)
+	sl:SetHeight(20)
+	sl:SetPoint("TOP", 0, top+spacing*item);
+	sl:SetOrientation('HORIZONTAL')
+	sl.tooltipText = "Vagina";
+	getglobal(sl:GetName()..'Text'):SetText('Toggle character vagina');
+	getglobal(sl:GetName()..'Low'):SetText('Off');
+	getglobal(sl:GetName()..'High'):SetText('On');
+	sl:SetMinMaxValues(0, 1)
+	sl:SetValueStep(1)
+	sl:SetValue(vsize)
+	sl:SetObeyStepOnDrag(true)
+	sl:Show();
+	sl:SetScript("OnValueChanged", function(self,arg1) 
+		arg1 = arg1-1;
+		if arg1 == -1 then arg1 = false end
+		EroWoW.ME.vagina_size = arg1;
+		EroWoW.LS.vagina_size = EroWoW.ME.vagina_size;
+	end)
+
+	
+
+	
+
+	-- Bind events
 	EroWoWSettingsFrame_close:SetScript("OnMouseUp", function (self, button)
 		EroWoW.Menu:toggle();
 	end)

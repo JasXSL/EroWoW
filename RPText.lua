@@ -27,12 +27,18 @@ function EroWoW.RPText:new(data)
 	local self = {}
 	setmetatable(self, EroWoW.RPText);
 
-	self.id = data.id or "";			-- Generally matches an Action ID
+	self.id = data.id or "";			-- Generally matches an Action ID. Gets converted into a table with {id = true}
 	self.text_sender = data.text_sender or false; 		-- RP Text
 	self.text_receiver = data.text_receiver or ""; 		-- RP Text
 	self.requirements = type(data.requirements) == "table" and data.requirements or {};
 	self.sound = data.sound;					-- Play this sound when sending or receiving this
 	self.fn = data.fn or nil;					-- Only supported for NPC/Spell events. Actions should use the action system instead
+
+	if type(self.id) ~= "table" and self.id ~= "" then
+		local id = {};
+		id[self.id] = true;
+		self.id = id;
+	end
 
 	return self
 end
@@ -92,7 +98,7 @@ function EroWoW.RPText:get(id, sender, receiver, spelldata, spellType)
 	for k,v in pairs(EroWoW.RPText.Lib) do
 		--print(v.id, id, v:validate(sender, receiver), v.text_sender)
 		if
-			v.id == id and v:validate(sender, receiver, spelldata, spellType) and 
+			v.id[id] and v:validate(sender, receiver, spelldata, spellType) and 
 			(
 				(not v.text_sender and isSelfCast) or
 				((v.text_sender or sender.type ~= "player") and not isSelfCast) -- NPC spells don't have text_sender, so they need to be put here
@@ -142,6 +148,7 @@ function EroWoW.RPText:getSynonym(tag, target, isReceiver)
 		local input = {...}
 		return input[math.random(#input)]
 	end
+
 
 	local name = target:getName();
 

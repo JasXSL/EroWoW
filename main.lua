@@ -2,16 +2,14 @@
 	/console scriptErrors 1
 
 	TODO:
-	- Add settings toggles
-		- Masochism: Translate 1% of damage taken into n% arousal (between 1-5)
-		- Genital sliders and checkboxes
-	- Common spell on player tracker (like root tickle etc) (get a hold of a druid)
-	- Add in more abilities
+	- Add in more abilities & Spell triggers
 	- Add pagination if you manage to fill up the whole first page
 	- Add global settings
-		- Use VH Connector
-	- Add VH connector
-	- Custom text import packages via JSON import
+		- Allow non-party members
+		- Allow in instances
+		- Allow changing swing text and spell text frequency
+	- Write VH Addon
+	- Extension imports via strings
 	- Alt click = create macro
 	 
 	 
@@ -44,8 +42,10 @@ local lDefaults = {
 	penis_size = false,
 	vagina_size = false,
 	breast_size = false,
+	butt_size = 2,
 	masochism = 0.25,			-- Value between 0 and 1
-	abilities = {}
+	abilities = {},
+	arousal = 0
 };
 
 -- Constants
@@ -74,7 +74,10 @@ function EroWoW:ini()
 	EroWoW.ME.penis_size = EroWoW.LS.penis_size;
 	EroWoW.ME.vagina_size = EroWoW.LS.vagina_size;
 	EroWoW.ME.breast_size = EroWoW.LS.breast_size;
+	EroWoW.ME.butt_size = EroWoW.LS.butt_size;
 	EroWoW.ME.masochism = EroWoW.LS.masochism;
+	EroWoW.ME.arousal = EroWoW.LS.arousal;
+	
 
 	EroWoW:buildUnitFrames();
 
@@ -159,6 +162,9 @@ function EroWoW:onEvent(self, event, prefix, message, channel, sender)
 
 		-- Saving
 		local l = EroWoW.LS;
+
+		l.arousal = EroWoW.ME.arousal;
+
 		l.abilities = {};
 		for k,v in pairs(EroWoW.Action.LIB) do
 			if not v.hidden then

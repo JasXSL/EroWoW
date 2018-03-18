@@ -99,21 +99,6 @@
 				   <Anchor point="TOPLEFT"/>
 				   <Anchor point="BOTTOMRIGHT"/>
 			   </Anchors>
-			   <Layers>
-				   <Layer level="ARTWORK">
-					   <FontString inherits="GameFontNormal" text="My Frame 2">
-						   <Anchors>
-							   <Anchor point="TOPLEFT" relativeTo="$parent">
-								   <Offset>
-									   <AbsDimension x="20" y="-30"/>
-								   </Offset>
-							   </Anchor>
-						   </Anchors>
-					   </FontString>
-				   </Layer>
-			   </Layers>
-			   <Frames>
-			   </Frames> 
 		   </Frame>
 		   <Button name="$parentTab1" inherits="CharacterFrameTabButtonTemplate" id="1" text="Actions">
 			   <Anchors>

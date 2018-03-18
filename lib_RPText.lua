@@ -25,6 +25,13 @@ function EroWoW.RPText:buildLibrary()
 		sender = true,
 		data = {Humanoid = true}
 	})
+	-- Includes other viable humanoid types like undeads
+	local template_condAttackerHumanoidish = req:new({
+		type = ty.RTYPE_TYPE,
+		sender = true,
+		data = {Humanoid = true, Undead = true}
+	})
+	
 	local template_condVictimBreasts = req:new({type = ty.RTYPE_HAS_BREASTS})
 	local template_condVictimPenis = req:new({type = ty.RTYPE_HAS_PENIS})
 	local template_condVictimVagina = req:new({type = ty.RTYPE_HAS_VAGINA})
@@ -89,21 +96,22 @@ function EroWoW.RPText:buildLibrary()
 
 
 -- MELEE SWINGS --
-	-- HUMANOID --
+	-- HUMANOIDISH --
+		-- Groin smack --
 		table.insert(EroWoW.R.rpTexts, EroWoW.RPText:new({
 			id = "SWING",
-			text_receiver = "%S attack smacked across your %Tgroin!",
+			text_receiver = "%S smackedyour %Tgroin!",
 			sound = 37472,
-			requirements = {template_condAttackerHumanoid},
+			requirements = {template_condAttackerHumanoidish},
 			-- FN is currently only supported for NPC actions. PC->PC actions should use the Action system instead
 			fn = template_addArousalMasochisticDefault
 		}))
-
+		-- Swing --
 		table.insert(EroWoW.R.rpTexts, EroWoW.RPText:new({
 			id = "SWING",
-			text_receiver = "%S attack smacked across your %Tbreasts!",
+			text_receiver = "%S smacked your %Tbreasts!",
 			sound = 37472,
-			requirements = {template_condAttackerHumanoid, template_condVictimBreasts},
+			requirements = {template_condAttackerHumanoidish, template_condVictimBreasts},
 			-- FN is currently only supported for NPC actions. PC->PC actions should use the Action system instead
 			fn = template_addArousalMasochisticDefault
 		}))
@@ -114,18 +122,18 @@ function EroWoW.RPText:buildLibrary()
 	-- HUMANOID CRIT --
 		table.insert(EroWoW.R.rpTexts, EroWoW.RPText:new({
 			id = "SWING_CRIT",
-			text_receiver = "%S's attack hit you straight in the %Tgroin!",
+			text_receiver = "%S's attack smacks flat across your %Tgroin!",
 			sound = 37472,
-			requirements = {template_condAttackerHumanoid},
+			requirements = {template_condAttackerHumanoidish},
 			-- FN is currently only supported for NPC actions. PC->PC actions should use the Action system instead
 			fn = template_addArousalMasochisticCrit
 		}))
 
 		table.insert(EroWoW.R.rpTexts, EroWoW.RPText:new({
 			id = "SWING_CRIT",
-			text_receiver = "%S's attack hit you straight across your %Tbreasts!",
+			text_receiver = "%S's attack smacks flat across your %Tbreasts!",
 			sound = 37472,
-			requirements = {template_condAttackerHumanoid, template_condVictimBreasts},
+			requirements = {template_condAttackerHumanoidish, template_condVictimBreasts},
 			-- FN is currently only supported for NPC actions. PC->PC actions should use the Action system instead
 			fn = template_addArousalMasochisticCrit
 		}))
@@ -168,6 +176,16 @@ function EroWoW.RPText:buildLibrary()
 			fn = template_addArousalPain
 		}))
 		
+		-- Ice spells -
+		local iceSpells = {SPELL_Chilled=true, SPELL_Frostbolt=true}
+		table.insert(EroWoW.R.rpTexts, EroWoW.RPText:new({
+			id = iceSpells,
+			text_receiver = "The cold spell causes your nipples to harden!",
+			--sound = 48289,
+			requirements = {template_condSpellAdd, template_condVictimBreasts},
+			fn = template_addArousalPain
+		}))
+
 
 
 end

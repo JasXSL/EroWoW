@@ -7,6 +7,10 @@ function EroWoW.SpellBinding:buildLibrary()
 		name = "Entangling Roots",
 		procChance = 1
 	}))
+	table.insert(R, sb:new({
+		name = {Chilled = true, Frostbolt = true},
+		procChance = 1
+	}))
 
 	
 

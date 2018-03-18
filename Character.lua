@@ -100,7 +100,9 @@ function EroWoW.Character:onEvent(event, ...)
 			local aura = buildSpellTrigger(spellId, name, harmful, unitCaster, count)
 			table.insert(active, aura)
 			if not auraExists(EroWoW.Character.AURAS, aura) then
-				EroWoW.SpellBinding:onAdd(EroWoW.Character:buildNPC(unitCaster, UnitName(unitCaster)), aura)
+				local uc = unitCaster;
+				if not uc then uc = "??" else uc = UnitName(unitCaster) end
+				EroWoW.SpellBinding:onAdd(EroWoW.Character:buildNPC(unitCaster, uc), aura)
 			end
 
 		end
@@ -123,7 +125,9 @@ function EroWoW.Character:onEvent(event, ...)
 		-- See what auras were removed
 		for i,a in pairs(EroWoW.Character.AURAS) do
 			if not auraExists(active, a) then
-				EroWoW.SpellBinding:onRemove(EroWoW.Character:buildNPC(a.unitCaster, UnitName(a.unitCaster)), a)
+				local uc = unitCaster;
+				if not uc then uc = "??" else uc = UnitName(unitCaster) end
+				EroWoW.SpellBinding:onRemove(EroWoW.Character:buildNPC(a.unitCaster, uc), a)
 			end
 		end
 
@@ -178,20 +182,16 @@ function EroWoW.Character:onEvent(event, ...)
 
 			
 			local chance = EroWoW.GS.swing_text_freq;
+			if crit ~= "" then chance = chance*2 end -- Crits have double chance for swing text
+
 			local rand = math.random()
 			if rand < chance and u and not UnitIsPlayer(u) then
 
 				local npc = EroWoW.Character:buildNPC(u, sourceName)
 
 				local rp = EroWoW.RPText:get(eventPrefix..crit, npc, EroWoW.ME)
-				if rp then 
-					EroWoW.RPText:print(EroWoW.RPText:convert(rp.text_receiver, npc, EroWoW.ME))
-					if rp.sound then
-						PlaySound(rp.sound, "SFX");
-					end
-					if type(rp.fn) == "function" then
-						rp:fn();
-					end
+				if rp then
+					rp:convertAndReceive(npc, EroWoW.ME)
 				end
 
 			end
@@ -232,12 +232,14 @@ end
 -- Builds an NPC from a unit
 function EroWoW.Character:buildNPC(u, name)
 
+	if not name then name = "???" end
 	local npc = EroWoW.Character:new({}, name);
-	npc.type = UnitCreatureType(u);
+	if not u then u = "???" end
+	npc.type = UnitCreatureType(u) or "???";
 	--npc.race = UnitRace(u);
-	npc.class = UnitClass(u);
+	npc.class = UnitClass(u) or "???";
 
-	local sex = UnitSex(u);
+	local sex = UnitSex(u) or 0;
 	if sex == 2 then npc.penis_size = 2
 	elseif sex == 3 then 
 		npc.breast_size = 2;
@@ -387,7 +389,7 @@ end
 
 
 function EroWoW.Character:isGenderless()
-	if self.penis_size == false and self.vagina_size == false and self.breast_size == false and self.type == "player" then
+	if self.penis_size == false and self.vagina_size == false and self.type == "player" then
 		return true
 	end
 	return false; 
@@ -407,7 +409,7 @@ end
 
 function EroWoW.Character:getBreastSize()
 	
-	if self:isGenderless() ~= "number" then
+	if self:isGenderless() and not self.breast_size then
 		if UnitSex("player") == 3
 		then return 2
 		else return false end
@@ -419,7 +421,7 @@ end
 
 function EroWoW.Character:getVaginaSize()
 	
-	if self:isGenderless() ~= "number" then
+	if self:isGenderless() then
 		if UnitSex("player") == 3
 		then return 0
 		else return false end
