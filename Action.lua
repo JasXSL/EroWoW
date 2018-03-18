@@ -627,7 +627,9 @@ function EroWoW.Action:useOnTarget(id, target, castFinish)
 		-- Finish cast
 		action:setCooldown();
 		-- Send to target
-		EroWoW:sendAction(UnitName(target), action.id, args, callback)
+		local first,last = UnitName(target)
+		if last then first = first.."-"..last end
+		EroWoW:sendAction(Ambiguate(first, "all"), action.id, args, callback)
 	else 
 		-- Start cast
 		EroWoW.Action:beginSpellCast(action, target);

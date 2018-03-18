@@ -16,6 +16,7 @@ EroWoW.Character.PORTRAIT_FRAME_WIDTH = 19;
 EroWoW.Character.PORTRAIT_FRAME_HEIGHT = 19;
 EroWoW.Character.PORTRAIT_PADDING = 7;
 
+EroWoW.Character.AURAS = {}
 
 -- Static
 function EroWoW.Character:ini()
@@ -23,12 +24,12 @@ function EroWoW.Character:ini()
 	EroWoW.Character.evtFrame:SetScript("OnEvent", EroWoW.Character.onEvent)
 	EroWoW.Character.evtFrame:RegisterEvent("PLAYER_STARTED_MOVING")
 	EroWoW.Character.evtFrame:RegisterEvent("PLAYER_STOPPED_MOVING")
-	EroWoW.Character.evtFrame:RegisterEvent("UNIT_SPELLCAST_START");
-	EroWoW.Character.evtFrame:RegisterEvent("UNIT_SPELLCAST_SENT");
+	EroWoW.Character.evtFrame:RegisterUnitEvent("UNIT_SPELLCAST_START", "player");
+	EroWoW.Character.evtFrame:RegisterUnitEvent("UNIT_SPELLCAST_SENT", "player");
 	EroWoW.Character.evtFrame:RegisterEvent("SOUNDKIT_FINISHED");
 	EroWoW.Character.evtFrame:RegisterEvent("COMBAT_LOG_EVENT")
 	EroWoW.Character.evtFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
-	
+	EroWoW.Character.evtFrame:RegisterUnitEvent("UNIT_AURA", "player")
 		
 	-- Main timer, ticking once per second
 	EroWoW.Timer:set(function()
@@ -51,6 +52,12 @@ end
 function EroWoW.Character:onEvent(event, ...)
 
 	local arguments = {...}
+
+	-- Builds data for a spell trigger
+	local function buildSpellTrigger(spellId, name, harmful, unitCaster, count, crit)
+		return { spellId = spellId, name=name, harmful=harmful, unitCaster=unitCaster, count=count, crit=crit}
+	end
+
 
 	for k,v in pairs(EroWoW.Character.eventBindings) do
 
@@ -80,64 +87,121 @@ function EroWoW.Character:onEvent(event, ...)
 		end
 	end
 	
+	if event == "UNIT_AURA" then
+
+		local unit = ...;
+		if unit ~= "player" then return end
+		local active = {} -- spellID = {name=name, count=count}
+
+		local function auraExists(tb, aura)
+			for i,a in pairs(tb) do
+				if a.spellId == aura.spellId and a.unitCaster == aura.unitCaster and a.harmful == aura.harmful then
+					return true;
+				end
+			end
+			return false
+		end
+		
+		local function addAura(spellId, name, harmful, unitCaster, count)
+
+			local aura = buildSpellTrigger(spellId, name, harmful, unitCaster, count)
+			table.insert(active, aura)
+			if not auraExists(EroWoW.Character.AURAS, aura) then
+				EroWoW.SpellBinding:onAdd(EroWoW.Character:buildNPC(unitCaster, UnitName(unitCaster)), aura)
+			end
+
+		end
+
+		
+
+		-- Read all buffs
+		for i=1,40 do 
+			local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId = UnitAura(unit, i)
+			if name == nil then break end
+			addAura(spellId, name, false, unitCaster, count)
+		end
+		-- Read all debuffs
+		for i=1,40 do 
+			local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId = UnitAura(unit, i, "HARMFUL")
+			if name == nil then break end
+			addAura(spellId, name, true, unitCaster, count)
+		end
+
+		-- See what auras were removed
+		for i,a in pairs(EroWoW.Character.AURAS) do
+			if not auraExists(active, a) then
+				EroWoW.SpellBinding:onRemove(EroWoW.Character:buildNPC(a.unitCaster, UnitName(a.unitCaster)), a)
+			end
+		end
+
+		EroWoW.Character.AURAS = active
+
+	end
+
 	-- Handle combat log
 	if event == "COMBAT_LOG_EVENT" then
 		local timestamp, combatEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags =  ...; -- Those arguments appear for all combat event variants.
 		local eventPrefix, eventSuffix = combatEvent:match("^(.-)_?([^_]*)$");
-		if eventSuffix == "DAMAGE" then
+
+		-- See if a viable unit exists
+		local u = false
+		if sourceGUID == UnitGUID("target") then u = "target"
+		elseif sourceGUID == UnitGUID("focus") then u = "focus"
+		elseif sourceGUID == UnitGUID("mouseover") then u = "mouseover"
+		elseif sourceGUID == UnitGUID("player") then u = "player"
+		end
+
+		-- These only work for healing or damage
+		if (eventPrefix == "SPELL" or eventPrefix == "SPELL_PERIODIC") and (eventSuffix == "DAMAGE" or eventSuffix=="HEAL") then
+
+			local npc = EroWoW.Character:new({}, sourceName);
+			if u then npc = EroWoW.Character:buildNPC(u, sourceName) end
+
+			-- Todo: Add spell triggers
+			damage = arguments[15]
+			local harmful = true
+			if eventSuffix ~= "DAMAGE" then harmful = false end
+
+			local trig = buildSpellTrigger(
+				arguments[12], -- Spell ID
+				arguments[13], --Spell Name
+				harmful, 
+				sourceName, 
+				1,
+				arguments[21] -- Crit
+			)
+			EroWoW.SpellBinding:onTick(npc, trig)
+
+		elseif eventSuffix == "DAMAGE" and eventPrefix == "SWING" then
 
 			local crit = ""
 			if arguments[18] then crit = "_CRIT" end
 
 
 			local damage = 0
-			if eventPrefix == "SPELL" or eventPrefix == "SPELL_PERIODIC" then
+			
 
-				-- Todo: Add spell triggers
-				damage = arguments[15]
-				print("Spell was", arguments[13])
+			damage = arguments[12]
 
+			
+			local chance = EroWoW.GS.swing_text_freq;
+			local rand = math.random()
+			if rand < chance and u and not UnitIsPlayer(u) then
 
-			elseif eventPrefix == "SWING" then
-				damage = arguments[12]
+				local npc = EroWoW.Character:buildNPC(u, sourceName)
 
-				-- See if a viable unit exists
-				local u = false
-				if sourceGUID == UnitGUID("target") then u = "target"
-				elseif sourceGUID == UnitGUID("focus") then u = "focus"
-				elseif sourceGUID == UnitGUID("mouseover") then u = "mouseover"
+				local rp = EroWoW.RPText:get(eventPrefix..crit, npc, EroWoW.ME)
+				if rp then 
+					EroWoW.RPText:print(EroWoW.RPText:convert(rp.text_receiver, npc, EroWoW.ME))
+					if rp.sound then
+						PlaySound(rp.sound, "SFX");
+					end
+					if type(rp.fn) == "function" then
+						rp:fn();
+					end
 				end
 
-				local chance = EroWoW.GS.swing_text_freq;
-				local rand = math.random()
-				if rand < chance and u and not UnitIsPlayer(u) then
-
-					local npc = EroWoW.Character:new({}, sourceName);
-					npc.type = UnitCreatureType(u);
-					--npc.race = UnitRace(u);
-					npc.class = UnitClass(u);
-
-					local sex = UnitSex(u);
-					if sex == 2 then npc.penis_size = 2
-					elseif sex == 3 then 
-						npc.breast_size = 2;
-						npc.vagina_size = 0;
-					end
-
-					local rp = EroWoW.RPText:get(eventPrefix..crit, npc, EroWoW.ME)
-					if rp then 
-						EroWoW.RPText:print(EroWoW.RPText:convert(rp.text_receiver, npc, EroWoW.ME))
-						if rp.sound then
-							PlaySound(rp.sound, "SFX");
-						end
-						if type(rp.fn) == "function" then
-							rp:fn();
-						end
-					end
-
-				end
 			end
-
 			if damage <= 0 then return end
 			local percentage = damage/UnitHealthMax("player");
 			EroWoW.ME:addArousal(percentage*0.1, false, true);
@@ -172,7 +236,22 @@ function EroWoW.Character:unbind(id)
 
 end
 
+-- Builds an NPC from a unit
+function EroWoW.Character:buildNPC(u, name)
 
+	local npc = EroWoW.Character:new({}, name);
+	npc.type = UnitCreatureType(u);
+	--npc.race = UnitRace(u);
+	npc.class = UnitClass(u);
+
+	local sex = UnitSex(u);
+	if sex == 2 then npc.penis_size = 2
+	elseif sex == 3 then 
+		npc.breast_size = 2;
+		npc.vagina_size = 0;
+	end
+	return npc;
+end
 
 
 

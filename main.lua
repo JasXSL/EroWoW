@@ -31,7 +31,7 @@ EroWoW.CAST_TARGET = nil		-- Cast target character, use this in actions
 local gDefaults = {
 	vh = true,
 	swing_text_freq = 0.15,		-- Percent chance of a swing triggering a special text
-	spell_text_freq = 0.3,		-- Percent chance of spell damage triggering a special text
+	spell_text_freq = 1,		-- Percent chance of spell damage triggering a special text
 };
 -- LocalStorage defaults
 local lDefaults = {
@@ -86,6 +86,7 @@ function EroWoW:ini()
 	-- Build libraries
 	EroWoW.RPText:buildLibrary()
 	EroWoW.Action:buildLibrary()
+	EroWoW.SpellBinding:buildLibrary()
 	EroWoW.Extension:index() -- Update the built libraries
 
 	-- Bind listener

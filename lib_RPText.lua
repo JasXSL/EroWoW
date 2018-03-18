@@ -10,6 +10,13 @@ function EroWoW.RPText:buildLibrary()
 	local template_addArousalMasochisticCrit = function(self)
 		EroWoW.ME:addArousal(0.3, false, true);
 	end
+	local template_addArousalDefault = function(self)
+		EroWoW.ME:addArousal(0.05, false, true);
+	end
+	local template_addArousalCrit = function(self)
+		EroWoW.ME:addArousal(0.1, false, true);
+	end
+	
 
 
 	-- Humanoid NPC attacker
@@ -18,9 +25,14 @@ function EroWoW.RPText:buildLibrary()
 		sender = true,
 		data = {Humanoid = true}
 	})
-	local template_condVictimBreasts = req:new({
-		type = ty.RTYPE_HAS_BREASTS,
-	})
+	local template_condVictimBreasts = req:new({type = ty.RTYPE_HAS_BREASTS})
+	local template_condVictimPenis = req:new({type = ty.RTYPE_HAS_PENIS})
+	local template_condVictimVagina = req:new({type = ty.RTYPE_HAS_VAGINA})
+	
+	local template_condSpellAdd = req:new({type=ty.RTYPE_SPELL_ADD})
+	local template_condSpellRem = req:new({type=ty.RTYPE_SPELL_REM})
+	local template_condSpellTick = req:new({type=ty.RTYPE_SPELL_TICK})
+	
 
 
 -- Fondle --
@@ -102,7 +114,7 @@ function EroWoW.RPText:buildLibrary()
 	-- HUMANOID CRIT --
 		table.insert(EroWoW.R.rpTexts, EroWoW.RPText:new({
 			id = "SWING_CRIT",
-			text_receiver = "%S attack hit you straight in the %Tgroin!",
+			text_receiver = "%S's attack hit you straight in the %Tgroin!",
 			sound = 37472,
 			requirements = {template_condAttackerHumanoid},
 			-- FN is currently only supported for NPC actions. PC->PC actions should use the Action system instead
@@ -111,12 +123,51 @@ function EroWoW.RPText:buildLibrary()
 
 		table.insert(EroWoW.R.rpTexts, EroWoW.RPText:new({
 			id = "SWING_CRIT",
-			text_receiver = "%S attack hit you straight across your %Tbreasts!",
+			text_receiver = "%S's attack hit you straight across your %Tbreasts!",
 			sound = 37472,
 			requirements = {template_condAttackerHumanoid, template_condVictimBreasts},
 			-- FN is currently only supported for NPC actions. PC->PC actions should use the Action system instead
 			fn = template_addArousalMasochisticCrit
 		}))
+
+
+
+
+
+-- SPELLS --
+
+		-- Entangling Roots --
+		table.insert(EroWoW.R.rpTexts, EroWoW.RPText:new({
+			id = "SPELL_Entangling Roots",
+			text_receiver = "A vine from the roots slips inside your clothes and starts tickling your %Tbutt!",
+			sound = 48289,
+			requirements = {template_condSpellAdd},
+			-- FN is currently only supported for NPC actions. PC->PC actions should use the Action system instead
+			fn = template_addArousal
+		}))
+		table.insert(EroWoW.R.rpTexts, EroWoW.RPText:new({
+			id = "SPELL_Entangling Roots",
+			text_receiver = "A vine from the roots slips inside your clothes and squeezes your %Tpenis!",
+			sound = 48289,
+			requirements = {template_condSpellAdd, template_condVictimPenis},
+			-- FN is currently only supported for NPC actions. PC->PC actions should use the Action system instead
+			fn = template_addArousal
+		}))
+		table.insert(EroWoW.R.rpTexts, EroWoW.RPText:new({
+			id = "SPELL_Entangling Roots",
+			text_receiver = "A vine from the roots slips inside your clothes and up inside your %Tvagina where it wiggles about!",
+			sound = 48289,
+			requirements = {template_condSpellAdd, template_condVictimVagina},
+			fn = template_addArousalCrit
+		}))
+		table.insert(EroWoW.R.rpTexts, EroWoW.RPText:new({
+			id = "SPELL_Entangling Roots",
+			text_receiver = "A vine from the roots slips inside your clothes and wrap around %Tbreasts, squeezing them rigorously!",
+			sound = 48289,
+			requirements = {template_condSpellAdd, template_condVictimBreasts},
+			fn = template_addArousalPain
+		}))
+		
 
 
 end

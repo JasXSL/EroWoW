@@ -37,10 +37,10 @@ function EroWoW.RPText:new(data)
 	return self
 end
 
-function EroWoW.RPText:validate(sender, receiver)
+function EroWoW.RPText:validate(sender, receiver, spelldata, spellType)
 
 	for k,v in pairs(self.requirements) do
-		if not v:validate(sender, receiver) then return false end	
+		if not v:validate(sender, receiver, spelldata, spellType) then return false end	
 	end
 	return true
 
@@ -63,12 +63,23 @@ function EroWoW.RPText:convert(text, sender, receiver)
 
 end
 
+-- Converts and outputs text_receiver and audio, as well as triggering fn if applicable
+function EroWoW.RPText:convertAndReceive(sender, receiver, noSound)
+
+	local text = EroWoW.RPText:convert(self.text_receiver, sender, receiver);
+	EroWoW.RPText:print(text)
+
+	if self.sound and not noSound then
+		PlaySound(self.sound, "SFX");
+	end
+
+end
 
 
 
 -- STATIC
 -- Returns an EroWoW.RPText object
-function EroWoW.RPText:get(id, sender, receiver)
+function EroWoW.RPText:get(id, sender, receiver, spelldata, spellType)
 
 	local viable = {};
 	local isSelfCast = UnitIsUnit(sender:getName(), receiver:getName())
@@ -77,7 +88,7 @@ function EroWoW.RPText:get(id, sender, receiver)
 	for k,v in pairs(EroWoW.RPText.Lib) do
 		--print(v.id, id, v:validate(sender, receiver), v.text_sender)
 		if
-			v.id == id and v:validate(sender, receiver) and 
+			v.id == id and v:validate(sender, receiver, spelldata, spellType) and 
 			(
 				(not v.text_sender and isSelfCast) or
 				((v.text_sender or sender.type ~= "player") and not isSelfCast) -- NPC spells don't have text_sender, so they need to be put here
@@ -183,7 +194,13 @@ RTYPE_BREASTS_GREATER = "breasts_greater",	-- (int)size :: Breasts greater than 
 RTYPE_BUTT_GREATER = "butt_greater",			-- (int)size :: Butt greater than size.
 RTYPE_RACE = "race",							-- {raceEN=true, raceEn=true...} Table of races that are accepted. Example: {Gnome=true, HighmountainTauren=true}
 RTYPE_CLASS = "class",						-- {englishClass=true, englishClass=true...} Table of classes that are accepted. Example: {DEATHKNIGHT=true, MONK=true}
-RTYPE_TYPE = "type"							-- {typeOne=true, typeTwo=true...} For players this is always "player", otherwise refer to the type of NPC, such as "Humanoid"
+RTYPE_TYPE = "type",							-- {typeOne=true, typeTwo=true...} For players this is always "player", otherwise refer to the type of NPC, such as "Humanoid"
+-- The following will only validate from spells received --
+RTYPE_CRIT = "crit",						-- Spell was a critical hit
+RTYPE_DETRIMENTAL = "detrimental",			-- Spell was detrimental
+RTYPE_SPELL_ADD = "spell_add",				-- Spell was just added
+RTYPE_SPELL_REM = "spell_rem",				-- Spell was just removed
+RTYPE_SPELL_TICK = "spell_tick",			-- Spell was ticking
 }
 
 
@@ -200,7 +217,7 @@ function EroWoW.RPText.Req:new(data)
 	return self
 end
 
-function EroWoW.RPText.Req:validate(sender, receiver)
+function EroWoW.RPText.Req:validate(sender, receiver, spelldata, spelltype)
 	
 	
 	-- Todo: Validate a requirement
@@ -210,7 +227,6 @@ function EroWoW.RPText.Req:validate(sender, receiver)
 	local data = self.data;
 	local inverse = self.inverse;
 	local name = targ:getName();
-
 	local ty = EroWoW.RPText.Req.Types;
 
 	-- Try to find errors
@@ -233,6 +249,16 @@ function EroWoW.RPText.Req:validate(sender, receiver)
 		out = targ.class ~= nil and data[targ.class] ~= nil;
 	elseif t == ty.RTYPE_TYPE then 
 		out = targ.type ~= nil and data[targ.type] ~= nil;
+	elseif t == ty.RTYPE_CRIT then
+		out = type(spelldata) == "table" and spelldata.crit;
+	elseif t == ty.RTYPE_DETRIMENTAL then
+		out = type(spelldata) == "table" and spelldata.harmful;
+	elseif t == ty.RTYPE_SPELL_ADD then
+		out = spelltype == ty.RTYPE_SPELL_ADD;
+	elseif t == ty.RTYPE_SPELL_REM then
+		out = spelltype == ty.RTYPE_SPELL_REM;
+	elseif t == ty.RTYPE_SPELL_TICK then
+		out = spelltype == ty.RTYPE_SPELL_TICK;
 	else print("Unknown validation type", t)
 	end
 

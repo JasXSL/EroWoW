@@ -22,6 +22,10 @@ function EroWoW.Extension:new(data, isRoot)
 
 	-- Import actions
 	self.actions = importTable(data.actions)
+
+	-- Import SpellBindings
+	self.spellBindings = importTable(data.spellBindings)
+
 	return self
 end
 
@@ -47,10 +51,13 @@ function EroWoW.Extension:index()
 
 	-- Reset libraries
 	EroWoW.RPText.Lib = {}
+	EroWoW.SpellBinding.Lib = {}
 	EroWoW.Action.LIB = {}
+	
 	for k,v in pairs(EroWoW.Extension.LIB) do
 		EroWoW.RPText.Lib = TableConcat(EroWoW.RPText.Lib, v.rpTexts);
 		EroWoW.Action.LIB = TableConcat(EroWoW.Action.LIB, v.actions);
+		EroWoW.SpellBinding.Lib = TableConcat(EroWoW.SpellBinding.Lib, v.spellBindings);
 	end
 end
 
