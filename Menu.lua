@@ -178,7 +178,7 @@ function ExiWoW.Menu:ini()
 	sl:Show();
 	sl:SetScript("OnValueChanged", function(self,arg1) 
 		ExiWoW.ME.masochism = arg1/100;
-		ExiWoW.LS.masochism = ExiWoW.ME.masochism;
+		ExiWoWLocalStorage.masochism = ExiWoW.ME.masochism;
 	end)
 
 	-- Penis size slider
@@ -189,7 +189,7 @@ function ExiWoW.Menu:ini()
 	sl:SetPoint("TOP", 0, top+spacing*item);
 	sl:SetOrientation('HORIZONTAL')
 	sl.tooltipText = "How well endowed is your character?";
-	getglobal(sl:GetName()..'Text'):SetText('Penis Size');
+	getglobal(sl:GetName()..'Text'):SetText('Male Endowment');
 	getglobal(sl:GetName()..'Low'):SetText('Off');
 	getglobal(sl:GetName()..'High'):SetText('Huge');
 	sl:SetMinMaxValues(0, 5)
@@ -201,7 +201,7 @@ function ExiWoW.Menu:ini()
 		arg1 = arg1-1;
 		if arg1 == -1 then arg1 = false end
 		ExiWoW.ME.penis_size = arg1;
-		ExiWoW.LS.penis_size = ExiWoW.ME.penis_size;
+		ExiWoWLocalStorage.penis_size = ExiWoW.ME.penis_size;
 	end)
 
 	-- Breast size slider
@@ -211,8 +211,8 @@ function ExiWoW.Menu:ini()
 	sl:SetHeight(20)
 	sl:SetPoint("TOP", 0, top+spacing*item);
 	sl:SetOrientation('HORIZONTAL')
-	sl.tooltipText = "How large are your breasts?";
-	getglobal(sl:GetName()..'Text'):SetText('Breast Size');
+	sl.tooltipText = "How large are your character's breasts?";
+	getglobal(sl:GetName()..'Text'):SetText('Female Endowment');
 	getglobal(sl:GetName()..'Low'):SetText('Off');
 	getglobal(sl:GetName()..'High'):SetText('Huge');
 	sl:SetMinMaxValues(0, 5)
@@ -224,7 +224,7 @@ function ExiWoW.Menu:ini()
 		arg1 = arg1-1;
 		if arg1 == -1 then arg1 = false end
 		ExiWoW.ME.breast_size = arg1;
-		ExiWoW.LS.breast_size = ExiWoW.ME.breast_size;
+		ExiWoWLocalStorage.breast_size = ExiWoW.ME.breast_size;
 	end)
 
 	-- Butt size
@@ -234,8 +234,8 @@ function ExiWoW.Menu:ini()
 	sl:SetHeight(20)
 	sl:SetPoint("TOP", 0, top+spacing*item);
 	sl:SetOrientation('HORIZONTAL')
-	sl.tooltipText = "How large is your butt?";
-	getglobal(sl:GetName()..'Text'):SetText('Butt Size');
+	sl.tooltipText = "How large is your rear?";
+	getglobal(sl:GetName()..'Text'):SetText('Rear Size');
 	getglobal(sl:GetName()..'Low'):SetText('Tiny');
 	getglobal(sl:GetName()..'High'):SetText('Huge');
 	sl:SetMinMaxValues(0, 4)
@@ -245,7 +245,7 @@ function ExiWoW.Menu:ini()
 	sl:Show();
 	sl:SetScript("OnValueChanged", function(self,arg1) 
 		ExiWoW.ME.butt_size = arg1;
-		ExiWoW.LS.butt_size = ExiWoW.ME.butt_size;
+		ExiWoWLocalStorage.butt_size = ExiWoW.ME.butt_size;
 	end)
 
 	-- Toggle vagina
@@ -256,7 +256,7 @@ function ExiWoW.Menu:ini()
 	sl:SetPoint("TOP", 0, top+spacing*item);
 	sl:SetOrientation('HORIZONTAL')
 	sl.tooltipText = "Vagina";
-	getglobal(sl:GetName()..'Text'):SetText('Toggle character vagina');
+	getglobal(sl:GetName()..'Text'):SetText('Female Genitalia');
 	getglobal(sl:GetName()..'Low'):SetText('Off');
 	getglobal(sl:GetName()..'High'):SetText('On');
 	sl:SetMinMaxValues(0, 1)
@@ -268,7 +268,7 @@ function ExiWoW.Menu:ini()
 		arg1 = arg1-1;
 		if arg1 == -1 then arg1 = false end
 		ExiWoW.ME.vagina_size = arg1;
-		ExiWoW.LS.vagina_size = ExiWoW.ME.vagina_size;
+		ExiWoWLocalStorage.vagina_size = ExiWoW.ME.vagina_size;
 	end)
 
 	

@@ -9,9 +9,9 @@ ExiWoW.Character.takehitCD = nil			-- Cooldown for takehit texts
 
 
 -- Consts
-ExiWoW.Character.AROUSAL_FADE_PER_SEC = 0.05;
-ExiWoW.Character.AROUSAL_MAX = 1.25;				-- You can overshoot max excitement and have to wait longer
-ExiWoW.Character.AROUSAL_FADE_IDLE = 0.001;
+ExiWoW.Character.EXCITEMENT_FADE_PER_SEC = 0.05;
+ExiWoW.Character.EXCITEMENT_MAX = 1.25;				-- You can overshoot max excitement and have to wait longer
+ExiWoW.Character.EXCITEMENT_FADE_IDLE = 0.001;
 ExiWoW.Character.AURAS = {}
 
 
@@ -37,9 +37,9 @@ function ExiWoW.Character:ini()
 		local me = ExiWoW.ME;
 		local fade = 0;
 		if me.meditating then
-			fade = ExiWoW.Character.AROUSAL_FADE_PER_SEC;
+			fade = ExiWoW.Character.EXCITEMENT_FADE_PER_SEC;
 		elseif not UnitAffectingCombat("player") then
-			fade = ExiWoW.Character.AROUSAL_FADE_IDLE;
+			fade = ExiWoW.Character.EXCITEMENT_FADE_IDLE;
 		end
 		me:addExcitement(-fade);
 
@@ -191,7 +191,7 @@ function ExiWoW.Character:onEvent(event, ...)
 			damage = arguments[12]
 
 			
-			local chance = ExiWoW.GS.swing_text_freq;
+			local chance = ExiWoWGlobalStorage.swing_text_freq;
 			if crit ~= "" then chance = chance*4 end -- Crits have 3x chance for swing text
 
 			local rand = math.random()
@@ -261,7 +261,7 @@ end
 
 
 function ExiWoW.Character:setTakehitTimer()
-	local rate = ExiWoW.GS.takehit_rp_rate;
+	local rate = ExiWoWGlobalStorage.takehit_rp_rate;
 	ExiWoW.Timer:clear(ExiWoW.Character.takehitCD);
 	ExiWoW.Character.takehitCD = ExiWoW.Timer:set(function()
 		ExiWoW.Character.takehitCD = nil;
@@ -375,7 +375,7 @@ function ExiWoW.Character:addExcitement(amount, set, multiplyMasochism)
 		self.excitement = tonumber(amount);
 	end
 
-	self.excitement =max(min(self.excitement, ExiWoW.Character.AROUSAL_MAX), 0);
+	self.excitement =max(min(self.excitement, ExiWoW.Character.EXCITEMENT_MAX), 0);
 	self:updateExcitementDisplay();
 
 	if (self.excitement >= 1) ~= pre then

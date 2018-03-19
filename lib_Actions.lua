@@ -182,7 +182,7 @@ function ExiWoW.Action:buildLibrary()
 
 	-- Spot excitement (Public, melee range) --
 	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
-		id = "SPOT_AROUSAL",
+		id = "SPOT_EXCITEMENT",
 		name = "Spot Excitement",
 		important = true,
 		description = "Spot excitement of a nearby player.",

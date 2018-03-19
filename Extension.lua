@@ -71,10 +71,12 @@ function ExiWoW.Extension:exportAll()
 	end
 end
 
+
 function ExiWoW.Extension:import(data, isRoot)
 	local ex = ExiWoW.Extension:new(data, isRoot);
 	if ex then
 		ExiWoW.Extension.LIB[ex.id] = ex
+		ExiWoW.Extension:index()
 		return ex
 	end
 	

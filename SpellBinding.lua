@@ -43,7 +43,7 @@ end
 
 
 function ExiWoW.SpellBinding:rollProc()
-	return math.random() < self.procChance--*ExiWoW.GS.spell_text_freq;
+	return math.random() < self.procChance--*ExiWoWGlobalStorage.spell_text_freq;
 end
 
 	-- Static --

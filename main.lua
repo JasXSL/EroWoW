@@ -72,12 +72,12 @@ function ExiWoW:ini()
 	-- Add character
 	ExiWoW.ME = ExiWoW.Character:new();
 
-	ExiWoW.ME.penis_size = ExiWoW.LS.penis_size;
-	ExiWoW.ME.vagina_size = ExiWoW.LS.vagina_size;
-	ExiWoW.ME.breast_size = ExiWoW.LS.breast_size;
-	ExiWoW.ME.butt_size = ExiWoW.LS.butt_size;
-	ExiWoW.ME.masochism = ExiWoW.LS.masochism;
-	ExiWoW.ME.excitement = ExiWoW.LS.excitement;
+	ExiWoW.ME.penis_size = ExiWoWLocalStorage.penis_size;
+	ExiWoW.ME.vagina_size = ExiWoWLocalStorage.vagina_size;
+	ExiWoW.ME.breast_size = ExiWoWLocalStorage.breast_size;
+	ExiWoW.ME.butt_size = ExiWoWLocalStorage.butt_size;
+	ExiWoW.ME.masochism = ExiWoWLocalStorage.masochism;
+	ExiWoW.ME.excitement = ExiWoWLocalStorage.excitement;
 	
 
 	ExiWoW:buildUnitFrames();
@@ -116,9 +116,9 @@ end
 
 -- Reset settings
 function ExiWoW:resetSettings()
-	local s = ExiWoW.GS;
+	local s = ExiWoWGlobalStorage;
 	for k,v in pairs(gDefaults) do s[k] = v end
-	s = ExiWoW.LS;
+	s = ExiWoWLocalStorage;
 	for k,v in pairs(lDefaults) do s[k] = v end
 	print("Settings reset")
 end
@@ -133,10 +133,7 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 		
 		if not ExiWoWLocalStorage then ExiWoWLocalStorage = {} end
 		if not ExiWoWGlobalStorage then ExiWoWGlobalStorage = {} end
-		-- handy shortcuts
-		ExiWoW.LS = ExiWoWLocalStorage;
-		ExiWoW.GS = ExiWoWGlobalStorage;
-
+		
 		-- Loading
 		for k,v in pairs(gDefaults) do
 			if ExiWoWGlobalStorage[k] == nil then ExiWoWGlobalStorage[k] = v end
@@ -151,7 +148,7 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 		
 
 		-- Load in abilities
-		for k,v in pairs(ExiWoW.LS.abilities) do
+		for k,v in pairs(ExiWoWLocalStorage.abilities) do
 			local abil = ExiWoW.Action:get(v.id)
 			if abil then abil:import(v) end
 		end
@@ -165,7 +162,7 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 	if event == "PLAYER_LOGOUT" then
 
 		-- Saving
-		local l = ExiWoW.LS;
+		local l = ExiWoWLocalStorage;
 
 		l.excitement = ExiWoW.ME.excitement;
 
