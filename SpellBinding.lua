@@ -31,11 +31,11 @@ function EroWoW.SpellBinding:new(data)
 end
 
 -- Runs (and returns if found) an RP text bound to a this spellbinding
-function EroWoW.SpellBinding:runRpText(sender, data, type)
+function EroWoW.SpellBinding:runRpText(sender, data, t)
 	if not self:rollProc() then return end
-	local rpText = EroWoW.SpellBinding:getRpText(sender, data, type)
+	local rpText = EroWoW.SpellBinding:getRpText(sender, data, t)
 	if rpText then
-		rpText:convertAndReceive(sender, EroWoW.ME)
+		rpText:convertAndReceive(sender, EroWoW.ME, false, data)
 		EroWoW.Character:setTakehitTimer();
 		return rpText
 	end
@@ -43,7 +43,7 @@ end
 
 
 function EroWoW.SpellBinding:rollProc()
-	return math.random() < self.procChance*EroWoW.GS.spell_text_freq;
+	return math.random() < self.procChance--*EroWoW.GS.spell_text_freq;
 end
 
 	-- Static --

@@ -24,10 +24,22 @@ local TAG_SUFFIXES = {
 	HIS = "his",
 	HE = "he"
 }
+-- Prevents issues, longer ones should be first
+local TAG_SUFFIX_ORDER = {}
+for k,v in pairs(TAG_SUFFIXES) do
+	table.insert(TAG_SUFFIX_ORDER, v)
+end
+table.sort(TAG_SUFFIX_ORDER, function(a,b)
+	if string.len(a) > string.len(b) then return true end
+	return false
+end)
+
 -- These are generic tags you can use
 local TAG_GENERIC = {
 	LEFTRIGHT = "leftright",			-- Returns left or right
-
+	HARDEN = "harden",					-- Synonym for harden
+	-- Only available from spells
+	SPELL = "spell",					-- Name of spell that was cast
 }
 
 -- RPText CLASS
@@ -53,24 +65,45 @@ end
 
 function EroWoW.RPText:validate(sender, receiver, spelldata, spellType)
 
-	for k,v in pairs(self.requirements) do
-		if not v:validate(sender, receiver, spelldata, spellType) then return false end	
+	function validateThese(input, noOr)
+
+		for k,v in pairs(input) do
+
+			-- Validate a sub
+			local success = true
+			if v[1] ~= nil then 
+				success = validateThese(v)	-- We must go deeper
+			else
+				success = v:validate(sender, receiver, spelldata, spellType) -- This entry was a condition
+			end
+
+			if success and not noOr then 
+				return true
+			elseif not success and noOr then
+				return false
+			end
+		end
+		return noOr
+
+	end
+
+	if not validateThese(self.requirements, true) then 
+		return false 
 	end
 	return true
 
 end
 
-function EroWoW.RPText:convert(text, sender, receiver)
+function EroWoW.RPText:convert(text, sender, receiver, spelldata)
 
-	
 	-- Do the suffixes
-	for k,v in pairs(TAG_SUFFIXES) do
-		text = string.gsub(text, "%%S"..v, EroWoW.RPText:getSynonym(v, sender))
-		text = string.gsub(text, "%%T"..v, EroWoW.RPText:getSynonym(v, receiver))
+	for k,v in pairs(TAG_SUFFIX_ORDER) do
+		text = string.gsub(text, "%%S"..v, EroWoW.RPText:getSynonym(v, sender, spelldata))
+		text = string.gsub(text, "%%T"..v, EroWoW.RPText:getSynonym(v, receiver, spelldata))
 	end
 
 	for k,v in pairs(TAG_GENERIC) do
-		text = string.gsub(text, "%%"..v, EroWoW.RPText:getSynonym(v))
+		text = string.gsub(text, "%%"..v, EroWoW.RPText:getSynonym(v, receiver, spelldata))
 	end
 	
 	-- Default names must go last because they're subsets
@@ -82,9 +115,9 @@ function EroWoW.RPText:convert(text, sender, receiver)
 end
 
 -- Converts and outputs text_receiver and audio, as well as triggering fn if applicable
-function EroWoW.RPText:convertAndReceive(sender, receiver, noSound)
+function EroWoW.RPText:convertAndReceive(sender, receiver, noSound, spell)
 
-	local text = EroWoW.RPText:convert(self.text_receiver, sender, receiver);
+	local text = EroWoW.RPText:convert(self.text_receiver, sender, receiver, spell);
 	EroWoW.RPText:print(text)
 
 	if type(self.fn) == "function" then
@@ -130,7 +163,7 @@ function EroWoW.RPText:get(id, sender, receiver, spelldata, spellType)
 
 end
 
-function EroWoW.RPText:getSynonym(tag, target, isReceiver)
+function EroWoW.RPText:getSynonym(tag, target, spelldata)
 
 	local getSizeTag = function(size)
 
@@ -162,7 +195,7 @@ function EroWoW.RPText:getSynonym(tag, target, isReceiver)
 		if string.lower(target.race) == "worgen" or lower(target.race) == "pandaren" then
 			tags = {"fuzzy", "furry"}
 		end
-		if next(tags) then
+		if next(tags) ~= nil then
 			return tags[math.random(#tags)].." "
 		end
 		return "";
@@ -180,7 +213,13 @@ function EroWoW.RPText:getSynonym(tag, target, isReceiver)
 	if tag == TAG_GENERIC.LEFTRIGHT then
 		if math.random() < 0.5 then return "left" end
 		return "right"
+	elseif tag == TAG_GENERIC.SPELL then
+		if type(spelldata) == "table" and spelldata.name then return spelldata.name end
+		return "spell"
+	elseif tag == TAG_GENERIC.HARDEN then
+		return getRandom("harden", "stiffen")
 	end
+
 
 	-- Specific tags
 	if tag == TAG_SUFFIXES.PENIS then
@@ -190,7 +229,8 @@ function EroWoW.RPText:getSynonym(tag, target, isReceiver)
 	elseif tag == TAG_SUFFIXES.VAGINA then
 		return getRandom("vagina", "pussy", "cunt")
 	elseif tag == TAG_SUFFIXES.BREASTS then
-		return getSizeTag(target:getBreastSize())..getRaceTag()..getRandom("boobs", "tits", "breasts", "knockers")
+		local out = getSizeTag(target:getBreastSize())..getRaceTag()..getRandom("boobs", "tits", "breasts", "knockers");
+		return out
 	elseif tag == TAG_SUFFIXES.RACETAG then
 		return getRaceTag()
 	elseif tag == TAG_SUFFIXES.BUTT then
@@ -198,7 +238,7 @@ function EroWoW.RPText:getSynonym(tag, target, isReceiver)
 	elseif tag == TAG_SUFFIXES.BREAST then
 		return getSizeTag(target:getBreastSize())..getRandom("boob", "tit", "breast")
 	elseif tag == TAG_SUFFIXES.BUTTCHEEK then
-		return getSizeTag(target:getButtSize())..getRaceTag().."buttcheek"
+		return getSizeTag(target:getButtSize()).."buttcheek"
 	elseif tag == TAG_SUFFIXES.RACE then
 		return string.lower(target.race)
 	elseif tag == TAG_SUFFIXES.CLASS then

@@ -23,3 +23,4 @@ SpellBinding.lua
 lib_RPText.lua
 lib_Actions.lua
 lib_SpellBindings.lua
+lib_Assets.lua
