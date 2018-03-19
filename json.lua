@@ -22,7 +22,7 @@
 -- SOFTWARE.
 --
 
-EroWoW.json = { _version = "0.1.0" }
+ExiWoW.json = { _version = "0.1.0" }
 
 -------------------------------------------------------------------------------
 -- Encode
@@ -131,7 +131,7 @@ encode = function(val, stack)
 end
 
 
-function EroWoW.json.encode(val)
+function ExiWoW.json.encode(val)
   return ( encode(val) )
 end
 
@@ -384,7 +384,7 @@ parse = function(str, idx)
 end
 
 
-function EroWoW.json.decode(str)
+function ExiWoW.json.decode(str)
   if type(str) ~= "string" then
     error("expected argument of type string, got " .. type(str))
   end

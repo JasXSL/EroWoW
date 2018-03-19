@@ -1,19 +1,19 @@
 -- Callback system
-EroWoW.Callbacks = {};		
-EroWoW.Callbacks.WAITING = {}; -- {id:str token, timer:int timer, callback:fn callback}
+ExiWoW.Callbacks = {};		
+ExiWoW.Callbacks.WAITING = {}; -- {id:str token, timer:int timer, callback:fn callback}
 -- Adds a callback listener and returns the callback token
-function EroWoW.Callbacks:add(fn)
+function ExiWoW.Callbacks:add(fn)
 	local token = string.gsub("xxxxxxxx", '[x]', function (c)
 		local out = string.format('%x', math.random(0, 0xf))
 		return out
 	end)
 	
 	-- Give it 1 sec
-	local timer = EroWoW.Timer:set(function()
-		EroWoW.Callbacks:trigger(token, false);
+	local timer = ExiWoW.Timer:set(function()
+		ExiWoW.Callbacks:trigger(token, false);
 	end, 1);
 	
-	table.insert(EroWoW.Callbacks.WAITING, {
+	table.insert(ExiWoW.Callbacks.WAITING, {
 		callback = fn,
 		id = token,
 		timer = timer
@@ -23,23 +23,23 @@ function EroWoW.Callbacks:add(fn)
 	return token;
 end
 
-function EroWoW.Callbacks:remove(token)
-	for k,v in pairs(EroWoW.Callbacks.WAITING) do
+function ExiWoW.Callbacks:remove(token)
+	for k,v in pairs(ExiWoW.Callbacks.WAITING) do
 		if v.id == token then
-			EroWoW.Timer:clear(v.timer);
-			EroWoW.Callbacks.WAITING[k] = nil;
+			ExiWoW.Timer:clear(v.timer);
+			ExiWoW.Callbacks.WAITING[k] = nil;
 			return;
 		end
 	end
 end
 
-function EroWoW.Callbacks:trigger(token, success, args, sender)
-	for k,v in pairs(EroWoW.Callbacks.WAITING) do
+function ExiWoW.Callbacks:trigger(token, success, args, sender)
+	for k,v in pairs(ExiWoW.Callbacks.WAITING) do
 		if v.id == token then
 			if type(v.callback) == "function" then
 				v:callback(success, args, sender);
 			end
-			EroWoW.Callbacks:remove(token);
+			ExiWoW.Callbacks:remove(token);
 			return;
 		end
 	end

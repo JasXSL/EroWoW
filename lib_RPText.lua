@@ -1,30 +1,30 @@
-function EroWoW.RPText:buildLibrary()
+function ExiWoW.RPText:buildLibrary()
 	
-	local req = EroWoW.RPText.Req;
+	local req = ExiWoW.RPText.Req;
 	local ty = req.Types;
-	local assetLib = EroWoW.LibAssets;
+	local assetLib = ExiWoW.LibAssets;
 	local spellKits = assetLib.spell_kits;
-	local R = EroWoW.R.rpTexts;
+	local R = ExiWoW.R.rpTexts;
 	
 
 	-- Gets a formatted spell kit from lib_Assets (or more)
 	-- A spell kit is a collection of spell names that share the same theme, such as frost, fire, basilisk stun etc
 	local getsk = function(...)
-		return EroWoW.LibAssets:spellKitToRP(...);
+		return ExiWoW.LibAssets:spellKitToRP(...);
 	end
 
 	-- Function templates
 	local template_addArousalMasochisticDefault = function(self)
-		EroWoW.ME:addArousal(0.15, false, true);
+		ExiWoW.ME:addArousal(0.15, false, true);
 	end
 	local template_addArousalMasochisticCrit = function(self)
-		EroWoW.ME:addArousal(0.3, false, true);
+		ExiWoW.ME:addArousal(0.3, false, true);
 	end
 	local template_addArousalDefault = function(self)
-		EroWoW.ME:addArousal(0.1);
+		ExiWoW.ME:addArousal(0.1);
 	end
 	local template_addArousalCrit = function(self)
-		EroWoW.ME:addArousal(0.2);
+		ExiWoW.ME:addArousal(0.2);
 	end
 	
 
@@ -63,7 +63,7 @@ function EroWoW.RPText:buildLibrary()
 
 		-- TARGET --
 			-- Fondle breasts target
-			table.insert(R, EroWoW.RPText:new({
+			table.insert(R, ExiWoW.RPText:new({
 				id = "FONDLE",
 				text_sender = "You grab a hold of and rub %T's %Tbreasts!",
 				text_receiver = "%S grabs a hold of and rubs your %Tbreasts!",
@@ -72,7 +72,7 @@ function EroWoW.RPText:buildLibrary()
 			}))
 
 			-- Fondle groin target
-			table.insert(R, EroWoW.RPText:new({
+			table.insert(R, ExiWoW.RPText:new({
 				id = "FONDLE",
 				text_sender = "You grab a hold of and rub %T's %Tgroin!",
 				text_receiver = "%S grabs a hold of and rubs your %Tgroin!",
@@ -81,7 +81,7 @@ function EroWoW.RPText:buildLibrary()
 			}))
 
 			-- Fondle butt target
-			table.insert(R, EroWoW.RPText:new({
+			table.insert(R, ExiWoW.RPText:new({
 				id = "FONDLE",
 				text_sender = "You grab a hold of and rub %T's %Tbutt!",
 				text_receiver = "%S grabs a hold of and rubs your %Tbutt!",
@@ -90,13 +90,13 @@ function EroWoW.RPText:buildLibrary()
 			}))
 
 		-- SELF --
-			table.insert(R, EroWoW.RPText:new({
+			table.insert(R, ExiWoW.RPText:new({
 				id = "FONDLE",
 				text_receiver = "You rub your own %Tgroin!",
 				sound = 57179,
 				requirements = {}
 			}))
-			table.insert(R, EroWoW.RPText:new({
+			table.insert(R, ExiWoW.RPText:new({
 				id = "FONDLE",
 				text_receiver = "You rub your %Tbreasts!",
 				sound = 57179,
@@ -114,7 +114,7 @@ function EroWoW.RPText:buildLibrary()
 -- MELEE SWINGS --
 	-- HUMANOIDISH (crits) --
 
-		table.insert(R, EroWoW.RPText:new({
+		table.insert(R, ExiWoW.RPText:new({
 			id = "SWING_CRIT",
 			text_receiver = "%S's attacks smacks against your %leftright %Tbreast!",
 			sound = 37472,
@@ -124,7 +124,7 @@ function EroWoW.RPText:buildLibrary()
 		}))
 
 
-		table.insert(R, EroWoW.RPText:new({
+		table.insert(R, ExiWoW.RPText:new({
 			id = "SWING_CRIT",
 			text_receiver = "%S's attack smacks painfully across your %Tgroin!",
 			sound = 37472,
@@ -133,7 +133,7 @@ function EroWoW.RPText:buildLibrary()
 			fn = template_addArousalMasochisticCrit
 		}))
 
-		table.insert(R, EroWoW.RPText:new({
+		table.insert(R, ExiWoW.RPText:new({
 			id = "SWING_CRIT",
 			text_receiver = "%S throws a cheap shot at your %Tgroin!",
 			sound = 37472,
@@ -142,7 +142,7 @@ function EroWoW.RPText:buildLibrary()
 			fn = template_addArousalMasochisticCrit
 		}))
 
-		table.insert(R, EroWoW.RPText:new({
+		table.insert(R, ExiWoW.RPText:new({
 			id = "SWING_CRIT",
 			text_receiver = "%S's attack smacks painfully across your %Tbreasts!",
 			sound = 37472,
@@ -153,7 +153,7 @@ function EroWoW.RPText:buildLibrary()
 
 
 	-- Tentacle fiends (like the one in the draenei start area)
-		table.insert(R, EroWoW.RPText:new({
+		table.insert(R, ExiWoW.RPText:new({
 			id = "SWING",
 			text_receiver = "%S slips a tentacle into your clothes, tickling your %Tgroin!",
 			sound = 21727,
@@ -161,7 +161,7 @@ function EroWoW.RPText:buildLibrary()
 			-- FN is currently only supported for NPC actions. PC->PC actions should use the Action system instead
 			fn = template_addArousalDefault
 		}))
-		table.insert(R, EroWoW.RPText:new({
+		table.insert(R, ExiWoW.RPText:new({
 			id = "SWING",
 			text_receiver = "%S slips a tentacle into your clothes, tickling between your %Trtag buttcheeks!",
 			sound = 21727,
@@ -169,7 +169,7 @@ function EroWoW.RPText:buildLibrary()
 			-- FN is currently only supported for NPC actions. PC->PC actions should use the Action system instead
 			fn = template_addArousalDefault
 		}))
-		table.insert(R, EroWoW.RPText:new({
+		table.insert(R, ExiWoW.RPText:new({
 			id = "SWING_CRIT",
 			text_receiver = "%S slips a tentacle into your clothes, slipping it up into your %Tvagina and wiggling it around!",
 			sound = 21727,
@@ -177,7 +177,7 @@ function EroWoW.RPText:buildLibrary()
 			-- FN is currently only supported for NPC actions. PC->PC actions should use the Action system instead
 			fn = template_addArousalCrit
 		}))
-		table.insert(R, EroWoW.RPText:new({
+		table.insert(R, ExiWoW.RPText:new({
 			id = "SWING",
 			text_receiver = "%S slips a tentacle into your clothes, hooping it around your nipples and tugs!",
 			sound = 21729,
@@ -185,7 +185,7 @@ function EroWoW.RPText:buildLibrary()
 			-- FN is currently only supported for NPC actions. PC->PC actions should use the Action system instead
 			fn = template_addArousalMasochisticDefault
 		}))
-		table.insert(R, EroWoW.RPText:new({
+		table.insert(R, ExiWoW.RPText:new({
 			id = "SWING",
 			text_receiver = "%S slips a tentacle up between your legs, tickling your %Tgroin!",
 			sound = 21727,
@@ -200,7 +200,7 @@ function EroWoW.RPText:buildLibrary()
 		-- GENERIC / NPC --
 
 			-- Ice spells
-			table.insert(R, EroWoW.RPText:new({
+			table.insert(R, ExiWoW.RPText:new({
 				id = getsk("ice", "ice_common"),
 				text_receiver = "The cold spell causes your nipples to harden!",
 				--sound = 48289,
@@ -210,7 +210,7 @@ function EroWoW.RPText:buildLibrary()
 
 			-- Lightning
 				
-				table.insert(R, EroWoW.RPText:new({
+				table.insert(R, ExiWoW.RPText:new({
 					id = getsk("electric", "electric_common"),
 					text_receiver = "The %spell shocks your nipples!",
 					sound = 35286,
@@ -220,7 +220,7 @@ function EroWoW.RPText:buildLibrary()
 					},
 					fn = template_addArousalPain
 				}))
-				table.insert(R, EroWoW.RPText:new({
+				table.insert(R, ExiWoW.RPText:new({
 					id = getsk("electric"),
 					text_receiver = "The %spell painfully shocks your %Tbreasts!",
 					sound = 35286,
@@ -234,7 +234,7 @@ function EroWoW.RPText:buildLibrary()
 
 			-- Basilisk stares
 				
-				table.insert(R, EroWoW.RPText:new({
+				table.insert(R, ExiWoW.RPText:new({
 					id = getsk("basilisk"),
 					text_receiver = "The %spell causes your nipples to %harden!",
 					--sound = 35103,
@@ -244,7 +244,7 @@ function EroWoW.RPText:buildLibrary()
 					},
 					fn = template_addArousalDefault
 				}))
-				table.insert(R, EroWoW.RPText:new({
+				table.insert(R, ExiWoW.RPText:new({
 					id = getsk("basilisk"),
 					text_receiver = "The %spell causes your %Tpenis to %harden!",
 					--sound = 35103,
@@ -256,7 +256,7 @@ function EroWoW.RPText:buildLibrary()
 				}))
 
 			-- Uppercut
-				table.insert(R, EroWoW.RPText:new({
+				table.insert(R, ExiWoW.RPText:new({
 					id = "SPELL_Uppercut",
 					text_receiver = "%S uppercuts your %Tbreasts with enough force to knock you back!",
 					--sound = 35103,
@@ -266,7 +266,7 @@ function EroWoW.RPText:buildLibrary()
 					},
 					fn = template_addArousalMasochisticCrit
 				}))
-				table.insert(R, EroWoW.RPText:new({
+				table.insert(R, ExiWoW.RPText:new({
 					id = "SPELL_Uppercut",
 					text_receiver = "%S uppercuts your %leftright %Tbreast, jiggling it around heavily as you stagger backwards!",
 					--sound = 35103,
@@ -285,7 +285,7 @@ function EroWoW.RPText:buildLibrary()
 		-- DRUID --
 
 			-- Entangling Roots
-			table.insert(R, EroWoW.RPText:new({
+			table.insert(R, ExiWoW.RPText:new({
 				id = "SPELL_Entangling Roots",
 				text_receiver = "A vine from the roots slips inside your clothes and starts tickling your %Tbutt!",
 				sound = 48289,
@@ -293,7 +293,7 @@ function EroWoW.RPText:buildLibrary()
 				-- FN is currently only supported for NPC actions. PC->PC actions should use the Action system instead
 				fn = template_addArousal
 			}))
-			table.insert(R, EroWoW.RPText:new({
+			table.insert(R, ExiWoW.RPText:new({
 				id = "SPELL_Entangling Roots",
 				text_receiver = "A vine from the roots slips inside your clothes and squeezes your %Tpenis!",
 				sound = 48289,
@@ -301,14 +301,14 @@ function EroWoW.RPText:buildLibrary()
 				-- FN is currently only supported for NPC actions. PC->PC actions should use the Action system instead
 				fn = template_addArousal
 			}))
-			table.insert(R, EroWoW.RPText:new({
+			table.insert(R, ExiWoW.RPText:new({
 				id = "SPELL_Entangling Roots",
 				text_receiver = "A vine from the roots slips inside your clothes and up inside your %Tvagina where it wiggles about!",
 				sound = 48289,
 				requirements = {template_condSpellAdd, template_condVictimVagina},
 				fn = template_addArousalCrit
 			}))
-			table.insert(R, EroWoW.RPText:new({
+			table.insert(R, ExiWoW.RPText:new({
 				id = "SPELL_Entangling Roots",
 				text_receiver = "A vine from the roots slips inside your clothes and wrap around your %Tbreasts, squeezing them rigorously!",
 				sound = 48289,
@@ -322,7 +322,7 @@ function EroWoW.RPText:buildLibrary()
 
 		-- ROGUE 
 			-- Crimson vial
-			table.insert(R, EroWoW.RPText:new({
+			table.insert(R, ExiWoW.RPText:new({
 				id = "SPELL_Crimson Vial",
 				text_receiver = "You spill some of the crimson vial all over your %Tbreasts!",
 				sound = 1059,

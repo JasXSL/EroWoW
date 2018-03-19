@@ -1,16 +1,16 @@
 -- Library for Actions --
-function EroWoW.Action:buildLibrary()
+function ExiWoW.Action:buildLibrary()
 
 			-- Template functions --
 	
 		
 	local function sendRPText(self, sender, target, suppressErrors)
 
-		local ts = EroWoW.ME;
-		local tt = EroWoW.CAST_TARGET;
+		local ts = ExiWoW.ME;
+		local tt = ExiWoW.CAST_TARGET;
 		if UnitIsUnit(target, "player") then tt = ts; end -- Self cast
 
-		local rptext = EroWoW.RPText:get(self.id, ts, tt);
+		local rptext = ExiWoW.RPText:get(self.id, ts, tt);
 		-- We only need a callback for this
 		return {
 			text=rptext.text_receiver,
@@ -23,7 +23,7 @@ function EroWoW.Action:buildLibrary()
 					PlaySound(rptext.sound, "SFX");
 				end
 				if rptext.text_sender then 
-					EroWoW.RPText:print(EroWoW.RPText:convert(rptext.text_sender, ts, tt))
+					ExiWoW.RPText:print(ExiWoW.RPText:convert(rptext.text_sender, ts, tt))
 				end
 			end
 		end
@@ -32,8 +32,8 @@ function EroWoW.Action:buildLibrary()
 	local function receiveRPText( self, sender, target, args)
 
 		if args.text and args.sender then
-			local ts = EroWoW.Character:new(args.sender, sender);
-			EroWoW.RPText:print(EroWoW.RPText:convert(args.text, ts, EroWoW.ME))
+			local ts = ExiWoW.Character:new(args.sender, sender);
+			ExiWoW.RPText:print(ExiWoW.RPText:convert(args.text, ts, ExiWoW.ME))
 		end
 		
 		-- Play receiving sound if not self cast
@@ -47,8 +47,8 @@ function EroWoW.Action:buildLibrary()
 
 			-- LIBRARY --
 
-	-- Meta action that checks if target has erowow --
-	table.insert(EroWoW.R.actions, EroWoW.Action:new({
+	-- Meta action that checks if target has ExiWoW --
+	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
 		id = "A",
 		global_cooldown = false,
 		suppress_all_errors = true,
@@ -60,28 +60,28 @@ function EroWoW.Action:buildLibrary()
 		hidden = true,
 		-- Custom sending logic
 		fn_send = function(self, sender, target, suppressErrors)
-			EroWoW.TARGET = nil
+			ExiWoW.TARGET = nil
 			-- Return no data, but one callback
 			return nil, function(se, success, data, sender)
 				if success then
-					EroWoW.TARGET = EroWoW.Character:new(data, sender);
+					ExiWoW.TARGET = ExiWoW.Character:new(data, sender);
 					local offset = 0;
-					if EroWoW.TARGET:isFemale() then offset = 0.25;
-					elseif not EroWoW.TARGET:isMale() then offset = 0.5; end
-					EroWoW.Frames.targetHasEroWoWFrame.genderTexture:SetTexCoord(offset,offset+0.25,0,1);
-					EroWoW.Frames.targetHasEroWoWFrame:Show();
+					if ExiWoW.TARGET:isFemale() then offset = 0.25;
+					elseif not ExiWoW.TARGET:isMale() then offset = 0.5; end
+					ExiWoW.Frames.targetHasExiWoWFrame.genderTexture:SetTexCoord(offset,offset+0.25,0,1);
+					ExiWoW.Frames.targetHasExiWoWFrame:Show();
 				end
 			end
 		end,
 		-- Handle the receiving end here
 		fn_receive = function(self, sender, target, data)
-			return EroWoW.ME:export(true)
+			return ExiWoW.ME:export(true)
 		end
 
 	}))
 
 	-- Disrobe --
-	table.insert(EroWoW.R.actions, EroWoW.Action:new({
+	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
 		id = "DISROBE",
 		name = "Disrobe",
 		description = "Removes a piece of armor from your target.",
@@ -94,7 +94,7 @@ function EroWoW.Action:buildLibrary()
 		cast_time = 2,
 		allow_caster_moving = false,
 		cast_sound_loop = 6425,				-- Tailoring, see http://www.wowhead.com/sound=6425/tailoring
-		max_distance = EroWoW.Action.MELEE_RANGE,
+		max_distance = ExiWoW.Action.MELEE_RANGE,
 		-- allow_self = false,
 
 		-- Custom sending logic
@@ -103,11 +103,11 @@ function EroWoW.Action:buildLibrary()
 			-- Return no data, but one callback
 			return nil, function(se, success, data)
 				if not success then
-					if data and data[1] then EroWoW:reportError(data[1], suppressErrors); end
+					if data and data[1] then ExiWoW:reportError(data[1], suppressErrors); end
 					self:resetCooldown();
 				else
 					PlaySound(1202, "SFX");
-					EroWoW:reportError(EroWoW:unitRpName(sender) .. " successfully removed "..Ambiguate(UnitName(target), "all").."'s "..EroWoW:itemSlotToname(data.slot).."!");
+					ExiWoW:reportError(ExiWoW:unitRpName(sender) .. " successfully removed "..Ambiguate(UnitName(target), "all").."'s "..ExiWoW:itemSlotToname(data.slot).."!");
 				end
 			end
 		end,
@@ -139,8 +139,8 @@ function EroWoW.Action:buildLibrary()
 			end
 
 			local slot = equipped_slots[ math.random( #equipped_slots ) ];
-			EroWoW:removeEquipped(slot);
-			EroWoW:reportError(EroWoW:unitRpName(sender) .. " tugged off your "..EroWoW:itemSlotToname(slot).."!");
+			ExiWoW:removeEquipped(slot);
+			ExiWoW:reportError(ExiWoW:unitRpName(sender) .. " tugged off your "..ExiWoW:itemSlotToname(slot).."!");
 			if not UnitIsUnit(Ambiguate(sender, "ALL"), "player") then 
 				PlaySound(1202, "SFX");
 			end
@@ -150,7 +150,7 @@ function EroWoW.Action:buildLibrary()
 	}))
 
 	-- meditate --
-	table.insert(EroWoW.R.actions, EroWoW.Action:new({
+	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
 		id = "MEDITATE",
 		self_only = true,
 		name = "Meditate",
@@ -163,17 +163,17 @@ function EroWoW.Action:buildLibrary()
 		-- Handle the receiving end here
 		fn_receive = function(self, sender, target, suppressErrors)
 
-			if EroWoW.ME.meditating then
-				return EroWoW:reportError("You are already meditating!");
+			if ExiWoW.ME.meditating then
+				return ExiWoW:reportError("You are already meditating!");
 			end
 
 			-- Start meditation --
 			DoEmote("SIT");
-			EroWoW.ME.meditating = true;
-			EroWoW.ME:toggleResting(true)
-			EroWoW.Character:bind("PLAYER_STARTED_MOVING", function()
-				EroWoW.ME:toggleResting(false)
-				EroWoW.ME.meditating = false;
+			ExiWoW.ME.meditating = true;
+			ExiWoW.ME:toggleResting(true)
+			ExiWoW.Character:bind("PLAYER_STARTED_MOVING", function()
+				ExiWoW.ME:toggleResting(false)
+				ExiWoW.ME.meditating = false;
 			end, 1);
 			return true
 
@@ -181,42 +181,42 @@ function EroWoW.Action:buildLibrary()
 	}))
 
 	-- Spot arousal (Public, melee range) --
-	table.insert(EroWoW.R.actions, EroWoW.Action:new({
+	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
 		id = "SPOT_AROUSAL",
 		name = "Spot Arousal",
 		important = true,
 		description = "Spot arousal of a nearby player.",
 		texture = "sha_ability_rogue_bloodyeye_nightborne",
 		cooldown = 0,
-		max_distance = EroWoW.Action.MELEE_RANGE,
+		max_distance = ExiWoW.Action.MELEE_RANGE,
 		party_restricted = false,
 		fn_send = function(self, sender, target, suppressErrors)
 			-- We only need a callback for this
-			return nil, function(se, success, data) EroWoW.Action:handleArousalCallback(target, success, data) end
+			return nil, function(se, success, data) ExiWoW.Action:handleArousalCallback(target, success, data) end
 		end,
-		fn_receive = EroWoW.Action.returnArousal
+		fn_receive = ExiWoW.Action.returnArousal
 	}));
 
 	-- Sniff (Worgen) --
-	table.insert(EroWoW.R.actions, EroWoW.Action:new({
+	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
 		id = "SNIFF",
 		name = "Sniff",
 		description = "Sniff the arousal of a player.",
 		texture = "inv_wolfdraenormountshadow",
 		cooldown = 0,
-		max_distance = EroWoW.Action.CASTER_RANGE,
+		max_distance = ExiWoW.Action.CASTER_RANGE,
 		party_restricted = false,
 		allowed_races = {"Worgen"},
 		fn_send = function(self, sender, target, suppressErrors)
 			DoEmote("SNIFF", target);
 			-- Callback
-			return nil, function(se, success, data) EroWoW.Action:handleArousalCallback(target, success, data) end
+			return nil, function(se, success, data) ExiWoW.Action:handleArousalCallback(target, success, data) end
 		end,
-		fn_receive = EroWoW.Action.returnArousal
+		fn_receive = ExiWoW.Action.returnArousal
 	}));
 
 	-- Fondle (Public) --
-	table.insert(EroWoW.R.actions, EroWoW.Action:new({
+	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
 		id = "FONDLE",
 		name = "Fondle",
 		description = "Fondle a player.",
@@ -224,12 +224,12 @@ function EroWoW.Action:buildLibrary()
 		--cooldown = 1.5,
 		cast_sound_success = 57179,
 		allow_instance = true,
-		max_distance = EroWoW.Action.MELEE_RANGE,
+		max_distance = ExiWoW.Action.MELEE_RANGE,
 		fn_send = sendRPText,
 		fn_receive = function(self, sender, target, args)
 			receiveRPText(self, sender, target, args) -- Default behavior
 			-- Custom actions
-			EroWoW.ME:addArousal(0.05);
+			ExiWoW.ME:addArousal(0.05);
 			return true
 		end
 	}));

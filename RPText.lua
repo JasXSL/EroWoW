@@ -1,9 +1,9 @@
-EroWoW.RPText = {}
-EroWoW.RPText.__index = EroWoW.RPText;
-EroWoW.RPText.Lib = {}
+ExiWoW.RPText = {}
+ExiWoW.RPText.__index = ExiWoW.RPText;
+ExiWoW.RPText.Lib = {}
 
-EroWoW.RPText.Req = {}
-EroWoW.RPText.Req.__index = EroWoW.RPText.Req;
+ExiWoW.RPText.Req = {}
+ExiWoW.RPText.Req.__index = ExiWoW.RPText.Req;
 
 -- The syntax of these are %S<type> for sender %T<type> for receiver. If no extra type is specified, it gets name
 local TAG_SENDER_NAME = "%S";
@@ -43,9 +43,9 @@ local TAG_GENERIC = {
 }
 
 -- RPText CLASS
-function EroWoW.RPText:new(data)
+function ExiWoW.RPText:new(data)
 	local self = {}
-	setmetatable(self, EroWoW.RPText);
+	setmetatable(self, ExiWoW.RPText);
 
 	self.id = data.id or "";			-- Generally matches an Action ID. Gets converted into a table with {id = true}
 	self.text_sender = data.text_sender or false; 		-- RP Text
@@ -63,7 +63,7 @@ function EroWoW.RPText:new(data)
 	return self
 end
 
-function EroWoW.RPText:validate(sender, receiver, spelldata, spellType)
+function ExiWoW.RPText:validate(sender, receiver, spelldata, spellType)
 
 	function validateThese(input, noOr)
 
@@ -94,16 +94,16 @@ function EroWoW.RPText:validate(sender, receiver, spelldata, spellType)
 
 end
 
-function EroWoW.RPText:convert(text, sender, receiver, spelldata)
+function ExiWoW.RPText:convert(text, sender, receiver, spelldata)
 
 	-- Do the suffixes
 	for k,v in pairs(TAG_SUFFIX_ORDER) do
-		text = string.gsub(text, "%%S"..v, EroWoW.RPText:getSynonym(v, sender, spelldata))
-		text = string.gsub(text, "%%T"..v, EroWoW.RPText:getSynonym(v, receiver, spelldata))
+		text = string.gsub(text, "%%S"..v, ExiWoW.RPText:getSynonym(v, sender, spelldata))
+		text = string.gsub(text, "%%T"..v, ExiWoW.RPText:getSynonym(v, receiver, spelldata))
 	end
 
 	for k,v in pairs(TAG_GENERIC) do
-		text = string.gsub(text, "%%"..v, EroWoW.RPText:getSynonym(v, receiver, spelldata))
+		text = string.gsub(text, "%%"..v, ExiWoW.RPText:getSynonym(v, receiver, spelldata))
 	end
 	
 	-- Default names must go last because they're subsets
@@ -115,10 +115,10 @@ function EroWoW.RPText:convert(text, sender, receiver, spelldata)
 end
 
 -- Converts and outputs text_receiver and audio, as well as triggering fn if applicable
-function EroWoW.RPText:convertAndReceive(sender, receiver, noSound, spell)
+function ExiWoW.RPText:convertAndReceive(sender, receiver, noSound, spell)
 
-	local text = EroWoW.RPText:convert(self.text_receiver, sender, receiver, spell);
-	EroWoW.RPText:print(text)
+	local text = ExiWoW.RPText:convert(self.text_receiver, sender, receiver, spell);
+	ExiWoW.RPText:print(text)
 
 	if type(self.fn) == "function" then
 		self:fn(sender, receiver);
@@ -133,14 +133,14 @@ end
 
 
 -- STATIC
--- Returns an EroWoW.RPText object
-function EroWoW.RPText:get(id, sender, receiver, spelldata, spellType)
+-- Returns an ExiWoW.RPText object
+function ExiWoW.RPText:get(id, sender, receiver, spelldata, spellType)
 
 	local viable = {};
 	local isSelfCast = UnitIsUnit(sender:getName(), receiver:getName())
 	
 
-	for k,v in pairs(EroWoW.RPText.Lib) do
+	for k,v in pairs(ExiWoW.RPText.Lib) do
 		--print(v.id, id, v:validate(sender, receiver), v.text_sender)
 		if
 			v.id[id] and v:validate(sender, receiver, spelldata, spellType) and 
@@ -163,7 +163,7 @@ function EroWoW.RPText:get(id, sender, receiver, spelldata, spellType)
 
 end
 
-function EroWoW.RPText:getSynonym(tag, target, spelldata)
+function ExiWoW.RPText:getSynonym(tag, target, spelldata)
 
 	local getSizeTag = function(size)
 
@@ -264,7 +264,7 @@ function EroWoW.RPText:getSynonym(tag, target, spelldata)
 
 end
 
-function EroWoW.RPText:print(text)
+function ExiWoW.RPText:print(text)
 	ChatFrame1:AddMessage(text, 1,0.8,1);
 	UIErrorsFrame:AddMessage(text, 1, 0.8, 1, 53, 6);
 end
@@ -273,7 +273,7 @@ end
 
 -- Req CLASS --
 -- Ranges are usually 0 = tiny, 1 = small, 2 = average, 3 = large, 4 = huge
-EroWoW.RPText.Req.Types = {
+ExiWoW.RPText.Req.Types = {
 RTYPE_HAS_PENIS = "has_penis",				-- These explain themselves
 RTYPE_HAS_VAGINA = "has_vagina",
 RTYPE_HAS_BREASTS = "has_breasts",
@@ -294,9 +294,9 @@ RTYPE_SPELL_TICK = "spell_tick",			-- Spell was ticking
 
 
 
-function EroWoW.RPText.Req:new(data)
+function ExiWoW.RPText.Req:new(data)
 	local self = {}
-	setmetatable(self, EroWoW.RPText.Req);
+	setmetatable(self, ExiWoW.RPText.Req);
 
 	self.type = data.type or false;									-- RTYPE_*
 	self.sender = data.sender or false;								-- Validate against sender							-- 
@@ -306,7 +306,7 @@ function EroWoW.RPText.Req:new(data)
 	return self
 end
 
-function EroWoW.RPText.Req:validate(sender, receiver, spelldata, spelltype)
+function ExiWoW.RPText.Req:validate(sender, receiver, spelldata, spelltype)
 	
 	
 	-- Todo: Validate a requirement
@@ -316,7 +316,7 @@ function EroWoW.RPText.Req:validate(sender, receiver, spelldata, spelltype)
 	local data = self.data;
 	local inverse = self.inverse;
 	local name = targ:getName();
-	local ty = EroWoW.RPText.Req.Types;
+	local ty = ExiWoW.RPText.Req.Types;
 
 	-- Try to find errors
 	local out = false

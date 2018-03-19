@@ -1,11 +1,11 @@
 -- Library of common reusable assets
-EroWoW.LibAssets = {}
+ExiWoW.LibAssets = {}
 -- When used in rp texts, they need to be prefixed with SPELL_
-function EroWoW.LibAssets:spellKitToRP(...)
+function ExiWoW.LibAssets:spellKitToRP(...)
 	local kits = {...}
 	local out = {}
 	for k,kit in pairs(kits) do
-		local input = EroWoW.LibAssets.spell_kits[kit];
+		local input = ExiWoW.LibAssets.spell_kits[kit];
 		for i,v in pairs(input) do
 			local tx = "SPELL_"..i;
 			out[tx] = true
@@ -16,8 +16,8 @@ end
 
 print("Building spell kits")
 -- Spell kits
-EroWoW.LibAssets.spell_kits = {}
-local sk = EroWoW.LibAssets.spell_kits;
+ExiWoW.LibAssets.spell_kits = {}
+local sk = ExiWoW.LibAssets.spell_kits;
 	sk.ice = {}											-- Ice/Cold
 	sk.ice_common = {}
 	sk.electric = {};										-- Electric shocks
@@ -39,6 +39,7 @@ local sk = EroWoW.LibAssets.spell_kits;
 
 	-- Basilisk freeze
 	sk.basilisk["Crystal Gaze"] = true
+	sk.basilisk["Petrifying Blast"] = true
 	
 	
 

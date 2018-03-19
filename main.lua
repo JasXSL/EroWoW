@@ -15,21 +15,21 @@
 	 
 ]]
 
-EroWoW = {};
-EroWoW.APP_NAME = "EroWoW"
-EroWoW.R = nil					-- Root extension
+ExiWoW = {};
+ExiWoW.APP_NAME = "ExiWoW"
+ExiWoW.R = nil					-- Root extension
 
 -- Targets
-EroWoW.ME = nil					-- My character
-EroWoW.TARGET = nil				-- Target character, do not use in actions
-EroWoW.CAST_TARGET = nil		-- Cast target character, use this in actions
+ExiWoW.ME = nil					-- My character
+ExiWoW.TARGET = nil				-- Target character, do not use in actions
+ExiWoW.CAST_TARGET = nil		-- Cast target character, use this in actions
 
-EroWoW.Frames = {}
-EroWoW.Frames.targetHasEroWoWFrame = nil;	-- Gender display
-EroWoW.Frames.portraitArousalBar = false; 	-- Arousal bar frame thing
-EroWoW.Frames.PORTRAIT_FRAME_WIDTH = 19;
-EroWoW.Frames.PORTRAIT_FRAME_HEIGHT = 19;
-EroWoW.Frames.PORTRAIT_PADDING = 7;
+ExiWoW.Frames = {}
+ExiWoW.Frames.targetHasExiWoWFrame = nil;	-- Gender display
+ExiWoW.Frames.portraitArousalBar = false; 	-- Arousal bar frame thing
+ExiWoW.Frames.PORTRAIT_FRAME_WIDTH = 19;
+ExiWoW.Frames.PORTRAIT_FRAME_HEIGHT = 19;
+ExiWoW.Frames.PORTRAIT_PADDING = 7;
 
 -- GlobalStorage defaults
 local gDefaults = {
@@ -50,75 +50,75 @@ local lDefaults = {
 };
 
 -- Constants
-EroWoW.GENITALS_PENIS = 1;
-EroWoW.GENITALS_VAGINA = 2;
-EroWoW.GENITALS_BREASTS = 4;
+ExiWoW.GENITALS_PENIS = 1;
+ExiWoW.GENITALS_VAGINA = 2;
+ExiWoW.GENITALS_BREASTS = 4;
 
 -- Register main frame
-EroWoW.MAIN = CreateFrame("Frame")
-EroWoW.MAIN:RegisterEvent("ADDON_LOADED");
-EroWoW.MAIN:RegisterEvent("PLAYER_LOGOUT");
-EroWoW.MAIN:RegisterEvent("CHAT_MSG_ADDON")
-EroWoW.MAIN:SetScript("OnEvent", function(self, event, prefix, message, channel, sender)
-	EroWoW:onEvent(self, event, prefix, message, channel, sender)
+ExiWoW.MAIN = CreateFrame("Frame")
+ExiWoW.MAIN:RegisterEvent("ADDON_LOADED");
+ExiWoW.MAIN:RegisterEvent("PLAYER_LOGOUT");
+ExiWoW.MAIN:RegisterEvent("CHAT_MSG_ADDON")
+ExiWoW.MAIN:SetScript("OnEvent", function(self, event, prefix, message, channel, sender)
+	ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 end)
 
 -- Initializer --
-function EroWoW:ini()
+function ExiWoW:ini()
 
-	--EroWoW.Menu.ini();
-	EroWoW.R = EroWoW.Extension:import({id="ROOT"}, true);	-- Build the main extension for assets
+	--ExiWoW.Menu.ini();
+	ExiWoW.R = ExiWoW.Extension:import({id="ROOT"}, true);	-- Build the main extension for assets
 
 	-- Add character
-	EroWoW.ME = EroWoW.Character:new();
+	ExiWoW.ME = ExiWoW.Character:new();
 
-	EroWoW.ME.penis_size = EroWoW.LS.penis_size;
-	EroWoW.ME.vagina_size = EroWoW.LS.vagina_size;
-	EroWoW.ME.breast_size = EroWoW.LS.breast_size;
-	EroWoW.ME.butt_size = EroWoW.LS.butt_size;
-	EroWoW.ME.masochism = EroWoW.LS.masochism;
-	EroWoW.ME.arousal = EroWoW.LS.arousal;
+	ExiWoW.ME.penis_size = ExiWoW.LS.penis_size;
+	ExiWoW.ME.vagina_size = ExiWoW.LS.vagina_size;
+	ExiWoW.ME.breast_size = ExiWoW.LS.breast_size;
+	ExiWoW.ME.butt_size = ExiWoW.LS.butt_size;
+	ExiWoW.ME.masochism = ExiWoW.LS.masochism;
+	ExiWoW.ME.arousal = ExiWoW.LS.arousal;
 	
 
-	EroWoW:buildUnitFrames();
+	ExiWoW:buildUnitFrames();
 	
 
 	-- Initialize timer and character
 	
-	EroWoW.Timer.ini();
-	EroWoW.Character:ini()
-	EroWoW.Menu:ini();
-	EroWoW.ME:onCapChange()
+	ExiWoW.Timer.ini();
+	ExiWoW.Character:ini()
+	ExiWoW.Menu:ini();
+	ExiWoW.ME:onCapChange()
 	
 	-- Action slash command
 	SLASH_EWACT1 = '/ewact'
-	function SlashCmdList.EWACT(msg, editbox) EroWoW.Action:useOnTarget(msg, "target") end
+	function SlashCmdList.EWACT(msg, editbox) ExiWoW.Action:useOnTarget(msg, "target") end
 	SLASH_EWRESET1 = '/ewreset'
-	function SlashCmdList.EWRESET(msg, editbox) EroWoW:resetSettings() end
+	function SlashCmdList.EWRESET(msg, editbox) ExiWoW:resetSettings() end
 
-	EroWoW.Action:ini()
+	ExiWoW.Action:ini()
 
 	-- Build libraries
-	EroWoW.RPText:buildLibrary()
-	EroWoW.Action:buildLibrary()
-	EroWoW.SpellBinding:buildLibrary()
-	EroWoW.Extension:index() -- Update the built libraries
+	ExiWoW.RPText:buildLibrary()
+	ExiWoW.Action:buildLibrary()
+	ExiWoW.SpellBinding:buildLibrary()
+	ExiWoW.Extension:index() -- Update the built libraries
 
 	-- Bind listener
-	RegisterAddonMessagePrefix(EroWoW.APP_NAME.."_act")		-- Sends an action	 {cb:cbToken, id:action_id, data:(var)data}
-	RegisterAddonMessagePrefix(EroWoW.APP_NAME.."_cb")		-- Receive a callback {cb:cbToken, success:(bool)success, data:(var)data}
+	RegisterAddonMessagePrefix(ExiWoW.APP_NAME.."_act")		-- Sends an action	 {cb:cbToken, id:action_id, data:(var)data}
+	RegisterAddonMessagePrefix(ExiWoW.APP_NAME.."_cb")		-- Receive a callback {cb:cbToken, success:(bool)success, data:(var)data}
 	
 
-	print("EroWoW online!");
+	print("ExiWoW online!");
 end
 
 
 
 -- Reset settings
-function EroWoW:resetSettings()
-	local s = EroWoW.GS;
+function ExiWoW:resetSettings()
+	local s = ExiWoW.GS;
 	for k,v in pairs(gDefaults) do s[k] = v end
-	s = EroWoW.LS;
+	s = ExiWoW.LS;
 	for k,v in pairs(lDefaults) do s[k] = v end
 	print("Settings reset")
 end
@@ -126,51 +126,51 @@ end
 
 	-- Primary event handler --
 	-- Handles addon commands and loading --
-function EroWoW:onEvent(self, event, prefix, message, channel, sender)
+function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 
 
-	if event == "ADDON_LOADED" and prefix == EroWoW.APP_NAME then
+	if event == "ADDON_LOADED" and prefix == ExiWoW.APP_NAME then
 		
-		if not EroWoWLocalStorage then EroWoWLocalStorage = {} end
-		if not EroWoWGlobalStorage then EroWoWGlobalStorage = {} end
+		if not ExiWoWLocalStorage then ExiWoWLocalStorage = {} end
+		if not ExiWoWGlobalStorage then ExiWoWGlobalStorage = {} end
 		-- handy shortcuts
-		EroWoW.LS = EroWoWLocalStorage;
-		EroWoW.GS = EroWoWGlobalStorage;
+		ExiWoW.LS = ExiWoWLocalStorage;
+		ExiWoW.GS = ExiWoWGlobalStorage;
 
 		-- Loading
 		for k,v in pairs(gDefaults) do
-			if EroWoWGlobalStorage[k] == nil then EroWoWGlobalStorage[k] = v end
+			if ExiWoWGlobalStorage[k] == nil then ExiWoWGlobalStorage[k] = v end
 		end
 		for k,v in pairs(lDefaults) do
-			if EroWoWLocalStorage[k] == nil then EroWoWLocalStorage[k] = v end
+			if ExiWoWLocalStorage[k] == nil then ExiWoWLocalStorage[k] = v end
 		end
 		
 		-- From here we can initialize
-		EroWoW:ini();
+		ExiWoW:ini();
 
 		
 
 		-- Load in abilities
-		for k,v in pairs(EroWoW.LS.abilities) do
-			local abil = EroWoW.Action:get(v.id)
+		for k,v in pairs(ExiWoW.LS.abilities) do
+			local abil = ExiWoW.Action:get(v.id)
 			if abil then abil:import(v) end
 		end
 
 		-- Redraw with cooldowns
-		EroWoW.Action:libSort();
-		EroWoW.Menu:refreshSpellsPage();
+		ExiWoW.Action:libSort();
+		ExiWoW.Menu:refreshSpellsPage();
 
 	end
 
 	if event == "PLAYER_LOGOUT" then
 
 		-- Saving
-		local l = EroWoW.LS;
+		local l = ExiWoW.LS;
 
-		l.arousal = EroWoW.ME.arousal;
+		l.arousal = ExiWoW.ME.arousal;
 
 		l.abilities = {};
-		for k,v in pairs(EroWoW.Action.LIB) do
+		for k,v in pairs(ExiWoW.Action.LIB) do
 			if not v.hidden then
 				table.insert( l.abilities, v:export() )
 			end
@@ -181,25 +181,25 @@ function EroWoW:onEvent(self, event, prefix, message, channel, sender)
 	-- Action received
 	if event == "CHAT_MSG_ADDON" then 
 		
-		if prefix == EroWoW.APP_NAME.."_act" then
+		if prefix == ExiWoW.APP_NAME.."_act" then
 
 			local sname = Ambiguate(sender, "all") 			-- Sender name for use in units
-			local data = EroWoW.json.decode(message); 		-- JSON decode message
+			local data = ExiWoW.json.decode(message); 		-- JSON decode message
 			local cb = data.cb								-- Callback if exists
 			local aID = data.id								-- Action ID
-			local success, data = EroWoW.Action:receive(aID, sender, data.data);
+			local success, data = ExiWoW.Action:receive(aID, sender, data.data);
 			if cb then
-				EroWoW:sendCallback(cb, sname, success, data);
+				ExiWoW:sendCallback(cb, sname, success, data);
 			end
 
 		end
 
-		if prefix == EroWoW.APP_NAME.."_cb" then
+		if prefix == ExiWoW.APP_NAME.."_cb" then
 
 			local sname = Ambiguate(sender, "all")
-			local data = EroWoW.json.decode(message);
+			local data = ExiWoW.json.decode(message);
 			local cb = data.cb
-			EroWoW.Callbacks:trigger(cb, data.success, data.data, sender);
+			ExiWoW.Callbacks:trigger(cb, data.success, data.data, sender);
 
 		end
 
@@ -208,7 +208,7 @@ end
 
 
 	-- Communications --
-function EroWoW:sendAction(unit, actionID, data, callback)
+function ExiWoW:sendAction(unit, actionID, data, callback)
 
 	local out = {
 		id = actionID,
@@ -216,12 +216,12 @@ function EroWoW:sendAction(unit, actionID, data, callback)
 	};
 
 	if type(callback) == "function" then
-		out.cb = EroWoW.Callbacks:add(callback);
+		out.cb = ExiWoW.Callbacks:add(callback);
 	end
-	SendAddonMessage(EroWoW.APP_NAME.."_act", EroWoW.json.encode(out), "WHISPER", unit)
+	SendAddonMessage(ExiWoW.APP_NAME.."_act", ExiWoW.json.encode(out), "WHISPER", unit)
 end
 
-function EroWoW:sendCallback(token, unit, success, data)
+function ExiWoW:sendCallback(token, unit, success, data)
 
 	local out = {
 		cb = token,
@@ -229,33 +229,33 @@ function EroWoW:sendCallback(token, unit, success, data)
 		data = data
 	};
 
-	SendAddonMessage(EroWoW.APP_NAME.."_cb", EroWoW.json.encode(out), "WHISPER", unit)
+	SendAddonMessage(ExiWoW.APP_NAME.."_cb", ExiWoW.json.encode(out), "WHISPER", unit)
 
 end
 
 
 	-- Tools --
 -- Returns false so you can use it as a return value
-function EroWoW:reportError(message, ignore)
+function ExiWoW:reportError(message, ignore)
 	if ignore then return false end
 	UIErrorsFrame:AddMessage(message, 1.0, 0.0, 0.0, 53, 6);
 	return false;
 end
 
-function EroWoW:reportNotice(message)
+function ExiWoW:reportNotice(message)
 	UIErrorsFrame:AddMessage(message, 0.5, 1.0, 0.5, 53, 6);
 	return true;
 end
 
 -- Returns an RP name, removing realm name if needed and replacing self with you
-function EroWoW:unitRpName(unit)
+function ExiWoW:unitRpName(unit)
 	unit = Ambiguate(unit, "all")
 	if UnitIsUnit(unit, "player") then return "YOU" end
 	return unit;
 end
 
 -- Removes an equipped item and puts it into inventory if possible
-function EroWoW:removeEquipped( slot )
+function ExiWoW:removeEquipped( slot )
 
 	for i=0,4 do
 		local free = GetContainerNumFreeSlots(i);
@@ -272,20 +272,20 @@ function EroWoW:removeEquipped( slot )
 
 end
 
-function EroWoW:timeFormat(seconds)
+function ExiWoW:timeFormat(seconds)
 
 	if seconds > 3600 then return tostring(math.ceil(seconds/3600)).." Hr" end
 	if seconds > 60 then return tostring(math.ceil(seconds/60)) .. " Min" end
 	return tostring(math.ceil(seconds)).." Sec"
 end
 
-function EroWoW:Set(list)
+function ExiWoW:Set(list)
 	local set = {}
 	for _, l in ipairs(list) do set[l] = true end
 	return set
 end
 
-function EroWoW:itemSlotToname(slot)
+function ExiWoW:itemSlotToname(slot)
 	local all_slots = {}
 	all_slots[1] = "head armor"
 	all_slots[3] = "shoulder armor"
@@ -302,11 +302,11 @@ end
 
 
 -- Unit Frames -
-function EroWoW:buildUnitFrames()
+function ExiWoW:buildUnitFrames()
 
-	local frameWidth = EroWoW.Frames.PORTRAIT_FRAME_WIDTH;
-	local frameHeight = EroWoW.Frames.PORTRAIT_FRAME_HEIGHT;
-	local padding = EroWoW.Frames.PORTRAIT_PADDING;
+	local frameWidth = ExiWoW.Frames.PORTRAIT_FRAME_WIDTH;
+	local frameHeight = ExiWoW.Frames.PORTRAIT_FRAME_HEIGHT;
+	local padding = ExiWoW.Frames.PORTRAIT_PADDING;
 
 	-- Icon
 	local bg = CreateFrame("Button",nil,PlayerFrame); --frameType, frameName, frameParent, frameTemplate   
@@ -320,7 +320,7 @@ function EroWoW:buildUnitFrames()
 	-- Bind events
 	bg:RegisterForClicks("AnyUp");
 	bg:SetScript("OnClick", function (self, button, down)
-		EroWoW.Menu:toggle();
+		ExiWoW.Menu:toggle();
 	end);
 
 	bg:SetFrameStrata("HIGH");
@@ -352,8 +352,8 @@ function EroWoW:buildUnitFrames()
 	t:SetRotation(-math.pi/2);
 	t:SetVertexColor(1,0.75,1)
 	t:AddMaskTexture(mask);
-	EroWoW.Frames.portraitArousalBar = t;
-	EroWoW.ME:updateArousalDisplay();
+	ExiWoW.Frames.portraitArousalBar = t;
+	ExiWoW.ME:updateArousalDisplay();
 
 	-- Border
 
@@ -404,13 +404,13 @@ function EroWoW:buildUnitFrames()
 	bg:SetSize(20,20);
 	bg:SetPoint("TOPRIGHT",-88,-10);
 	t = bg:CreateTexture(nil, "BACKGROUND");
-	t:SetTexture("Interface/AddOns/EroWoW/media/icons/genders.blp");
+	t:SetTexture("Interface/AddOns/ExiWoW/media/icons/genders.blp");
 	t:SetVertexColor(1,0.5,1);
 	t:SetTexCoord(0,0.25,0,1);
 	t:SetAlpha(0.75);
 	t:SetAllPoints(bg);
 	bg.genderTexture = t;
-	EroWoW.Frames.targetHasEroWoWFrame = bg;
+	ExiWoW.Frames.targetHasExiWoWFrame = bg;
 	bg:Hide();
 
 	--[[
@@ -419,6 +419,6 @@ function EroWoW:buildUnitFrames()
 	t:SetJustifyH("CENTER")
 	t:SetJustifyV("MIDDLE")
 	t:SetTextColor(0.75,0.5,0.75,1)
-	t:SetText(floor(EroWoW.ME.arousal*100))
+	t:SetText(floor(ExiWoW.ME.arousal*100))
 ]]
 end

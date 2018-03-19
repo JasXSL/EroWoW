@@ -1,45 +1,45 @@
 -- Contains info about a character, 
-EroWoW.Character = {}
-EroWoW.Character.__index = EroWoW.Character;
-EroWoW.Character.evtFrame = CreateFrame("Frame");
-EroWoW.Character.eventBindings = {};		-- {id:(int)id, evt:(str)evt, fn:(func)function, numTriggers:(int)numTriggers=inf}
-EroWoW.Character.eventBindingIndex = 0;	
+ExiWoW.Character = {}
+ExiWoW.Character.__index = ExiWoW.Character;
+ExiWoW.Character.evtFrame = CreateFrame("Frame");
+ExiWoW.Character.eventBindings = {};		-- {id:(int)id, evt:(str)evt, fn:(func)function, numTriggers:(int)numTriggers=inf}
+ExiWoW.Character.eventBindingIndex = 0;	
 
-EroWoW.Character.takehitCD = nil			-- Cooldown for takehit texts
+ExiWoW.Character.takehitCD = nil			-- Cooldown for takehit texts
 
 
 -- Consts
-EroWoW.Character.AROUSAL_FADE_PER_SEC = 0.05;
-EroWoW.Character.AROUSAL_MAX = 1.25;				-- You can overshoot max arousal and have to wait longer
-EroWoW.Character.AROUSAL_FADE_IDLE = 0.001;
-EroWoW.Character.AURAS = {}
+ExiWoW.Character.AROUSAL_FADE_PER_SEC = 0.05;
+ExiWoW.Character.AROUSAL_MAX = 1.25;				-- You can overshoot max arousal and have to wait longer
+ExiWoW.Character.AROUSAL_FADE_IDLE = 0.001;
+ExiWoW.Character.AURAS = {}
 
 
 
 -- Static
-function EroWoW.Character:ini()
+function ExiWoW.Character:ini()
 
-	EroWoW.Character.evtFrame:SetScript("OnEvent", EroWoW.Character.onEvent)
-	EroWoW.Character.evtFrame:RegisterEvent("PLAYER_STARTED_MOVING")
-	EroWoW.Character.evtFrame:RegisterEvent("PLAYER_STOPPED_MOVING")
-	EroWoW.Character.evtFrame:RegisterUnitEvent("UNIT_SPELLCAST_START", "player");
-	EroWoW.Character.evtFrame:RegisterUnitEvent("UNIT_SPELLCAST_SENT", "player");
-	EroWoW.Character.evtFrame:RegisterEvent("SOUNDKIT_FINISHED");
-	EroWoW.Character.evtFrame:RegisterEvent("COMBAT_LOG_EVENT")
-	EroWoW.Character.evtFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
-	EroWoW.Character.evtFrame:RegisterUnitEvent("UNIT_AURA", "player")
-	EroWoW.Character.evtFrame:RegisterEvent("PLAYER_DEAD");
+	ExiWoW.Character.evtFrame:SetScript("OnEvent", ExiWoW.Character.onEvent)
+	ExiWoW.Character.evtFrame:RegisterEvent("PLAYER_STARTED_MOVING")
+	ExiWoW.Character.evtFrame:RegisterEvent("PLAYER_STOPPED_MOVING")
+	ExiWoW.Character.evtFrame:RegisterUnitEvent("UNIT_SPELLCAST_START", "player");
+	ExiWoW.Character.evtFrame:RegisterUnitEvent("UNIT_SPELLCAST_SENT", "player");
+	ExiWoW.Character.evtFrame:RegisterEvent("SOUNDKIT_FINISHED");
+	ExiWoW.Character.evtFrame:RegisterEvent("COMBAT_LOG_EVENT")
+	ExiWoW.Character.evtFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
+	ExiWoW.Character.evtFrame:RegisterUnitEvent("UNIT_AURA", "player")
+	ExiWoW.Character.evtFrame:RegisterEvent("PLAYER_DEAD");
 
 	-- Main timer, ticking once per second
-	EroWoW.Timer:set(function()
+	ExiWoW.Timer:set(function()
 		
 		-- Owner meditation
-		local me = EroWoW.ME;
+		local me = ExiWoW.ME;
 		local fade = 0;
 		if me.meditating then
-			fade = EroWoW.Character.AROUSAL_FADE_PER_SEC;
+			fade = ExiWoW.Character.AROUSAL_FADE_PER_SEC;
 		elseif not UnitAffectingCombat("player") then
-			fade = EroWoW.Character.AROUSAL_FADE_IDLE;
+			fade = ExiWoW.Character.AROUSAL_FADE_IDLE;
 		end
 		me:addArousal(-fade);
 
@@ -48,7 +48,7 @@ function EroWoW.Character:ini()
 
 end
 
-function EroWoW.Character:onEvent(event, ...)
+function ExiWoW.Character:onEvent(event, ...)
 
 	local arguments = {...}
 
@@ -58,7 +58,7 @@ function EroWoW.Character:onEvent(event, ...)
 	end
 
 
-	for k,v in pairs(EroWoW.Character.eventBindings) do
+	for k,v in pairs(ExiWoW.Character.eventBindings) do
 
 		if v.evt == event then
 
@@ -66,9 +66,9 @@ function EroWoW.Character:onEvent(event, ...)
 
 			-- Remove if out of triggers
 			if trigs < 1 then
-				EroWoW.Character.eventBindings[k] = nil;
+				ExiWoW.Character.eventBindings[k] = nil;
 			else
-				EroWoW.Character.eventBindings[k].numTriggers = trigs;
+				ExiWoW.Character.eventBindings[k].numTriggers = trigs;
 			end
 
 			if type(v.fn) == "function" then
@@ -79,15 +79,15 @@ function EroWoW.Character:onEvent(event, ...)
 	end
 
 	if event == "PLAYER_TARGET_CHANGED" then
-		EroWoW.Frames.targetHasEroWoWFrame:Hide();
+		ExiWoW.Frames.targetHasExiWoWFrame:Hide();
 		if UnitExists("target") then
 			-- Query for the addon
-			EroWoW.Action:useOnTarget("A", "target", true);
+			ExiWoW.Action:useOnTarget("A", "target", true);
 		end
 	end
 
 	if event == "PLAYER_DEAD" then
-		EroWoW.ME:addArousal(0, true);
+		ExiWoW.ME:addArousal(0, true);
 	end
 	
 	if event == "UNIT_AURA" then
@@ -109,10 +109,10 @@ function EroWoW.Character:onEvent(event, ...)
 
 			local aura = buildSpellTrigger(spellId, name, harmful, unitCaster, count)
 			table.insert(active, aura)
-			if not auraExists(EroWoW.Character.AURAS, aura) then
+			if not auraExists(ExiWoW.Character.AURAS, aura) then
 				local uc = unitCaster;
 				if not uc then uc = "??" else uc = UnitName(unitCaster) end
-				EroWoW.SpellBinding:onAdd(EroWoW.Character:buildNPC(unitCaster, uc), aura)
+				ExiWoW.SpellBinding:onAdd(ExiWoW.Character:buildNPC(unitCaster, uc), aura)
 			end
 
 		end
@@ -133,15 +133,15 @@ function EroWoW.Character:onEvent(event, ...)
 		end
 
 		-- See what auras were removed
-		for i,a in pairs(EroWoW.Character.AURAS) do
+		for i,a in pairs(ExiWoW.Character.AURAS) do
 			if not auraExists(active, a) then
 				local uc = unitCaster;
 				if not uc then uc = "??" else uc = UnitName(unitCaster) end
-				EroWoW.SpellBinding:onRemove(EroWoW.Character:buildNPC(a.unitCaster, uc), a)
+				ExiWoW.SpellBinding:onRemove(ExiWoW.Character:buildNPC(a.unitCaster, uc), a)
 			end
 		end
 
-		EroWoW.Character.AURAS = active
+		ExiWoW.Character.AURAS = active
 
 	end
 
@@ -159,10 +159,10 @@ function EroWoW.Character:onEvent(event, ...)
 		end
 
 		-- These only work for healing or damage
-		if not EroWoW.Character.takehitCD and (eventPrefix == "SPELL" or eventPrefix == "SPELL_PERIODIC") and (eventSuffix == "DAMAGE" or eventSuffix=="HEAL") then
+		if not ExiWoW.Character.takehitCD and (eventPrefix == "SPELL" or eventPrefix == "SPELL_PERIODIC") and (eventSuffix == "DAMAGE" or eventSuffix=="HEAL") then
 
-			local npc = EroWoW.Character:new({}, sourceName);
-			if u then npc = EroWoW.Character:buildNPC(u, sourceName) end
+			local npc = ExiWoW.Character:new({}, sourceName);
+			if u then npc = ExiWoW.Character:buildNPC(u, sourceName) end
 
 			-- Todo: Add spell triggers
 			damage = arguments[15]
@@ -177,7 +177,7 @@ function EroWoW.Character:onEvent(event, ...)
 				1,
 				arguments[21] -- Crit
 			)
-			EroWoW.SpellBinding:onTick(npc, trig)
+			ExiWoW.SpellBinding:onTick(npc, trig)
 
 		elseif eventSuffix == "DAMAGE" and eventPrefix == "SWING" then
 
@@ -191,49 +191,49 @@ function EroWoW.Character:onEvent(event, ...)
 			damage = arguments[12]
 
 			
-			local chance = EroWoW.GS.swing_text_freq;
+			local chance = ExiWoW.GS.swing_text_freq;
 			if crit ~= "" then chance = chance*4 end -- Crits have 3x chance for swing text
 
 			local rand = math.random()
-			if not EroWoW.Character.takehitCD and rand < chance and u and not UnitIsPlayer(u) then
+			if not ExiWoW.Character.takehitCD and rand < chance and u and not UnitIsPlayer(u) then
 
-				local npc = EroWoW.Character:buildNPC(u, sourceName)
-				local rp = EroWoW.RPText:get(eventPrefix..crit, npc, EroWoW.ME)
+				local npc = ExiWoW.Character:buildNPC(u, sourceName)
+				local rp = ExiWoW.RPText:get(eventPrefix..crit, npc, ExiWoW.ME)
 				if rp then
-					EroWoW.Character:setTakehitTimer();
-					rp:convertAndReceive(npc, EroWoW.ME)
+					ExiWoW.Character:setTakehitTimer();
+					rp:convertAndReceive(npc, ExiWoW.ME)
 				end
 
 			end
 
 			if damage <= 0 then return end
 			local percentage = damage/UnitHealthMax("player");
-			EroWoW.ME:addArousal(percentage*0.1, false, true);
+			ExiWoW.ME:addArousal(percentage*0.1, false, true);
 			
 
 	   end
 	end
 end
 
-function EroWoW.Character:bind(evt, fn, numTriggers)
+function ExiWoW.Character:bind(evt, fn, numTriggers)
 
-	EroWoW.Character.eventBindingIndex = EroWoW.Character.eventBindingIndex+1;
-	table.insert(EroWoW.Character.eventBindings, {
-		id = EroWoW.Character.eventBindingIndex,
+	ExiWoW.Character.eventBindingIndex = ExiWoW.Character.eventBindingIndex+1;
+	table.insert(ExiWoW.Character.eventBindings, {
+		id = ExiWoW.Character.eventBindingIndex,
 		evt = evt,
 		fn = fn,
 		numTriggers = numTriggers or math.huge
 	});
 
-	return EroWoW.Character.eventBindingIndex;
+	return ExiWoW.Character.eventBindingIndex;
 
 end
 
-function EroWoW.Character:unbind(id)
+function ExiWoW.Character:unbind(id)
 
-	for k,v in pairs(EroWoW.Character.eventBindings) do
+	for k,v in pairs(ExiWoW.Character.eventBindings) do
 		if v.id == id then
-			EroWoW.Character.eventBindings[k] = nil;
+			ExiWoW.Character.eventBindings[k] = nil;
 			return
 		end
 	end
@@ -241,10 +241,10 @@ function EroWoW.Character:unbind(id)
 end
 
 -- Builds an NPC from a unit
-function EroWoW.Character:buildNPC(u, name)
+function ExiWoW.Character:buildNPC(u, name)
 
 	if not name then name = "???" end
-	local npc = EroWoW.Character:new({}, name);
+	local npc = ExiWoW.Character:new({}, name);
 	if not u then u = "???" end
 	npc.type = UnitCreatureType(u) or "???";
 	--npc.race = UnitRace(u);
@@ -260,11 +260,11 @@ function EroWoW.Character:buildNPC(u, name)
 end
 
 
-function EroWoW.Character:setTakehitTimer()
-	local rate = EroWoW.GS.takehit_rp_rate;
-	EroWoW.Timer:clear(EroWoW.Character.takehitCD);
-	EroWoW.Character.takehitCD = EroWoW.Timer:set(function()
-		EroWoW.Character.takehitCD = nil;
+function ExiWoW.Character:setTakehitTimer()
+	local rate = ExiWoW.GS.takehit_rp_rate;
+	ExiWoW.Timer:clear(ExiWoW.Character.takehitCD);
+	ExiWoW.Character.takehitCD = ExiWoW.Timer:set(function()
+		ExiWoW.Character.takehitCD = nil;
 	end, rate)
 end
 
@@ -273,9 +273,9 @@ end
 
 
 	-- Class declaration --
-function EroWoW.Character:new(settings, name)
+function ExiWoW.Character:new(settings, name)
 	local self = {}
-	setmetatable(self, EroWoW.Character); 
+	setmetatable(self, ExiWoW.Character); 
 	if type(settings) ~= "table" then
 		settings = {}
 	end
@@ -311,7 +311,7 @@ function EroWoW.Character:new(settings, name)
 	-- 
 
 	-- Importable properties
-	-- Use EroWoW.Character:getnSize
+	-- Use ExiWoW.Character:getnSize
 	-- If all these are false, size will be set to 2 for penis/breasts, 0 for vagina. Base on character sex in WoW 
 	self.penis_size = getVar(settings.penis_size, false);				-- False or range between 0 and 4
 	self.vagina_size = getVar(settings.vagina_size, false);				-- False or 0
@@ -325,7 +325,7 @@ function EroWoW.Character:new(settings, name)
 end
 
 -- Exporting
-function EroWoW.Character:export(full)
+function ExiWoW.Character:export(full)
 	local out = {
 		arousal = self.arousal,
 		penis_size = self.penis_size,
@@ -342,30 +342,30 @@ function EroWoW.Character:export(full)
 end
 
 -- Gets a clamped arousal value
-function EroWoW.Character:getArousalPerc()
+function ExiWoW.Character:getArousalPerc()
 	return max(min(self.arousal,1),0);
 end
 
 -- Raised when you max or drop off max arousal --
-function EroWoW.Character:onCapChange()
+function ExiWoW.Character:onCapChange()
 	local maxed = self.arousal >= 1
 
-	EroWoW.Timer:clear(EroWoW.capFlashTimer);
+	ExiWoW.Timer:clear(ExiWoW.capFlashTimer);
 	local se = self
 	if maxed then
-		self.capFlashTimer = EroWoW.Timer:set(function()
+		self.capFlashTimer = ExiWoW.Timer:set(function()
 			se.capFlashPow = se.capFlashPow+0.25;
 			if se.capFlashPow >= 2 then se.capFlashPow = 0 end
 			local green = -0.5 * (math.cos(math.pi * se.capFlashPow) - 1)
-			EroWoW.portraitBorder:SetVertexColor(1,0.5+green*0.5,1);
+			ExiWoW.portraitBorder:SetVertexColor(1,0.5+green*0.5,1);
 		end, 0.05, math.huge);
 	else
-		EroWoW.portraitBorder:SetVertexColor(1,1,1);
+		ExiWoW.portraitBorder:SetVertexColor(1,1,1);
 	end
 
 end
 
-function EroWoW.Character:addArousal(amount, set, multiplyMasochism)
+function ExiWoW.Character:addArousal(amount, set, multiplyMasochism)
 
 	if multiplyMasochism then amount = amount*self.masochism end
 	local pre = self.arousal >= 1
@@ -375,7 +375,7 @@ function EroWoW.Character:addArousal(amount, set, multiplyMasochism)
 		self.arousal = tonumber(amount);
 	end
 
-	self.arousal =max(min(self.arousal, EroWoW.Character.AROUSAL_MAX), 0);
+	self.arousal =max(min(self.arousal, ExiWoW.Character.AROUSAL_MAX), 0);
 	self:updateArousalDisplay();
 
 	if (self.arousal >= 1) ~= pre then
@@ -384,39 +384,39 @@ function EroWoW.Character:addArousal(amount, set, multiplyMasochism)
 
 end
 
-function EroWoW.Character:toggleResting(on)
+function ExiWoW.Character:toggleResting(on)
 
-	EroWoW.Timer:clear(self.restingTimer);
+	ExiWoW.Timer:clear(self.restingTimer);
 	local se = self
 	if on then
 		se.restingPow = 0
-		self.restingTimer = EroWoW.Timer:set(function()
+		self.restingTimer = ExiWoW.Timer:set(function()
 			se.restingPow = se.restingPow+0.1;
 			local opacity = -0.5 * (math.cos(math.pi * se.restingPow) - 1)
-			EroWoW.portraitResting:SetAlpha(0.5+opacity*0.5);
+			ExiWoW.portraitResting:SetAlpha(0.5+opacity*0.5);
 		end, 0.05, math.huge);
 	else
-		EroWoW.portraitResting:SetAlpha(0);
+		ExiWoW.portraitResting:SetAlpha(0);
 	end
 
 end
 
-function EroWoW.Character:updateArousalDisplay()
+function ExiWoW.Character:updateArousalDisplay()
 
-	EroWoW.Frames.portraitArousalBar:SetHeight(EroWoW.Frames.PORTRAIT_FRAME_HEIGHT*max(self:getArousalPerc(), 0.00001));
+	ExiWoW.Frames.portraitArousalBar:SetHeight(ExiWoW.Frames.PORTRAIT_FRAME_HEIGHT*max(self:getArousalPerc(), 0.00001));
 
 end
 
 
 
-function EroWoW.Character:isGenderless()
+function ExiWoW.Character:isGenderless()
 	if self.penis_size == false and self.vagina_size == false and self.type == "player" then
 		return true
 	end
 	return false; 
 end
 
-function EroWoW.Character:getPenisSize()
+function ExiWoW.Character:getPenisSize()
 	
 	if self:isGenderless() then
 		if UnitSex("player") == 2 
@@ -428,7 +428,7 @@ function EroWoW.Character:getPenisSize()
 
 end
 
-function EroWoW.Character:getBreastSize()
+function ExiWoW.Character:getBreastSize()
 	
 	if self:isGenderless() and not self.breast_size then
 		if UnitSex("player") == 3
@@ -440,7 +440,7 @@ function EroWoW.Character:getBreastSize()
 
 end
 
-function EroWoW.Character:getVaginaSize()
+function ExiWoW.Character:getVaginaSize()
 	
 	if self:isGenderless() then
 		if UnitSex("player") == 3
@@ -452,7 +452,7 @@ function EroWoW.Character:getVaginaSize()
 
 end
 
-function EroWoW.Character:getButtSize()
+function ExiWoW.Character:getButtSize()
 	
 	if type(self.butt_size) ~= "number" then
 		return 2
@@ -463,18 +463,18 @@ function EroWoW.Character:getButtSize()
 end
 
 -- Returns an Ambiguate name
-function EroWoW.Character:getName()
+function ExiWoW.Character:getName()
 	if self.name == nil then
 		return Ambiguate(UnitName("player"), "all") 
 	end
 	return Ambiguate(self.name, "all");
 end
 
-function EroWoW.Character:isMale()
+function ExiWoW.Character:isMale()
 	return self:getPenisSize() ~= false and self:getBreastSize() == false and self:getVaginaSize() == false
 end
 
-function EroWoW.Character:isFemale()
+function ExiWoW.Character:isFemale()
 	return self:getPenisSize() == false and self:getBreastSize() ~= false and self:getVaginaSize() ~= false
 end
 

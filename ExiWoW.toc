@@ -1,10 +1,10 @@
 ## Interface: 70300
-## Title: EroWoW
+## Title: ExiWoW
 ## Notes: Adds arousal to WoW!
 ## Version: 0.0.1
 
-## SavedVariables: EroWoWGlobalStorage
-## SavedVariablesPerCharacter: EroWoWLocalStorage
+## SavedVariables: ExiWoWGlobalStorage
+## SavedVariablesPerCharacter: ExiWoWLocalStorage
 
 panel.xml
 

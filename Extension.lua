@@ -1,10 +1,10 @@
-EroWoW.Extension = {}
-EroWoW.Extension.__index = EroWoW.Extension;
-EroWoW.Extension.LIB = {};						-- name => EroWoW.Extension
+ExiWoW.Extension = {}
+ExiWoW.Extension.__index = ExiWoW.Extension;
+ExiWoW.Extension.LIB = {};						-- name => ExiWoW.Extension
 
-function EroWoW.Extension:new(data, isRoot)
+function ExiWoW.Extension:new(data, isRoot)
 	local self = {}
-	setmetatable(self, EroWoW.Character); 
+	setmetatable(self, ExiWoW.Character); 
 	if type(data) ~= "table" or type(data.id) ~= "string" or (data.id == "ROOT" and not isRoot) then
 		print("Unable to import extension, data or id missing")
 		return false;
@@ -30,7 +30,7 @@ function EroWoW.Extension:new(data, isRoot)
 end
 
 -- Exports to a JSON string for the user
-function EroWoW.Extension:export()
+function ExiWoW.Extension:export()
 	if self.id == nil then return false end
 	-- Todo:export
 end
@@ -40,7 +40,7 @@ end
 -- STATIC --
 
 -- Updates asset indexes --
-function EroWoW.Extension:index()
+function ExiWoW.Extension:index()
 
 	local function TableConcat(t1,t2)
 		for i=1,#t2 do
@@ -50,20 +50,20 @@ function EroWoW.Extension:index()
 	end
 
 	-- Reset libraries
-	EroWoW.RPText.Lib = {}
-	EroWoW.SpellBinding.Lib = {}
-	EroWoW.Action.LIB = {}
+	ExiWoW.RPText.Lib = {}
+	ExiWoW.SpellBinding.Lib = {}
+	ExiWoW.Action.LIB = {}
 	
-	for k,v in pairs(EroWoW.Extension.LIB) do
-		EroWoW.RPText.Lib = TableConcat(EroWoW.RPText.Lib, v.rpTexts);
-		EroWoW.Action.LIB = TableConcat(EroWoW.Action.LIB, v.actions);
-		EroWoW.SpellBinding.Lib = TableConcat(EroWoW.SpellBinding.Lib, v.spellBindings);
+	for k,v in pairs(ExiWoW.Extension.LIB) do
+		ExiWoW.RPText.Lib = TableConcat(ExiWoW.RPText.Lib, v.rpTexts);
+		ExiWoW.Action.LIB = TableConcat(ExiWoW.Action.LIB, v.actions);
+		ExiWoW.SpellBinding.Lib = TableConcat(ExiWoW.SpellBinding.Lib, v.spellBindings);
 	end
 end
 
-function EroWoW.Extension:exportAll()
+function ExiWoW.Extension:exportAll()
 	local out = {}
-	for k,v in pairs(EroWoW.Extension.LIB) do
+	for k,v in pairs(ExiWoW.Extension.LIB) do
 		local exp = v:export()
 		if exp then 
 			table.insert(out, exp)
@@ -71,20 +71,20 @@ function EroWoW.Extension:exportAll()
 	end
 end
 
-function EroWoW.Extension:import(data, isRoot)
-	local ex = EroWoW.Extension:new(data, isRoot);
+function ExiWoW.Extension:import(data, isRoot)
+	local ex = ExiWoW.Extension:new(data, isRoot);
 	if ex then
-		EroWoW.Extension.LIB[ex.id] = ex
+		ExiWoW.Extension.LIB[ex.id] = ex
 		return ex
 	end
 	
 end
 
 -- Import from text --
-function EroWoW.Extension:importFromText(text)
+function ExiWoW.Extension:importFromText(text)
 	-- Todo: Figure out a way to import with custom functions
 end
 
-function EroWoW.Extension:remove(id)
-	EroWoW.Extension.LIB[id] = nil
+function ExiWoW.Extension:remove(id)
+	ExiWoW.Extension.LIB[id] = nil
 end

@@ -1,30 +1,30 @@
-EroWoW.Action = {}
-EroWoW.Action.__index = EroWoW.Action;
-	EroWoW.Action.LIB = {}
-	EroWoW.Action.GCD = false;				-- On global cooldown
-	EroWoW.Action.GCD_TIMER = 0;
-	EroWoW.Action.GCD_SECONDS = 1.5;
-	EroWoW.Action.GCD_STARTED = 0;
+ExiWoW.Action = {}
+ExiWoW.Action.__index = ExiWoW.Action;
+	ExiWoW.Action.LIB = {}
+	ExiWoW.Action.GCD = false;				-- On global cooldown
+	ExiWoW.Action.GCD_TIMER = 0;
+	ExiWoW.Action.GCD_SECONDS = 1.5;
+	ExiWoW.Action.GCD_STARTED = 0;
 	-- Consts
-	EroWoW.Action.MELEE_RANGE = {37727};				-- These are itemIDs, used with 
-	EroWoW.Action.CASTER_RANGE = {34471,28767};
-	EroWoW.Action.tooltipTimer = 0;					-- Interval for refreshing the tooltip
+	ExiWoW.Action.MELEE_RANGE = {37727};				-- These are itemIDs, used with 
+	ExiWoW.Action.CASTER_RANGE = {34471,28767};
+	ExiWoW.Action.tooltipTimer = 0;					-- Interval for refreshing the tooltip
 
 	-- Cast timer
-	EroWoW.Action.CASTING_SPELL = nil;				-- Spell being cast
-	EroWoW.Action.CASTING_TIMER = nil;				-- Spell being cast
-	EroWoW.Action.CASTING_TARGET = "player";				-- Spell being cast
-	EroWoW.Action.CASTING_MOVEMENT_BINDING = nil		-- Event binding for moving while casting 
-	EroWoW.Action.CASTING_SPELL_BINDING = nil			-- Event binding for using a blizzard spell while casting
-	EroWoW.Action.FINISHING_SPELL_BINDING = nil
-	EroWoW.Action.CASTING_SOUND_LOOP = nil;					-- Sound loop
-	EroWoW.Action.CASTING_SOUND_FINISH_EVENT = nil;			-- Event handler for making the sound loop
-	EroWoW.Action.FRAME_CASTBAR = nil;
+	ExiWoW.Action.CASTING_SPELL = nil;				-- Spell being cast
+	ExiWoW.Action.CASTING_TIMER = nil;				-- Spell being cast
+	ExiWoW.Action.CASTING_TARGET = "player";				-- Spell being cast
+	ExiWoW.Action.CASTING_MOVEMENT_BINDING = nil		-- Event binding for moving while casting 
+	ExiWoW.Action.CASTING_SPELL_BINDING = nil			-- Event binding for using a blizzard spell while casting
+	ExiWoW.Action.FINISHING_SPELL_BINDING = nil
+	ExiWoW.Action.CASTING_SOUND_LOOP = nil;					-- Sound loop
+	ExiWoW.Action.CASTING_SOUND_FINISH_EVENT = nil;			-- Event handler for making the sound loop
+	ExiWoW.Action.FRAME_CASTBAR = nil;
 
 -- Define the class
-function EroWoW.Action:new(data)
+function ExiWoW.Action:new(data)
 	local self = {}
-	setmetatable(self, EroWoW.Action);
+	setmetatable(self, ExiWoW.Action);
 
 	if type(data) ~= "table" then
 		data = {}
@@ -81,8 +81,8 @@ function EroWoW.Action:new(data)
 	self.charges = data.charges or math.huge;						-- Charges tied to this spell. Charges can be added by loot?
 	
 	-- Convert to sets
-	if self.allowed_classes ~= false then self.allowed_classes = EroWoW:Set(self.allowed_classes); end
-	if self.allowed_races ~= false then self.allowed_races = EroWoW:Set(self.allowed_races); end
+	if self.allowed_classes ~= false then self.allowed_classes = ExiWoW:Set(self.allowed_classes); end
+	if self.allowed_races ~= false then self.allowed_races = ExiWoW:Set(self.allowed_races); end
 	
 
 
@@ -108,7 +108,7 @@ end
 		-- Methods --
 -- Saving & Loading --
 
-function EroWoW.Action:import(data)
+function ExiWoW.Action:import(data)
 
 	-- Importable args
 	if data.learned ~= nil and not self.learned then self.learned = not not data.learned end
@@ -121,7 +121,7 @@ function EroWoW.Action:import(data)
 
 end
 
-function EroWoW.Action:export()
+function ExiWoW.Action:export()
 
 	return {
 		id = self.id,
@@ -134,13 +134,13 @@ end
 
 
 
-function EroWoW.Action:setCooldown(overrideTime, ignoreGlobal)
+function ExiWoW.Action:setCooldown(overrideTime, ignoreGlobal)
 
 	-- This action is completely excempt from cooldowns
 	if (ignoreGlobal or not self.global_cooldown) and self.cooldown <= 0 then return end
 
 	if self.global_cooldown and not ignoreGlobal then
-		EroWoW.Action:setGlobalCooldown();
+		ExiWoW.Action:setGlobalCooldown();
 	end
 
 	local cd = self.cooldown;
@@ -150,41 +150,41 @@ function EroWoW.Action:setCooldown(overrideTime, ignoreGlobal)
 	if cd > 0 then
 		self.on_cooldown = true;
 		self.cooldown_started = GetTime();
-		EroWoW.Timer:set(function(se)
+		ExiWoW.Timer:set(function(se)
 			self:resetCooldown();
 		end, cd);
 	end
-	EroWoW.Menu:refreshSpellsPage();
+	ExiWoW.Menu:refreshSpellsPage();
 
 
 end
 
-function EroWoW.Action:setGlobalCooldown()
+function ExiWoW.Action:setGlobalCooldown()
 
-	EroWoW.Action.GCD = true;
-	EroWoW.Action.GCD_STARTED = GetTime();
-	EroWoW.Timer:clear(EroWoW.Action.GCD_TIMER);
-	EroWoW.Timer:set(function()
-		EroWoW.Action.GCD = false;
-		EroWoW.Action.GCD_STARTED = 0;
-	end, EroWoW.Action.GCD_SECONDS);
-	EroWoW.Menu:refreshSpellsPage();
+	ExiWoW.Action.GCD = true;
+	ExiWoW.Action.GCD_STARTED = GetTime();
+	ExiWoW.Timer:clear(ExiWoW.Action.GCD_TIMER);
+	ExiWoW.Timer:set(function()
+		ExiWoW.Action.GCD = false;
+		ExiWoW.Action.GCD_STARTED = 0;
+	end, ExiWoW.Action.GCD_SECONDS);
+	ExiWoW.Menu:refreshSpellsPage();
 
 end
 
-function EroWoW.Action:resetCooldown()
+function ExiWoW.Action:resetCooldown()
 
 	self.on_cooldown = false;
-	EroWoW.Timer:clear(self.cooldown_timer);
+	ExiWoW.Timer:clear(self.cooldown_timer);
 	self.cooldown_started = 0;
-	EroWoW.Menu:refreshSpellsPage();
+	ExiWoW.Menu:refreshSpellsPage();
 
 end
 
 -- Returns when cooldown started and how long it is
-function EroWoW.Action:getCooldown()
+function ExiWoW.Action:getCooldown()
 
-	local gl = EroWoW.Action.GCD_SECONDS+EroWoW.Action.GCD_STARTED;
+	local gl = ExiWoW.Action.GCD_SECONDS+ExiWoW.Action.GCD_STARTED;
 	local ll = self.cooldown_started+self.cooldown;
 
 	local ctime = GetTime();
@@ -193,7 +193,7 @@ function EroWoW.Action:getCooldown()
 
 	-- Global cooldown is longer
 	if gl > ll then
-		return EroWoW.Action.GCD_STARTED, EroWoW.Action.GCD_SECONDS;
+		return ExiWoW.Action.GCD_STARTED, ExiWoW.Action.GCD_SECONDS;
 	end
 
 	-- Local cooldown --
@@ -202,25 +202,25 @@ function EroWoW.Action:getCooldown()
 end
 
 -- Validates conditions used in ability display
-function EroWoW.Action:validateFiltering(caster, suppressErrors)
+function ExiWoW.Action:validateFiltering(caster, suppressErrors)
 
 	local _, _, cls = UnitClass(caster);
 	local _, rname = UnitRace(caster);
 
 	if self.allowed_classes ~= false and not self.allowed_classes[cls] then
-		return EroWoW:reportError("Invalid class.", suppressErrors)
+		return ExiWoW:reportError("Invalid class.", suppressErrors)
 	end
 
 	if self.allowed_races ~= false and not self.allowed_races[rname] then
-		return EroWoW:reportError("Invalid race.", suppressErrors)
+		return ExiWoW:reportError("Invalid race.", suppressErrors)
 	end
 	
 	if self.disallowed_classes ~= false and self.disallowed_classes[cls] then
-		return EroWoW:reportError("Invalid class.", suppressErrors)
+		return ExiWoW:reportError("Invalid class.", suppressErrors)
 	end
 
 	if self.disallowed_races ~= false and self.disallowed_races[rname] then
-		return EroWoW:reportError("Invalid race.", suppressErrors)
+		return ExiWoW:reportError("Invalid race.", suppressErrors)
 	end
 	
 
@@ -228,11 +228,11 @@ function EroWoW.Action:validateFiltering(caster, suppressErrors)
 	if caster == "player" then
 		
 		if self.charges < 1 then
-			return EroWoW:reportError("Not enough charges.", suppressErrors)
+			return ExiWoW:reportError("Not enough charges.", suppressErrors)
 		end
 
 		if not self.learned then
-			return EroWoW:reportError("Spell not learned.", suppressErrors)
+			return ExiWoW:reportError("Spell not learned.", suppressErrors)
 		end
 
 	end
@@ -245,32 +245,32 @@ end
 -- Condition validation
 -- Validates for both receive and send --
 -- Returns boolean true on success
-function EroWoW.Action:validate(unitCaster, unitTarget, suppressErrors)
+function ExiWoW.Action:validate(unitCaster, unitTarget, suppressErrors)
 
 	if self.suppress_all_errors then suppressErrors = true end -- Allow actions to suppress errors - 
 	
 	-- Make sure it's not on cooldown
-	if unitCaster == "player" and (self.on_cooldown or (self.global_cooldown and EroWoW.Action.GCD)) then
-		return EroWoW:reportError("Can't do that yet", suppressErrors);
+	if unitCaster == "player" and (self.on_cooldown or (self.global_cooldown and ExiWoW.Action.GCD)) then
+		return ExiWoW:reportError("Can't do that yet", suppressErrors);
 	end
 
 	local inInstance = IsInInstance()
 	if inInstance and not self.allow_instance then
-		return EroWoW:reportError("Can't be used in instances.", suppressErrors)
+		return ExiWoW:reportError("Can't be used in instances.", suppressErrors)
 	end
 
 	-- Make sure target and caster are actual units
 	unitCaster = Ambiguate(unitCaster, "all")
 	unitTarget = Ambiguate(unitTarget, "all")
 	if not UnitExists(unitCaster) then
-		return EroWoW:reportError("Caster does not exist", suppressErrors);
+		return ExiWoW:reportError("Caster does not exist", suppressErrors);
 	end
 	if not UnitExists(unitTarget) then
-		return EroWoW:reportError("No viable target", suppressErrors);
+		return ExiWoW:reportError("No viable target", suppressErrors);
 	end
 
 	if not UnitIsPlayer(unitTarget) then
-		return EroWoW:reportError("Target is not a player", suppressErrors);
+		return ExiWoW:reportError("Target is not a player", suppressErrors);
 	end
 
 	-- Validate filtering. Filtering is also used in if a spell should show up whatsoever
@@ -282,40 +282,40 @@ function EroWoW.Action:validate(unitCaster, unitTarget, suppressErrors)
 		(unitCaster == "player" and UnitIsUnit(unitTarget, "player")) or
 		(unitTarget == "player" and UnitIsUnit(unitCaster, "player"));
 	if not self.allow_self and isSelf then
-		return EroWoW:reportError("Action can not target self", suppressErrors);
+		return ExiWoW:reportError("Action can not target self", suppressErrors);
 	end
 
 	-- Unit must be in a party or raid
 	local inParty = UnitInRaid(unitCaster) or UnitInParty(unitCaster) or UnitInRaid(unitTarget) or UnitInRaid(unitTarget) or isSelf
 	if not inParty and self.require_party then
-		return EroWoW:reportError("Target is not in your party or raid", suppressErrors);
+		return ExiWoW:reportError("Target is not in your party or raid", suppressErrors);
 	end
 
-	if not inParty and self.party_restricted and not EroWoW.Settings.public_interactions then
-		return EroWoW:reportError("Target is not in your party or raid", suppressErrors);
+	if not inParty and self.party_restricted and not ExiWoW.Settings.public_interactions then
+		return ExiWoW:reportError("Target is not in your party or raid", suppressErrors);
 	end
 
 	-- Check dead
 	if UnitIsDeadOrGhost(unitCaster) and not self.allow_caster_dead then
-		return EroWoW:reportError("You are dead.", suppressErrors);
+		return ExiWoW:reportError("You are dead.", suppressErrors);
 	end
 	if UnitIsDeadOrGhost(unitTarget) and not self.allow_targ_dead then
-		return EroWoW:reportError("Your target is dead you creep", suppressErrors);
+		return ExiWoW:reportError("Your target is dead you creep", suppressErrors);
 	end
 
 
 
 	-- Unit in range
 	if self.max_distance ~= 0 and (not self:checkRange(unitTarget) or not self:checkRange(unitCaster)) then
-		return EroWoW:reportError("Too far away!", suppressErrors);
+		return ExiWoW:reportError("Too far away!", suppressErrors);
 	end
 
 	-- Check combat
 	if not self.allow_targ_combat and UnitAffectingCombat(unitTarget) then
-		return EroWoW:reportError("Target is in combat", suppressErrors);
+		return ExiWoW:reportError("Target is in combat", suppressErrors);
 	end
 	if not self.allow_targ_combat and UnitAffectingCombat(unitTarget) then
-		return EroWoW:reportError("You are in combat", suppressErrors);
+		return ExiWoW:reportError("You are in combat", suppressErrors);
 	end
 
 
@@ -325,22 +325,22 @@ function EroWoW.Action:validate(unitCaster, unitTarget, suppressErrors)
 	if unitCaster == "player" then
 
 		-- Make sure we're not stunned
-		local pl = EroWoW.ME;
+		local pl = ExiWoW.ME;
 		if not HasFullControl() and not self.allow_stunned then
-			return EroWoW:reportError("Can't use actions right now", suppressErrors);
+			return ExiWoW:reportError("Can't use actions right now", suppressErrors);
 		end
 
 		-- Stealth
 		if not IsStealthed() and self.require_stealth then
-			return EroWoW:reportError("You must be in stealth to use this action!", suppressErrors);
+			return ExiWoW:reportError("You must be in stealth to use this action!", suppressErrors);
 		end
 
 		-- Unit movement --
 		if not self.allow_caster_moving and GetUnitSpeed(unitCaster) > 0 then
-			return EroWoW:reportError("Can't use while moving", suppressErrors);
+			return ExiWoW:reportError("Can't use while moving", suppressErrors);
 		end
 		if not self.allow_targ_moving and GetUnitSpeed(unitTarget) > 0 then
-			return EroWoW:reportError("Can't use on a moving target", suppressErrors);
+			return ExiWoW:reportError("Can't use on a moving target", suppressErrors);
 		end
 
 	-- Validate when RECEIVING --
@@ -354,7 +354,7 @@ function EroWoW.Action:validate(unitCaster, unitTarget, suppressErrors)
 
 end
 
-function EroWoW.Action:checkRange(target)
+function ExiWoW.Action:checkRange(target)
 	for i,v in ipairs(self.max_distance) do
 		if IsItemInRange(v, target) then
 			return true;
@@ -365,14 +365,14 @@ end
 
 
 	-- TOOLTIP HANDLING --
-function EroWoW.Action:onTooltip(frame)
+function ExiWoW.Action:onTooltip(frame)
 
-	EroWoW.Timer:clear(EroWoW.Action.tooltipTimer);
+	ExiWoW.Timer:clear(ExiWoW.Action.tooltipTimer);
 	if not not frame then
 
 		-- Set timer for refreshing
 		local th = self
-		EroWoW.Action.tooltipTimer = EroWoW.Timer:set(function()
+		ExiWoW.Action.tooltipTimer = ExiWoW.Timer:set(function()
 			th:drawTooltip()
 		end, 0.25, math.huge);
 
@@ -389,11 +389,11 @@ function EroWoW.Action:onTooltip(frame)
 end
 
 	-- Returns range in yards based on the range consts --
-function EroWoW.Action:getRangeYards()
+function ExiWoW.Action:getRangeYards()
 	return 40;
 end
 
-function EroWoW.Action:drawTooltip()
+function ExiWoW.Action:drawTooltip()
 
 	local v = self
 	GameTooltip:ClearLines()
@@ -404,13 +404,13 @@ function EroWoW.Action:drawTooltip()
 	local singles = {}
 
 	if v.cast_time > 0 then
-		table.insert(singles, EroWoW:timeFormat(v.cast_time).." cast");
+		table.insert(singles, ExiWoW:timeFormat(v.cast_time).." cast");
 	else
 		table.insert(singles, "Instant")
 	end
 
 	if not v.self_only and v.max_distance then
-		if v.max_distance == EroWoW.Action.MELEE_RANGE then
+		if v.max_distance == ExiWoW.Action.MELEE_RANGE then
 			table.insert(singles, "Melee Range");
 		else
 			table.insert(singles, tostring(v:getRangeYards()).." yd range");
@@ -418,7 +418,7 @@ function EroWoW.Action:drawTooltip()
 	end
 
 	if v.cooldown > 0 then
-		table.insert(singles, EroWoW:timeFormat(v.cooldown).." cooldown");
+		table.insert(singles, ExiWoW:timeFormat(v.cooldown).." cooldown");
 	end
 
 	local c = 0.8	-- Brightness of text
@@ -458,7 +458,7 @@ function EroWoW.Action:drawTooltip()
 	end
 
 	if started > 0 then
-		GameTooltip:AddLine("Cooldown remaining: "..tostring(EroWoW:timeFormat(duration-(GetTime()-started))), 1, 1,1, 0.75);
+		GameTooltip:AddLine("Cooldown remaining: "..tostring(ExiWoW:timeFormat(duration-(GetTime()-started))), 1, 1,1, 0.75);
 	end
 
 
@@ -470,10 +470,10 @@ end
 
 	-- CASTBAR --
 -- Shows castbar for this action, or can be used statically to turn off
-function EroWoW.Action:toggleCastBar(on)
+function ExiWoW.Action:toggleCastBar(on)
 
 
-	local sb = EroWoW.Action.FRAME_CASTBAR;
+	local sb = ExiWoW.Action.FRAME_CASTBAR;
 
 	if not on then
 		-- Hide
@@ -526,23 +526,23 @@ end
 
 -- INI --
 
-function EroWoW.Action:ini()
+function ExiWoW.Action:ini()
 
-	EroWoW.Action:libSort()
-	EroWoW.Menu:refreshSpellsPage()
+	ExiWoW.Action:libSort()
+	ExiWoW.Menu:refreshSpellsPage()
 	
-	EroWoW.Action.FRAME_CASTBAR = CreateFrame("StatusBar", "EroWoWCastBar", UIParent, "CastingBarFrameTemplate");
-	local sb = EroWoW.Action.FRAME_CASTBAR;
+	ExiWoW.Action.FRAME_CASTBAR = CreateFrame("StatusBar", "ExiWoWCastBar", UIParent, "CastingBarFrameTemplate");
+	local sb = ExiWoW.Action.FRAME_CASTBAR;
 	CastingBarFrame_OnLoad(sb, false, false, false);
 	sb:SetSize(195,13);
 	sb:SetPoint("CENTER", UIParent, "CENTER", 0, -200);
 
-	--EroWoW.Action.LIB[1]:toggleCastBar(true);
+	--ExiWoW.Action.LIB[1]:toggleCastBar(true);
 
 end
 
-function EroWoW.Action:libSort()
-	table.sort(EroWoW.Action.LIB, function(a,b)
+function ExiWoW.Action:libSort()
+	table.sort(ExiWoW.Action.LIB, function(a,b)
 
 		local aimportance = (a.favorite and 1 or 0)*2+(a.important and 1 or 0);
 		local bimportance = (b.favorite and 1 or 0)*2+(b.important and 1 or 0);
@@ -555,7 +555,7 @@ function EroWoW.Action:libSort()
 end
 
 -- Useful stuff for actions --
-function EroWoW.Action:handleArousalCallback(target, success, data)
+function ExiWoW.Action:handleArousalCallback(target, success, data)
 	-- Fail --
 	if not success then return false end
 
@@ -569,18 +569,18 @@ function EroWoW.Action:handleArousalCallback(target, success, data)
 	elseif data[1] < 1 then text = "looks heavily aroused.";
 	end
 
-	EroWoW:reportNotice(Ambiguate(UnitName(target), "all").." "..text);
+	ExiWoW:reportNotice(Ambiguate(UnitName(target), "all").." "..text);
 end
 
-function EroWoW.Action:returnArousal()
-	return true, {EroWoW.ME.arousal};
+function ExiWoW.Action:returnArousal()
+	return true, {ExiWoW.ME.arousal};
 end
 
 
 -- Get from library by id
-function EroWoW.Action:get(id)
+function ExiWoW.Action:get(id)
 
-	for i, act in pairs(EroWoW.Action.LIB) do
+	for i, act in pairs(ExiWoW.Action.LIB) do
 		if act.id == id then return act end
 	end
 	return false
@@ -588,16 +588,16 @@ function EroWoW.Action:get(id)
 end
 
 -- Send an action
-function EroWoW.Action:useOnTarget(id, target, castFinish)
+function ExiWoW.Action:useOnTarget(id, target, castFinish)
 
-	if EroWoW.Action.CASTING_SPELL then
-		return EroWoW:reportError("You are already using an action!");
+	if ExiWoW.Action.CASTING_SPELL then
+		return ExiWoW:reportError("You are already using an action!");
 	end
 
 	-- Find the action
-	local action = EroWoW.Action:get(id);
+	local action = ExiWoW.Action:get(id);
 	if not action then
-		return EroWoW:reportError("Action not found: "..id);
+		return ExiWoW:reportError("Action not found: "..id);
 	end
 
 	-- Self cast actions don't need to send a message
@@ -622,26 +622,26 @@ function EroWoW.Action:useOnTarget(id, target, castFinish)
 
 	-- Default send logic
 
-	EroWoW.CAST_TARGET = EroWoW.TARGET
+	ExiWoW.CAST_TARGET = ExiWoW.TARGET
 	if action.cast_time <= 0 or castFinish then 
 		-- Finish cast
 		action:setCooldown();
 		-- Send to target
 		local first,last = UnitName(target)
 		if last then first = first.."-"..last end
-		EroWoW:sendAction(Ambiguate(first, "all"), action.id, args, callback)
+		ExiWoW:sendAction(Ambiguate(first, "all"), action.id, args, callback)
 	else 
 		-- Start cast
-		EroWoW.Action:beginSpellCast(action, target);
+		ExiWoW.Action:beginSpellCast(action, target);
 	end
 
 end
 
 
 -- Receive an action
-function EroWoW.Action:receive(id, sender, args, allowErrors)
+function ExiWoW.Action:receive(id, sender, args, allowErrors)
 
-	local action = EroWoW.Action:get(id);
+	local action = ExiWoW.Action:get(id);
 	if not action then return false end			-- Received Action not found
 
 	-- Received action is invalid
@@ -655,18 +655,18 @@ function EroWoW.Action:receive(id, sender, args, allowErrors)
 end
 
 -- Tools for conditions
-function EroWoW.Action:computeDistance(x1,y1,z1,x2,y2,z2, instance1, instance2)
+function ExiWoW.Action:computeDistance(x1,y1,z1,x2,y2,z2, instance1, instance2)
 	if instance1 ~= instance2 then return end
 	return ((x2 - x1) ^ 2 + (y2 - y1) ^ 2 + (z2-z1) ^ 2) ^ 0.5
 end
 
-function EroWoW.Action:beginSpellCast(action, target)
+function ExiWoW.Action:beginSpellCast(action, target)
 
-	EroWoW.Action:endSpellCast(false);
-	EroWoW.Action.CASTING_SPELL = action;
-	EroWoW.Action.CASTING_TARGET = Ambiguate( UnitName(target), "all" );
-	EroWoW.Action.CASTING_TIMER = EroWoW.Timer:set(function()
-		EroWoW.Action:endSpellCast(true);
+	ExiWoW.Action:endSpellCast(false);
+	ExiWoW.Action.CASTING_SPELL = action;
+	ExiWoW.Action.CASTING_TARGET = Ambiguate( UnitName(target), "all" );
+	ExiWoW.Action.CASTING_TIMER = ExiWoW.Timer:set(function()
+		ExiWoW.Action:endSpellCast(true);
 	end, action.cast_time);
 
 	-- Cast bar
@@ -674,8 +674,8 @@ function EroWoW.Action:beginSpellCast(action, target)
 
 	local interrupt = function()
 		PlaySound(10846, "SFX");
-		EroWoW:reportError("Interrupted");
-		EroWoW.Action:endSpellCast(false);
+		ExiWoW:reportError("Interrupted");
+		ExiWoW.Action:endSpellCast(false);
 	end
 
 	if action.cast_sound_start then
@@ -685,61 +685,61 @@ function EroWoW.Action:beginSpellCast(action, target)
 	-- Audio loop
 	if action.cast_sound_loop then
 		local _, handle = PlaySound(action.cast_sound_loop, "SFX", false, true);
-		EroWoW.Action.CASTING_SOUND_LOOP = handle;
-		EroWoW.Action.CASTING_SOUND_FINISH_EVENT = EroWoW.Character:bind("SOUNDKIT_FINISHED", function(data)
-			if data[1] == EroWoW.Action.CASTING_SOUND_LOOP then 
+		ExiWoW.Action.CASTING_SOUND_LOOP = handle;
+		ExiWoW.Action.CASTING_SOUND_FINISH_EVENT = ExiWoW.Character:bind("SOUNDKIT_FINISHED", function(data)
+			if data[1] == ExiWoW.Action.CASTING_SOUND_LOOP then 
 				local _, handle = PlaySound(action.cast_sound_loop, "SFX", false, true);
-				EroWoW.Action.CASTING_SOUND_LOOP = handle;
+				ExiWoW.Action.CASTING_SOUND_LOOP = handle;
 			end
 		end)
 	end
 
 	if not action.allow_caster_moving then
-		EroWoW.Action.CASTING_MOVEMENT_BINDING = EroWoW.Character:bind("PLAYER_STARTED_MOVING", interrupt)
+		ExiWoW.Action.CASTING_MOVEMENT_BINDING = ExiWoW.Character:bind("PLAYER_STARTED_MOVING", interrupt)
 	end
 
-	EroWoW.Action.CASTING_SPELL_BINDING = EroWoW.Character:bind("UNIT_SPELLCAST_START", function(data)
+	ExiWoW.Action.CASTING_SPELL_BINDING = ExiWoW.Character:bind("UNIT_SPELLCAST_START", function(data)
 		if UnitIsUnit(data[1], "PLAYER") then interrupt() end
 	end)
-	EroWoW.Action.FINISHING_SPELL_BINDING = EroWoW.Character:bind("UNIT_SPELLCAST_SENT", function(data)
+	ExiWoW.Action.FINISHING_SPELL_BINDING = ExiWoW.Character:bind("UNIT_SPELLCAST_SENT", function(data)
 		if UnitIsUnit(data[1], "PLAYER") then interrupt() end
 	end)
 
 	
 end
 
-function EroWoW.Action:endSpellCast(success)
+function ExiWoW.Action:endSpellCast(success)
 
 	-- Make sure we are actually casting --
-	if not EroWoW.Action.CASTING_SPELL then return end
+	if not ExiWoW.Action.CASTING_SPELL then return end
 
 	
-	EroWoW.Character:unbind(EroWoW.Action.CASTING_MOVEMENT_BINDING);
-	EroWoW.Character:unbind(EroWoW.Action.CASTING_SPELL_BINDING);
-	EroWoW.Character:unbind(EroWoW.Action.FINISHING_SPELL_BINDING);
-	EroWoW.Character:unbind(EroWoW.Action.CASTING_SOUND_FINISH_EVENT);
+	ExiWoW.Character:unbind(ExiWoW.Action.CASTING_MOVEMENT_BINDING);
+	ExiWoW.Character:unbind(ExiWoW.Action.CASTING_SPELL_BINDING);
+	ExiWoW.Character:unbind(ExiWoW.Action.FINISHING_SPELL_BINDING);
+	ExiWoW.Character:unbind(ExiWoW.Action.CASTING_SOUND_FINISH_EVENT);
 
 	-- Let it play the fade out animation
 	if not success then
-		EroWoW.Action:toggleCastBar(false);
+		ExiWoW.Action:toggleCastBar(false);
 	end
 
-	if EroWoW.Action.CASTING_SOUND_LOOP then
-		StopSound(EroWoW.Action.CASTING_SOUND_LOOP);
-		EroWoW.Action.CASTING_SOUND_LOOP = nil
+	if ExiWoW.Action.CASTING_SOUND_LOOP then
+		StopSound(ExiWoW.Action.CASTING_SOUND_LOOP);
+		ExiWoW.Action.CASTING_SOUND_LOOP = nil
 	end
 
 	if success and self.cast_sound_success then
 		PlaySound(self.cast_sound_success, "SFX")
 	end
 
-	EroWoW.Timer:clear(EroWoW.Action.CASTING_TIMER);
-	EroWoW.Timer:clear(EroWoW.Action.CASTING_INTERVAL);
+	ExiWoW.Timer:clear(ExiWoW.Action.CASTING_TIMER);
+	ExiWoW.Timer:clear(ExiWoW.Action.CASTING_INTERVAL);
 	
-	local id = EroWoW.Action.CASTING_SPELL.id;
-	EroWoW.Action.CASTING_SPELL = nil;
+	local id = ExiWoW.Action.CASTING_SPELL.id;
+	ExiWoW.Action.CASTING_SPELL = nil;
 	if success then
-		EroWoW.Action:useOnTarget(id, EroWoW.Action.CASTING_TARGET, true);
+		ExiWoW.Action:useOnTarget(id, ExiWoW.Action.CASTING_TARGET, true);
 	end
 
 end

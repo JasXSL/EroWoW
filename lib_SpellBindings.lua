@@ -1,8 +1,8 @@
-function EroWoW.SpellBinding:buildLibrary()
+function ExiWoW.SpellBinding:buildLibrary()
 	
-	local sb = EroWoW.SpellBinding;
-	local R = EroWoW.R.spellBindings;
-	local spellKits = EroWoW.LibAssets.spell_kits;
+	local sb = ExiWoW.SpellBinding;
+	local R = ExiWoW.R.spellBindings;
+	local spellKits = ExiWoW.LibAssets.spell_kits;
 	-- Simple form uses RPText for everything
 	table.insert(R, sb:new({
 		name = "Entangling Roots",
