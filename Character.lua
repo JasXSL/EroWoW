@@ -192,7 +192,7 @@ function EroWoW.Character:onEvent(event, ...)
 
 			
 			local chance = EroWoW.GS.swing_text_freq;
-			if crit ~= "" then chance = chance*3 end -- Crits have 3x chance for swing text
+			if crit ~= "" then chance = chance*4 end -- Crits have 3x chance for swing text
 
 			local rand = math.random()
 			if not EroWoW.Character.takehitCD and rand < chance and u and not UnitIsPlayer(u) then
@@ -350,17 +350,17 @@ end
 function EroWoW.Character:onCapChange()
 	local maxed = self.arousal >= 1
 
-	EroWoW.Timer:clear(self.capFlashTimer);
+	EroWoW.Timer:clear(EroWoW.capFlashTimer);
 	local se = self
 	if maxed then
 		self.capFlashTimer = EroWoW.Timer:set(function()
 			se.capFlashPow = se.capFlashPow+0.25;
 			if se.capFlashPow >= 2 then se.capFlashPow = 0 end
 			local green = -0.5 * (math.cos(math.pi * se.capFlashPow) - 1)
-			se.portraitBorder:SetVertexColor(1,0.5+green*0.5,1);
+			EroWoW.portraitBorder:SetVertexColor(1,0.5+green*0.5,1);
 		end, 0.05, math.huge);
 	else
-		se.portraitBorder:SetVertexColor(1,1,1);
+		EroWoW.portraitBorder:SetVertexColor(1,1,1);
 	end
 
 end
@@ -393,10 +393,10 @@ function EroWoW.Character:toggleResting(on)
 		self.restingTimer = EroWoW.Timer:set(function()
 			se.restingPow = se.restingPow+0.1;
 			local opacity = -0.5 * (math.cos(math.pi * se.restingPow) - 1)
-			se.portraitResting:SetAlpha(0.5+opacity*0.5);
+			EroWoW.portraitResting:SetAlpha(0.5+opacity*0.5);
 		end, 0.05, math.huge);
 	else
-		self.portraitResting:SetAlpha(0);
+		EroWoW.portraitResting:SetAlpha(0);
 	end
 
 end

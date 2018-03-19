@@ -201,7 +201,7 @@ function EroWoW.RPText:buildLibrary()
 
 			-- Ice spells
 			table.insert(R, EroWoW.RPText:new({
-				id = getsk("ice"),
+				id = getsk("ice", "ice_common"),
 				text_receiver = "The cold spell causes your nipples to harden!",
 				--sound = 48289,
 				requirements = {{template_condSpellAdd, template_condSpellTick}, template_condVictimBreasts},
@@ -253,6 +253,28 @@ function EroWoW.RPText:buildLibrary()
 						template_condVictimPenis
 					},
 					fn = template_addArousalDefault
+				}))
+
+			-- Uppercut
+				table.insert(R, EroWoW.RPText:new({
+					id = "SPELL_Uppercut",
+					text_receiver = "%S uppercuts your %Tbreasts with enough force to knock you back!",
+					--sound = 35103,
+					requirements = {
+						template_condSpellTick,
+						template_condVictimBreasts
+					},
+					fn = template_addArousalMasochisticCrit
+				}))
+				table.insert(R, EroWoW.RPText:new({
+					id = "SPELL_Uppercut",
+					text_receiver = "%S uppercuts your %leftright %Tbreast, jiggling it around heavily as you stagger backwards!",
+					--sound = 35103,
+					requirements = {
+						template_condSpellTick,
+						template_condVictimBreasts
+					},
+					fn = template_addArousalMasochisticCrit
 				}))
 
 
@@ -307,7 +329,6 @@ function EroWoW.RPText:buildLibrary()
 				requirements = {template_condSpellAdd, template_condVictimBreasts},
 				fn = template_addArousalDefault
 			}))
-
 
 
 

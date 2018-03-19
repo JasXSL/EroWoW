@@ -12,6 +12,10 @@ function EroWoW.SpellBinding:buildLibrary()
 		name = spellKits.ice,
 		procChance = 1
 	}))
+	table.insert(R, sb:new({
+		name = spellKits.ice_common,
+		procChance = 0.1
+	}))
 
 	
 
@@ -36,6 +40,11 @@ function EroWoW.SpellBinding:buildLibrary()
 	table.insert(R, sb:new({
 		name = spellKits.basilisk,
 		procChance = 1
+	}))
+
+	table.insert(R, sb:new({
+		name = "Uppercut",
+		procChance = 0.5
 	}))
 
 end

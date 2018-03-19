@@ -34,7 +34,7 @@ EroWoW.Frames.PORTRAIT_PADDING = 7;
 -- GlobalStorage defaults
 local gDefaults = {
 	vh = true,
-	swing_text_freq = 0.1,		-- Percent chance of a swing triggering a special text
+	swing_text_freq = 0.15,		-- Percent chance of a swing triggering a special text
 	spell_text_freq = 1,		-- Percent chance of spell damage triggering a special text
 	takehit_rp_rate = 6			-- RP texts from being hit by spells and abilities can only trigger this often
 };
@@ -81,12 +81,15 @@ function EroWoW:ini()
 	
 
 	EroWoW:buildUnitFrames();
+	
 
 	-- Initialize timer and character
+	
 	EroWoW.Timer.ini();
 	EroWoW.Character:ini()
 	EroWoW.Menu:ini();
-
+	EroWoW.ME:onCapChange()
+	
 	-- Action slash command
 	SLASH_EWACT1 = '/ewact'
 	function SlashCmdList.EWACT(msg, editbox) EroWoW.Action:useOnTarget(msg, "target") end

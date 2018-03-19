@@ -19,18 +19,20 @@ print("Building spell kits")
 EroWoW.LibAssets.spell_kits = {}
 local sk = EroWoW.LibAssets.spell_kits;
 	sk.ice = {}											-- Ice/Cold
+	sk.ice_common = {}
 	sk.electric = {};										-- Electric shocks
 	sk.electric_common = {};
 	sk.basilisk = {};										-- Basilisk stare stuns
 	
 	-- Ice
-	sk.ice["Chilled"]=true;
+	sk.ice_common["Chilled"]=true;
 	sk.ice["Frostbolt"]=true;
  
 	-- Electric
 	sk.electric_common["Lightning Shield"] = true
 	sk.electric["Stormstrike"] = true
 	sk.electric["Lightning Bolt"] = true
+	sk.electric["Chain Lightning"] = true
 	
 	
 	
