@@ -555,7 +555,7 @@ function ExiWoW.Action:libSort()
 end
 
 -- Useful stuff for actions --
-function ExiWoW.Action:handleArousalCallback(target, success, data)
+function ExiWoW.Action:handleExcitementCallback(target, success, data)
 	-- Fail --
 	if not success then return false end
 
@@ -572,8 +572,8 @@ function ExiWoW.Action:handleArousalCallback(target, success, data)
 	ExiWoW:reportNotice(Ambiguate(UnitName(target), "all").." "..text);
 end
 
-function ExiWoW.Action:returnArousal()
-	return true, {ExiWoW.ME.arousal};
+function ExiWoW.Action:returnExcitement()
+	return true, {ExiWoW.ME.excitement};
 end
 
 

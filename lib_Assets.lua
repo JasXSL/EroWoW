@@ -14,7 +14,6 @@ function ExiWoW.LibAssets:spellKitToRP(...)
 	return out;
 end
 
-print("Building spell kits")
 -- Spell kits
 ExiWoW.LibAssets.spell_kits = {}
 local sk = ExiWoW.LibAssets.spell_kits;

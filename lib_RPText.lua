@@ -14,17 +14,17 @@ function ExiWoW.RPText:buildLibrary()
 	end
 
 	-- Function templates
-	local template_addArousalMasochisticDefault = function(self)
-		ExiWoW.ME:addArousal(0.15, false, true);
+	local template_addExcitementMasochisticDefault = function(self)
+		ExiWoW.ME:addExcitement(0.15, false, true);
 	end
-	local template_addArousalMasochisticCrit = function(self)
-		ExiWoW.ME:addArousal(0.3, false, true);
+	local template_addExcitementMasochisticCrit = function(self)
+		ExiWoW.ME:addExcitement(0.3, false, true);
 	end
-	local template_addArousalDefault = function(self)
-		ExiWoW.ME:addArousal(0.1);
+	local template_addExcitementDefault = function(self)
+		ExiWoW.ME:addExcitement(0.1);
 	end
-	local template_addArousalCrit = function(self)
-		ExiWoW.ME:addArousal(0.2);
+	local template_addExcitementCrit = function(self)
+		ExiWoW.ME:addExcitement(0.2);
 	end
 	
 
@@ -120,7 +120,7 @@ function ExiWoW.RPText:buildLibrary()
 			sound = 37472,
 			requirements = {template_condAttackerHumanoidish, template_condVictimBreasts},
 			-- FN is currently only supported for NPC actions. PC->PC actions should use the Action system instead
-			fn = template_addArousalMasochisticCrit
+			fn = template_addExcitementMasochisticCrit
 		}))
 
 
@@ -130,7 +130,7 @@ function ExiWoW.RPText:buildLibrary()
 			sound = 37472,
 			requirements = {template_condAttackerHumanoidish},
 			-- FN is currently only supported for NPC actions. PC->PC actions should use the Action system instead
-			fn = template_addArousalMasochisticCrit
+			fn = template_addExcitementMasochisticCrit
 		}))
 
 		table.insert(R, ExiWoW.RPText:new({
@@ -139,7 +139,7 @@ function ExiWoW.RPText:buildLibrary()
 			sound = 37472,
 			requirements = {template_condAttackerHumanoidish},
 			-- FN is currently only supported for NPC actions. PC->PC actions should use the Action system instead
-			fn = template_addArousalMasochisticCrit
+			fn = template_addExcitementMasochisticCrit
 		}))
 
 		table.insert(R, ExiWoW.RPText:new({
@@ -148,7 +148,7 @@ function ExiWoW.RPText:buildLibrary()
 			sound = 37472,
 			requirements = {template_condAttackerHumanoidish, template_condVictimBreasts},
 			-- FN is currently only supported for NPC actions. PC->PC actions should use the Action system instead
-			fn = template_addArousalMasochisticCrit
+			fn = template_addExcitementMasochisticCrit
 		}))
 
 
@@ -159,7 +159,7 @@ function ExiWoW.RPText:buildLibrary()
 			sound = 21727,
 			requirements = {template_condAttackerIsTentacleFiend},
 			-- FN is currently only supported for NPC actions. PC->PC actions should use the Action system instead
-			fn = template_addArousalDefault
+			fn = template_addExcitementDefault
 		}))
 		table.insert(R, ExiWoW.RPText:new({
 			id = "SWING",
@@ -167,7 +167,7 @@ function ExiWoW.RPText:buildLibrary()
 			sound = 21727,
 			requirements = {template_condAttackerIsTentacleFiend},
 			-- FN is currently only supported for NPC actions. PC->PC actions should use the Action system instead
-			fn = template_addArousalDefault
+			fn = template_addExcitementDefault
 		}))
 		table.insert(R, ExiWoW.RPText:new({
 			id = "SWING_CRIT",
@@ -175,7 +175,7 @@ function ExiWoW.RPText:buildLibrary()
 			sound = 21727,
 			requirements = {template_condAttackerIsTentacleFiend, template_condVictimVagina},
 			-- FN is currently only supported for NPC actions. PC->PC actions should use the Action system instead
-			fn = template_addArousalCrit
+			fn = template_addExcitementCrit
 		}))
 		table.insert(R, ExiWoW.RPText:new({
 			id = "SWING",
@@ -183,7 +183,7 @@ function ExiWoW.RPText:buildLibrary()
 			sound = 21729,
 			requirements = {template_condAttackerIsTentacleFiend, template_condVictimBreasts},
 			-- FN is currently only supported for NPC actions. PC->PC actions should use the Action system instead
-			fn = template_addArousalMasochisticDefault
+			fn = template_addExcitementMasochisticDefault
 		}))
 		table.insert(R, ExiWoW.RPText:new({
 			id = "SWING",
@@ -191,7 +191,7 @@ function ExiWoW.RPText:buildLibrary()
 			sound = 21727,
 			requirements = {template_condAttackerIsTentacleFiend},
 			-- FN is currently only supported for NPC actions. PC->PC actions should use the Action system instead
-			fn = template_addArousalDefault
+			fn = template_addExcitementDefault
 		}))
 	--
 
@@ -205,7 +205,7 @@ function ExiWoW.RPText:buildLibrary()
 				text_receiver = "The cold spell causes your nipples to harden!",
 				--sound = 48289,
 				requirements = {{template_condSpellAdd, template_condSpellTick}, template_condVictimBreasts},
-				fn = template_addArousalPain
+				fn = template_addExcitementPain
 			}))
 
 			-- Lightning
@@ -218,7 +218,7 @@ function ExiWoW.RPText:buildLibrary()
 						{template_condSpellAdd, template_condSpellTick},  -- OR
 						template_condVictimBreasts
 					},
-					fn = template_addArousalPain
+					fn = template_addExcitementPain
 				}))
 				table.insert(R, ExiWoW.RPText:new({
 					id = getsk("electric"),
@@ -228,7 +228,7 @@ function ExiWoW.RPText:buildLibrary()
 						{template_condSpellAdd, template_condSpellTick},  -- OR
 						template_condVictimBreasts
 					},
-					fn = template_addArousalPain
+					fn = template_addExcitementPain
 				}))
 
 
@@ -242,7 +242,7 @@ function ExiWoW.RPText:buildLibrary()
 						template_condSpellAdd,
 						template_condVictimBreasts
 					},
-					fn = template_addArousalDefault
+					fn = template_addExcitementDefault
 				}))
 				table.insert(R, ExiWoW.RPText:new({
 					id = getsk("basilisk"),
@@ -252,7 +252,7 @@ function ExiWoW.RPText:buildLibrary()
 						template_condSpellAdd,
 						template_condVictimPenis
 					},
-					fn = template_addArousalDefault
+					fn = template_addExcitementDefault
 				}))
 
 			-- Uppercut
@@ -264,7 +264,7 @@ function ExiWoW.RPText:buildLibrary()
 						template_condSpellTick,
 						template_condVictimBreasts
 					},
-					fn = template_addArousalMasochisticCrit
+					fn = template_addExcitementMasochisticCrit
 				}))
 				table.insert(R, ExiWoW.RPText:new({
 					id = "SPELL_Uppercut",
@@ -274,7 +274,7 @@ function ExiWoW.RPText:buildLibrary()
 						template_condSpellTick,
 						template_condVictimBreasts
 					},
-					fn = template_addArousalMasochisticCrit
+					fn = template_addExcitementMasochisticCrit
 				}))
 
 
@@ -291,7 +291,7 @@ function ExiWoW.RPText:buildLibrary()
 				sound = 48289,
 				requirements = {template_condSpellAdd},
 				-- FN is currently only supported for NPC actions. PC->PC actions should use the Action system instead
-				fn = template_addArousal
+				fn = template_addExcitement
 			}))
 			table.insert(R, ExiWoW.RPText:new({
 				id = "SPELL_Entangling Roots",
@@ -299,21 +299,21 @@ function ExiWoW.RPText:buildLibrary()
 				sound = 48289,
 				requirements = {template_condSpellAdd, template_condVictimPenis},
 				-- FN is currently only supported for NPC actions. PC->PC actions should use the Action system instead
-				fn = template_addArousal
+				fn = template_addExcitement
 			}))
 			table.insert(R, ExiWoW.RPText:new({
 				id = "SPELL_Entangling Roots",
 				text_receiver = "A vine from the roots slips inside your clothes and up inside your %Tvagina where it wiggles about!",
 				sound = 48289,
 				requirements = {template_condSpellAdd, template_condVictimVagina},
-				fn = template_addArousalCrit
+				fn = template_addExcitementCrit
 			}))
 			table.insert(R, ExiWoW.RPText:new({
 				id = "SPELL_Entangling Roots",
 				text_receiver = "A vine from the roots slips inside your clothes and wrap around your %Tbreasts, squeezing them rigorously!",
 				sound = 48289,
 				requirements = {template_condSpellAdd, template_condVictimBreasts},
-				fn = template_addArousalPain
+				fn = template_addExcitementPain
 			}))
 			
 
@@ -327,7 +327,7 @@ function ExiWoW.RPText:buildLibrary()
 				text_receiver = "You spill some of the crimson vial all over your %Tbreasts!",
 				sound = 1059,
 				requirements = {template_condSpellAdd, template_condVictimBreasts},
-				fn = template_addArousalDefault
+				fn = template_addExcitementDefault
 			}))
 
 

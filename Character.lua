@@ -10,7 +10,7 @@ ExiWoW.Character.takehitCD = nil			-- Cooldown for takehit texts
 
 -- Consts
 ExiWoW.Character.AROUSAL_FADE_PER_SEC = 0.05;
-ExiWoW.Character.AROUSAL_MAX = 1.25;				-- You can overshoot max arousal and have to wait longer
+ExiWoW.Character.AROUSAL_MAX = 1.25;				-- You can overshoot max excitement and have to wait longer
 ExiWoW.Character.AROUSAL_FADE_IDLE = 0.001;
 ExiWoW.Character.AURAS = {}
 
@@ -41,7 +41,7 @@ function ExiWoW.Character:ini()
 		elseif not UnitAffectingCombat("player") then
 			fade = ExiWoW.Character.AROUSAL_FADE_IDLE;
 		end
-		me:addArousal(-fade);
+		me:addExcitement(-fade);
 
 
 	end, 1, math.huge)
@@ -87,7 +87,7 @@ function ExiWoW.Character:onEvent(event, ...)
 	end
 
 	if event == "PLAYER_DEAD" then
-		ExiWoW.ME:addArousal(0, true);
+		ExiWoW.ME:addExcitement(0, true);
 	end
 	
 	if event == "UNIT_AURA" then
@@ -208,7 +208,7 @@ function ExiWoW.Character:onEvent(event, ...)
 
 			if damage <= 0 then return end
 			local percentage = damage/UnitHealthMax("player");
-			ExiWoW.ME:addArousal(percentage*0.1, false, true);
+			ExiWoW.ME:addExcitement(percentage*0.1, false, true);
 			
 
 	   end
@@ -286,7 +286,7 @@ function ExiWoW.Character:new(settings, name)
 	end
 
 	-- Visuals
-	self.capFlashTimer = 0			-- Timer event of arousal cap
+	self.capFlashTimer = 0			-- Timer event of excitement cap
 	self.capFlashPow = 0
 	self.portraitBorder = false;
 	self.portraitResting = false;
@@ -295,9 +295,9 @@ function ExiWoW.Character:new(settings, name)
 
 	-- Stats & Conf
 	self.name = name;					-- Nil for player self
-	self.arousal = 0;
+	self.excitement = 0;
 	self.hasControl = true;
-	self.meditating = false;			-- Losing arousal 
+	self.meditating = false;			-- Losing excitement 
 	self.masochism = 0.25;
 	
 	-- These are automatically set on export if full is set.
@@ -319,7 +319,7 @@ function ExiWoW.Character:new(settings, name)
 	self.butt_size = getVar(settings.butt_size, 2);						-- Always a number
 	
 	-- Feature tests
-	--self:addArousal(1.1);
+	--self:addExcitement(1.1);
 
 	return self
 end
@@ -327,7 +327,7 @@ end
 -- Exporting
 function ExiWoW.Character:export(full)
 	local out = {
-		arousal = self.arousal,
+		excitement = self.excitement,
 		penis_size = self.penis_size,
 		vagina_size = self.vagina_size,
 		breast_size = self.breast_size,
@@ -341,14 +341,14 @@ function ExiWoW.Character:export(full)
 	return out;
 end
 
--- Gets a clamped arousal value
-function ExiWoW.Character:getArousalPerc()
-	return max(min(self.arousal,1),0);
+-- Gets a clamped excitement value
+function ExiWoW.Character:getExcitementPerc()
+	return max(min(self.excitement,1),0);
 end
 
--- Raised when you max or drop off max arousal --
+-- Raised when you max or drop off max excitement --
 function ExiWoW.Character:onCapChange()
-	local maxed = self.arousal >= 1
+	local maxed = self.excitement >= 1
 
 	ExiWoW.Timer:clear(ExiWoW.capFlashTimer);
 	local se = self
@@ -365,20 +365,20 @@ function ExiWoW.Character:onCapChange()
 
 end
 
-function ExiWoW.Character:addArousal(amount, set, multiplyMasochism)
+function ExiWoW.Character:addExcitement(amount, set, multiplyMasochism)
 
 	if multiplyMasochism then amount = amount*self.masochism end
-	local pre = self.arousal >= 1
+	local pre = self.excitement >= 1
 	if not set then
-		self.arousal = self.arousal+tonumber(amount);
+		self.excitement = self.excitement+tonumber(amount);
 	else
-		self.arousal = tonumber(amount);
+		self.excitement = tonumber(amount);
 	end
 
-	self.arousal =max(min(self.arousal, ExiWoW.Character.AROUSAL_MAX), 0);
-	self:updateArousalDisplay();
+	self.excitement =max(min(self.excitement, ExiWoW.Character.AROUSAL_MAX), 0);
+	self:updateExcitementDisplay();
 
-	if (self.arousal >= 1) ~= pre then
+	if (self.excitement >= 1) ~= pre then
 		self:onCapChange()
 	end
 
@@ -401,9 +401,9 @@ function ExiWoW.Character:toggleResting(on)
 
 end
 
-function ExiWoW.Character:updateArousalDisplay()
+function ExiWoW.Character:updateExcitementDisplay()
 
-	ExiWoW.Frames.portraitArousalBar:SetHeight(ExiWoW.Frames.PORTRAIT_FRAME_HEIGHT*max(self:getArousalPerc(), 0.00001));
+	ExiWoW.Frames.portraitExcitementBar:SetHeight(ExiWoW.Frames.PORTRAIT_FRAME_HEIGHT*max(self:getExcitementPerc(), 0.00001));
 
 end
 

@@ -167,7 +167,7 @@ function ExiWoW.Menu:ini()
 	sl:SetHeight(20)
 	sl:SetPoint("TOP", 0, -50);
 	sl:SetOrientation('HORIZONTAL')
-	sl.tooltipText = "Affects amount of arousal you gain from taking hits or masochistic actions and spells.";
+	sl.tooltipText = "Affects amount of excitement you gain from taking hits or masochistic actions and spells.";
 	getglobal(sl:GetName()..'Low'):SetText('0');
 	getglobal(sl:GetName()..'High'):SetText('100');
 	getglobal(sl:GetName()..'Text'):SetText('Masochism');

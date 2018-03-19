@@ -26,7 +26,7 @@ ExiWoW.CAST_TARGET = nil		-- Cast target character, use this in actions
 
 ExiWoW.Frames = {}
 ExiWoW.Frames.targetHasExiWoWFrame = nil;	-- Gender display
-ExiWoW.Frames.portraitArousalBar = false; 	-- Arousal bar frame thing
+ExiWoW.Frames.portraitExcitementBar = false; 	-- Excitement bar frame thing
 ExiWoW.Frames.PORTRAIT_FRAME_WIDTH = 19;
 ExiWoW.Frames.PORTRAIT_FRAME_HEIGHT = 19;
 ExiWoW.Frames.PORTRAIT_PADDING = 7;
@@ -46,7 +46,7 @@ local lDefaults = {
 	butt_size = 2,
 	masochism = 0.25,			-- Value between 0 and 1
 	abilities = {},
-	arousal = 0
+	excitement = 0
 };
 
 -- Constants
@@ -77,7 +77,7 @@ function ExiWoW:ini()
 	ExiWoW.ME.breast_size = ExiWoW.LS.breast_size;
 	ExiWoW.ME.butt_size = ExiWoW.LS.butt_size;
 	ExiWoW.ME.masochism = ExiWoW.LS.masochism;
-	ExiWoW.ME.arousal = ExiWoW.LS.arousal;
+	ExiWoW.ME.excitement = ExiWoW.LS.excitement;
 	
 
 	ExiWoW:buildUnitFrames();
@@ -167,7 +167,7 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 		-- Saving
 		local l = ExiWoW.LS;
 
-		l.arousal = ExiWoW.ME.arousal;
+		l.excitement = ExiWoW.ME.excitement;
 
 		l.abilities = {};
 		for k,v in pairs(ExiWoW.Action.LIB) do
@@ -348,12 +348,12 @@ function ExiWoW:buildUnitFrames()
 	t:SetPoint("BOTTOM");
 	t:SetSize(frameWidth,frameHeight);
 	t:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
-	--t:SetHeight(frameHeight*max(self.arousal, 0.00001)); -- Setting to 0 doesn't work
+	--t:SetHeight(frameHeight*max(self.excitement, 0.00001)); -- Setting to 0 doesn't work
 	t:SetRotation(-math.pi/2);
 	t:SetVertexColor(1,0.75,1)
 	t:AddMaskTexture(mask);
-	ExiWoW.Frames.portraitArousalBar = t;
-	ExiWoW.ME:updateArousalDisplay();
+	ExiWoW.Frames.portraitExcitementBar = t;
+	ExiWoW.ME:updateExcitementDisplay();
 
 	-- Border
 
@@ -419,6 +419,6 @@ function ExiWoW:buildUnitFrames()
 	t:SetJustifyH("CENTER")
 	t:SetJustifyV("MIDDLE")
 	t:SetTextColor(0.75,0.5,0.75,1)
-	t:SetText(floor(ExiWoW.ME.arousal*100))
+	t:SetText(floor(ExiWoW.ME.excitement*100))
 ]]
 end

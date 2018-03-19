@@ -154,7 +154,7 @@ function ExiWoW.Action:buildLibrary()
 		id = "MEDITATE",
 		self_only = true,
 		name = "Meditate",
-		description = "Meditate for a while, allowing your arousal to fade at a greatly increased rate.",
+		description = "Meditate for a while, allowing your excitement to fade at a greatly increased rate.",
 		texture = "monk_ability_transcendence",
 		cooldown = 0,
 		allow_caster_moving = false,
@@ -180,28 +180,28 @@ function ExiWoW.Action:buildLibrary()
 		end
 	}))
 
-	-- Spot arousal (Public, melee range) --
+	-- Spot excitement (Public, melee range) --
 	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
 		id = "SPOT_AROUSAL",
-		name = "Spot Arousal",
+		name = "Spot Excitement",
 		important = true,
-		description = "Spot arousal of a nearby player.",
+		description = "Spot excitement of a nearby player.",
 		texture = "sha_ability_rogue_bloodyeye_nightborne",
 		cooldown = 0,
 		max_distance = ExiWoW.Action.MELEE_RANGE,
 		party_restricted = false,
 		fn_send = function(self, sender, target, suppressErrors)
 			-- We only need a callback for this
-			return nil, function(se, success, data) ExiWoW.Action:handleArousalCallback(target, success, data) end
+			return nil, function(se, success, data) ExiWoW.Action:handleExcitementCallback(target, success, data) end
 		end,
-		fn_receive = ExiWoW.Action.returnArousal
+		fn_receive = ExiWoW.Action.returnExcitement
 	}));
 
 	-- Sniff (Worgen) --
 	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
 		id = "SNIFF",
 		name = "Sniff",
-		description = "Sniff the arousal of a player.",
+		description = "Sniff the excitement of a player.",
 		texture = "inv_wolfdraenormountshadow",
 		cooldown = 0,
 		max_distance = ExiWoW.Action.CASTER_RANGE,
@@ -210,9 +210,9 @@ function ExiWoW.Action:buildLibrary()
 		fn_send = function(self, sender, target, suppressErrors)
 			DoEmote("SNIFF", target);
 			-- Callback
-			return nil, function(se, success, data) ExiWoW.Action:handleArousalCallback(target, success, data) end
+			return nil, function(se, success, data) ExiWoW.Action:handleExcitementCallback(target, success, data) end
 		end,
-		fn_receive = ExiWoW.Action.returnArousal
+		fn_receive = ExiWoW.Action.returnExcitement
 	}));
 
 	-- Fondle (Public) --
@@ -229,7 +229,7 @@ function ExiWoW.Action:buildLibrary()
 		fn_receive = function(self, sender, target, args)
 			receiveRPText(self, sender, target, args) -- Default behavior
 			-- Custom actions
-			ExiWoW.ME:addArousal(0.05);
+			ExiWoW.ME:addExcitement(0.05);
 			return true
 		end
 	}));
