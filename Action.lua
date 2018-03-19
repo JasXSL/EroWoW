@@ -515,9 +515,45 @@ function ExiWoW.Action:toggleCastBar(on)
 end
 
 
+-- Template functions for callbacks and such --
+function ExiWoW.Action:sendRPText(sender, target, suppressErrors)
 
+	local ts = ExiWoW.ME;
+	local tt = ExiWoW.CAST_TARGET;
+	if UnitIsUnit(target, "player") then tt = ts; end -- Self cast
 
+	local rptext = ExiWoW.RPText:get(self.id, ts, tt);
+	-- We only need a callback for this
+	return {
+		text=rptext.text_receiver,
+		sender=ts:export(true),
+		sound=rptext.sound
+	}, 
+	function(se, success, data) 
+		if success then
+			if rptext.sound then
+				PlaySound(rptext.sound, "SFX");
+			end
+			if rptext.text_sender then 
+				ExiWoW.RPText:print(ExiWoW.RPText:convert(rptext.text_sender, ts, tt))
+			end
+		end
+	end
+end
 
+function ExiWoW.Action:receiveRPText( sender, target, args)
+
+	if args.text and args.sender then
+		local ts = ExiWoW.Character:new(args.sender, sender);
+		ExiWoW.RPText:print(ExiWoW.RPText:convert(args.text, ts, ExiWoW.ME))
+	end
+	
+	-- Play receiving sound if not self cast
+	if not UnitIsUnit(Ambiguate(sender, "ALL"), "player") and args.sound then 
+		PlaySound(args.sound, "SFX");
+	end
+
+end
 
 
 

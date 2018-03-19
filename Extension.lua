@@ -11,7 +11,7 @@ function ExiWoW.Extension:new(data, isRoot)
 	end
 
 	local function importTable(t)
-		if type(t) ~= table then return {} end
+		if type(t) ~= "table" then return {} end
 		return t
 	end
 
@@ -53,12 +53,17 @@ function ExiWoW.Extension:index()
 	ExiWoW.RPText.Lib = {}
 	ExiWoW.SpellBinding.Lib = {}
 	ExiWoW.Action.LIB = {}
-	
+
 	for k,v in pairs(ExiWoW.Extension.LIB) do
 		ExiWoW.RPText.Lib = TableConcat(ExiWoW.RPText.Lib, v.rpTexts);
 		ExiWoW.Action.LIB = TableConcat(ExiWoW.Action.LIB, v.actions);
 		ExiWoW.SpellBinding.Lib = TableConcat(ExiWoW.SpellBinding.Lib, v.spellBindings);
 	end
+
+	-- Update the HUD
+	ExiWoW.Action:libSort()
+	ExiWoW.Menu:refreshSpellsPage()
+
 end
 
 function ExiWoW.Extension:exportAll()
@@ -77,6 +82,9 @@ function ExiWoW.Extension:import(data, isRoot)
 	if ex then
 		ExiWoW.Extension.LIB[ex.id] = ex
 		ExiWoW.Extension:index()
+		if ex.id ~= "ROOT" then
+			print("-- Using: ", ex.id)
+		end
 		return ex
 	end
 	

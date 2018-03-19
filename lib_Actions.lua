@@ -1,49 +1,6 @@
 -- Library for Actions --
 function ExiWoW.Action:buildLibrary()
 
-			-- Template functions --
-	
-		
-	local function sendRPText(self, sender, target, suppressErrors)
-
-		local ts = ExiWoW.ME;
-		local tt = ExiWoW.CAST_TARGET;
-		if UnitIsUnit(target, "player") then tt = ts; end -- Self cast
-
-		local rptext = ExiWoW.RPText:get(self.id, ts, tt);
-		-- We only need a callback for this
-		return {
-			text=rptext.text_receiver,
-			sender=ts:export(true),
-			sound=rptext.sound
-		}, 
-		function(se, success, data) 
-			if success then
-				if rptext.sound then
-					PlaySound(rptext.sound, "SFX");
-				end
-				if rptext.text_sender then 
-					ExiWoW.RPText:print(ExiWoW.RPText:convert(rptext.text_sender, ts, tt))
-				end
-			end
-		end
-	end
-
-	local function receiveRPText( self, sender, target, args)
-
-		if args.text and args.sender then
-			local ts = ExiWoW.Character:new(args.sender, sender);
-			ExiWoW.RPText:print(ExiWoW.RPText:convert(args.text, ts, ExiWoW.ME))
-		end
-		
-		-- Play receiving sound if not self cast
-		if not UnitIsUnit(Ambiguate(sender, "ALL"), "player") and args.sound then 
-			PlaySound(args.sound, "SFX");
-		end
-
-	end
-
-
 
 			-- LIBRARY --
 
@@ -215,23 +172,6 @@ function ExiWoW.Action:buildLibrary()
 		fn_receive = ExiWoW.Action.returnExcitement
 	}));
 
-	-- Fondle (Public) --
-	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
-		id = "FONDLE",
-		name = "Fondle",
-		description = "Fondle a player.",
-		texture = "ability_paladin_handoflight",
-		--cooldown = 1.5,
-		cast_sound_success = 57179,
-		allow_instance = true,
-		max_distance = ExiWoW.Action.MELEE_RANGE,
-		fn_send = sendRPText,
-		fn_receive = function(self, sender, target, args)
-			receiveRPText(self, sender, target, args) -- Default behavior
-			-- Custom actions
-			ExiWoW.ME:addExcitement(0.05);
-			return true
-		end
-	}));
+	
 
 end

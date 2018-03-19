@@ -1,5 +1,8 @@
 -- Library of common reusable assets
 ExiWoW.LibAssets = {}
+local req = ExiWoW.RPText.Req;	-- RPText requirement constructor
+local ty = req.Types;			-- Local filter types
+
 -- When used in rp texts, they need to be prefixed with SPELL_
 function ExiWoW.LibAssets:spellKitToRP(...)
 	local kits = {...}
@@ -14,7 +17,60 @@ function ExiWoW.LibAssets:spellKitToRP(...)
 	return out;
 end
 
+
+
+
+
+
+-- Effect templates, such as adding arousal
+ExiWoW.LibAssets.effects = {}
+local ef = ExiWoW.LibAssets.effects;
+
+	ef.addExcitementMasochisticDefault = function(self)
+		ExiWoW.ME:addExcitement(0.15, false, true);
+	end
+	ef.addExcitementMasochisticCrit = function(self)
+		ExiWoW.ME:addExcitement(0.3, false, true);
+	end
+	ef.addExcitementDefault = function(self)
+		ExiWoW.ME:addExcitement(0.1);
+	end
+	ef.addExcitementCrit = function(self)
+		ExiWoW.ME:addExcitement(0.2);
+	end
+
+
+-- NPC Libraries (Don't forget to make NPC Name conditions out of these)
+	local npc_tentacleFiend = {}
+	npc_tentacleFiend["Writhing Terror"] = true;
+
+
+-- RPText Condition templates
+ExiWoW.LibAssets.rpTextConds = {}
+local rtc = ExiWoW.LibAssets.rpTextConds
+	-- Humanoid NPC attacker
+	rtc.attackerHumanoid = req:new({type = ty.RTYPE_TYPE,sender = true,data = {Humanoid = true}})
+	-- Includes other viable humanoid types like undeads
+	rtc.attackerHumanoidish = req:new({ type = ty.RTYPE_TYPE, sender = true, data = {Humanoid = true, Undead = true} })
+
+	rtc.victimBreasts = req:new({type = ty.RTYPE_HAS_BREASTS})
+	rtc.victimPenis = req:new({type = ty.RTYPE_HAS_PENIS})
+	rtc.victimVagina = req:new({type = ty.RTYPE_HAS_VAGINA})
+
+	rtc.spellAdd = req:new({type=ty.RTYPE_SPELL_ADD})
+	rtc.spellRem = req:new({type=ty.RTYPE_SPELL_REM})
+	rtc.spellTick = req:new({type=ty.RTYPE_SPELL_TICK})
+	rtc.spellAddOrTick = {rtc.spellAdd, rtc.spellTick};
+	
+	-- NPC Name conditions
+	rtc.attackerIsTentacleFiend = req:new({type=ty.RTYPE_NAME, data=npc_tentacleFiend, sender=true})
+	
+
+
+
+
 -- Spell kits
+-- These are used in both RPTexts and SpellBindings
 ExiWoW.LibAssets.spell_kits = {}
 local sk = ExiWoW.LibAssets.spell_kits;
 	sk.ice = {}											-- Ice/Cold
@@ -32,9 +88,6 @@ local sk = ExiWoW.LibAssets.spell_kits;
 	sk.electric["Stormstrike"] = true
 	sk.electric["Lightning Bolt"] = true
 	sk.electric["Chain Lightning"] = true
-	
-	
-	
 
 	-- Basilisk freeze
 	sk.basilisk["Crystal Gaze"] = true

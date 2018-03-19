@@ -67,7 +67,7 @@ end)
 function ExiWoW:ini()
 
 	--ExiWoW.Menu.ini();
-	ExiWoW.R = ExiWoW.Extension:import({id="ROOT"}, true);	-- Build the main extension for assets
+	
 
 	-- Add character
 	ExiWoW.ME = ExiWoW.Character:new();
@@ -89,6 +89,8 @@ function ExiWoW:ini()
 	ExiWoW.Character:ini()
 	ExiWoW.Menu:ini();
 	ExiWoW.ME:onCapChange()
+
+	ExiWoW.R = ExiWoW.Extension:import({id="ROOT"}, true);	-- Build the main extension for assets
 	
 	-- Action slash command
 	SLASH_EWACT1 = '/ewact'
