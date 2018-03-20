@@ -47,6 +47,10 @@ local ef = ExiWoW.LibAssets.effects;
 	-- NPCs that can pinch
 	local npc_pincer = {}
 	npc_pincer["%Scorpid"] = true
+	npc_pincer["%Desert Crawler"] = true
+	npc_pincer["%Duneclaw Burrower"] = true
+	
+
 
 -- RPText Condition templates
 ExiWoW.LibAssets.rpTextConds = {}
@@ -95,6 +99,8 @@ local sk = ExiWoW.LibAssets.spell_kits;
 	sk.electric["Stormstrike"] = true
 	sk.electric["Lightning Bolt"] = true
 	sk.electric["Chain Lightning"] = true
+	sk.electric["Lightning Breath"] = true
+	
 
 	-- Basilisk freeze
 	sk.basilisk["Crystal Gaze"] = true
@@ -106,4 +112,5 @@ local sk = ExiWoW.LibAssets.spell_kits;
 
 	sk.spillable_add["Crimson Vial"] = true
 	sk.spillable["Bottle of Grog"] = true
+	
 	

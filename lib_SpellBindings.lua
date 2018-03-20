@@ -52,6 +52,11 @@ function ExiWoW.SpellBinding:buildLibrary()
 	}))
 
 	table.insert(R, sb:new({
+		name = "Headbutt",
+		procChance = 0.5
+	}))
+
+	table.insert(R, sb:new({
 		name = spellKits.insects,
 		procChance = 0.5
 	}))
