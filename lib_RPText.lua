@@ -12,12 +12,18 @@ function ExiWoW.RPText:buildLibrary()
 
 	-- Gets a formatted spell kit from lib_Assets (or more)
 	-- A spell kit is a collection of spell names that share the same theme, such as frost, fire, basilisk stun etc
-	local getsk = function(...)
-		return ExiWoW.LibAssets:spellKitToRP(...);
-	end
-
-	
+	local getsk = ExiWoW.LibAssets.spellKitToRP;
+		
 	-- Only PG stuff in here
+	
+	-- Insect swarm
+	table.insert(R, ExiWoW.RPText:new({
+		id = getsk("insects"),
+		text_receiver = "The insects get into your equipment, skittering across your body!",
+		--sound = 35103,
+		requirements = {rtc.spellAdd},
+		fn = ef.addExcitementDefault
+	}))
 
 
 end

@@ -9,7 +9,6 @@
 		- Allow in instances
 		- Allow changing swing text and spell text frequency
 	- Write VH Addon
-	- Extension imports via strings
 	- Alt click = create macro
 	 
 	 

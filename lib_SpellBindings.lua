@@ -19,9 +19,13 @@ function ExiWoW.SpellBinding:buildLibrary()
 
 	
 
-	-- ROGUE --
+	-- Spillable
 	table.insert(R, sb:new({
-		name = "Crimson Vial",
+		name = spellKits.spillable,
+		procChance = 0.25
+	}))
+	table.insert(R, sb:new({
+		name = spellKits.spillable_add,
 		procChance = 0.25
 	}))
 
@@ -44,6 +48,11 @@ function ExiWoW.SpellBinding:buildLibrary()
 
 	table.insert(R, sb:new({
 		name = "Uppercut",
+		procChance = 0.5
+	}))
+
+	table.insert(R, sb:new({
+		name = spellKits.insects,
 		procChance = 0.5
 	}))
 

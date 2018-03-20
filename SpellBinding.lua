@@ -92,3 +92,4 @@ end
 function ExiWoW.SpellBinding:getRpText(sender, data, type)
 	return ExiWoW.RPText:get("SPELL_"..data.name, sender, ExiWoW.ME, data, type)
 end
+

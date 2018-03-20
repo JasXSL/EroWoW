@@ -4,7 +4,7 @@ local req = ExiWoW.RPText.Req;	-- RPText requirement constructor
 local ty = req.Types;			-- Local filter types
 
 -- When used in rp texts, they need to be prefixed with SPELL_
-function ExiWoW.LibAssets:spellKitToRP(...)
+function ExiWoW.LibAssets.spellKitToRP(...)
 	local kits = {...}
 	local out = {}
 	for k,kit in pairs(kits) do
@@ -78,7 +78,10 @@ local sk = ExiWoW.LibAssets.spell_kits;
 	sk.electric = {};										-- Electric shocks
 	sk.electric_common = {};
 	sk.basilisk = {};										-- Basilisk stare stuns
-	
+	sk.insects = {};
+	sk.spillable = {};									-- Liquids that can spill on a player, bottles, potions etc
+	sk.spillable_add = {};								-- Same as above, but for long term buff adds, above is ticking
+
 	-- Ice
 	sk.ice_common["Chilled"]=true;
 	sk.ice["Frostbolt"]=true;
@@ -93,5 +96,10 @@ local sk = ExiWoW.LibAssets.spell_kits;
 	sk.basilisk["Crystal Gaze"] = true
 	sk.basilisk["Petrifying Blast"] = true
 	
-	
+	-- Insect swarms
+	sk.insects["Insect Swarm"] = true
 
+
+	sk.spillable_add["Crimson Vial"] = true
+	sk.spillable["Bottle of Grog"] = true
+	

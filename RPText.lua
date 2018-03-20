@@ -139,7 +139,6 @@ function ExiWoW.RPText:get(id, sender, receiver, spelldata, spellType)
 	local viable = {};
 	local isSelfCast = UnitIsUnit(sender:getName(), receiver:getName())
 	
-
 	for k,v in pairs(ExiWoW.RPText.Lib) do
 		--print(v.id, id, v:validate(sender, receiver), v.text_sender)
 		if
