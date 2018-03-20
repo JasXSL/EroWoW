@@ -44,6 +44,9 @@ local ef = ExiWoW.LibAssets.effects;
 	local npc_tentacleFiend = {}
 	npc_tentacleFiend["Writhing Terror"] = true;
 
+	-- NPCs that can pinch
+	local npc_pincer = {}
+	npc_pincer["%Scorpid"] = true
 
 -- RPText Condition templates
 ExiWoW.LibAssets.rpTextConds = {}
@@ -64,7 +67,8 @@ local rtc = ExiWoW.LibAssets.rpTextConds
 	
 	-- NPC Name conditions
 	rtc.attackerIsTentacleFiend = req:new({type=ty.RTYPE_NAME, data=npc_tentacleFiend, sender=true})
-	
+	rtc.attackerIsPinchy = req:new({type=ty.RTYPE_NAME, data=npc_pincer, sender=true})
+		
 
 
 

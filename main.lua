@@ -5,10 +5,6 @@ local appName, internal = ...
 	TODO:
 	- Add in more abilities & Spell triggers
 	- Add pagination if you manage to fill up the whole first page
-	- Add global settings
-		- Allow non-party members
-		- Allow in instances
-		- Allow changing swing text and spell text frequency
 	- Write VH Addon
 	- Alt click = create macro
 	 

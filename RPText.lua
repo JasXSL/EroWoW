@@ -326,7 +326,18 @@ function ExiWoW.RPText.Req:validate(sender, receiver, spelldata, spelltype)
 	elseif t == ty.RTYPE_HAS_BREASTS then 
 		out = targ:getBreastSize() ~= false;
 	elseif t == ty.RTYPE_NAME then
-		out = data[name] == true
+		if data[name] == true then out = true
+		else
+			-- Full scan
+			for na,t in pairs(data) do
+				if na:sub(1,1) == "%" then
+					if name:find(na:sub(2)) then
+						out = true;
+						break
+					end
+				end
+			end
+		end
 	elseif t == ty.RTYPE_PENIS_GREATER then 
 		out = targ:getPenisSize() ~= false and targ:getPenisSize() > data[1];
 	elseif t == ty.RTYPE_BREASTS_GREATER then 

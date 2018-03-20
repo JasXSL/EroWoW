@@ -261,6 +261,7 @@ function ExiWoW.Action:validate(unitCaster, unitTarget, suppressErrors)
 		return ExiWoW:reportError("Can't be used in instances.", suppressErrors)
 	end
 
+
 	-- Make sure target and caster are actual units
 	unitCaster = Ambiguate(unitCaster, "all")
 	unitTarget = Ambiguate(unitTarget, "all")
@@ -271,7 +272,7 @@ function ExiWoW.Action:validate(unitCaster, unitTarget, suppressErrors)
 		return ExiWoW:reportError("No viable target", suppressErrors);
 	end
 
-	if not UnitIsPlayer(unitCaster, unitTarget) then
+	if not UnitIsPlayer(unitCaster) or not UnitIsPlayer(unitTarget) then
 		return ExiWoW:reportError("Target is not a player", suppressErrors);
 	end
 
