@@ -1,3 +1,4 @@
+local appName, internal = ...
 -- SpellBindings are spells that trigger RPTexts when received or ticking
 -- Spellbindings will search for RPTexts with the spell name prefixed with SPELL_
 -- They will also enable spell specific conditions
@@ -49,6 +50,7 @@ end
 	-- Static --
 -- Runs code on all spell bindings that match the name --
 function ExiWoW.SpellBinding:runOnThese(name, callback)
+	if not internal.checkHardlimits(nil,nil,true) then return end
 	for k,v in pairs(ExiWoW.SpellBinding.Lib) do
 		if v.name[name] then
 			callback(v);

@@ -1,3 +1,5 @@
+local appName, internal = ...
+
 ExiWoW.Action = {}
 ExiWoW.Action.__index = ExiWoW.Action;
 	ExiWoW.Action.LIB = {}
@@ -269,8 +271,12 @@ function ExiWoW.Action:validate(unitCaster, unitTarget, suppressErrors)
 		return ExiWoW:reportError("No viable target", suppressErrors);
 	end
 
-	if not UnitIsPlayer(unitTarget) then
+	if not UnitIsPlayer(unitCaster, unitTarget) then
 		return ExiWoW:reportError("Target is not a player", suppressErrors);
+	end
+
+	if not internal.checkHardlimits(unitCaster, unitSender, suppressErrors) then
+		return false;
 	end
 
 	-- Validate filtering. Filtering is also used in if a spell should show up whatsoever
@@ -288,10 +294,6 @@ function ExiWoW.Action:validate(unitCaster, unitTarget, suppressErrors)
 	-- Unit must be in a party or raid
 	local inParty = UnitInRaid(unitCaster) or UnitInParty(unitCaster) or UnitInRaid(unitTarget) or UnitInRaid(unitTarget) or isSelf
 	if not inParty and self.require_party then
-		return ExiWoW:reportError("Target is not in your party or raid", suppressErrors);
-	end
-
-	if not inParty and self.party_restricted and not ExiWoW.Settings.public_interactions then
 		return ExiWoW:reportError("Target is not in your party or raid", suppressErrors);
 	end
 

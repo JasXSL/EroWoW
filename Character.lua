@@ -1,3 +1,5 @@
+local appName, internal = ...
+
 -- Contains info about a character, 
 ExiWoW.Character = {}
 ExiWoW.Character.__index = ExiWoW.Character;

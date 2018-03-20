@@ -1,3 +1,4 @@
+local appName, internal = ...
 --[[
 	/console scriptErrors 1
 
@@ -10,7 +11,6 @@
 		- Allow changing swing text and spell text frequency
 	- Write VH Addon
 	- Alt click = create macro
-	 
 	 
 ]]
 
@@ -32,10 +32,11 @@ ExiWoW.Frames.PORTRAIT_PADDING = 7;
 
 -- GlobalStorage defaults
 local gDefaults = {
-	vh = true,
-	swing_text_freq = 0.15,		-- Percent chance of a swing triggering a special text
+	swing_text_freq = 0.15,		-- Percent chance of a swing triggering a special text. Crits are 4x this value
 	spell_text_freq = 1,		-- Percent chance of spell damage triggering a special text
-	takehit_rp_rate = 6			-- RP texts from being hit by spells and abilities can only trigger this often
+	takehit_rp_rate = 6,			-- RP texts from being hit by spells and abilities can only trigger this often
+	enable_in_dungeons = false,
+	enable_public = false,
 };
 -- LocalStorage defaults
 local lDefaults = {
@@ -113,6 +114,33 @@ function ExiWoW:ini()
 	print("ExiWoW online!");
 end
 
+-- Checks dungeon/party hardlimit
+internal.checkHardlimits = function(sender, receiver, suppressErrors)
+
+	-- Public toggle
+	if not ExiWoWGlobalStorage.enable_public then
+		local isSelf =
+			(sender == "player" and UnitIsUnit(sender, "player")) or
+			(receiver == "player" and UnitIsUnit(receiver, "player"));
+
+		if sender and not UnitInRaid(sender) and not UnitInParty(sender) and not isSelf then
+			return ExiWoW:reportError("Sender is not in your party", suppressErrors);
+		end
+		if receiver and not UnitInRaid(receiver) and not UnitInParty(receiver) and not isSelf then
+			return ExiWoW:reportError("Target is not in your party", suppressErrors);
+		end
+	end
+
+	if not ExiWoWGlobalStorage.enable_in_dungeons then
+
+		if IsInInstance() then
+			return ExiWoW:reportError("Can't use in an instance.", suppressErrors)
+		end
+
+	end
+	return true;
+
+end
 
 
 -- Reset settings
