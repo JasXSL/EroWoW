@@ -55,8 +55,8 @@ function ExiWoW.Character:onEvent(event, ...)
 	local arguments = {...}
 
 	-- Builds data for a spell trigger
-	local function buildSpellTrigger(spellId, name, harmful, unitCaster, count, crit)
-		return { spellId = spellId, name=name, harmful=harmful, unitCaster=unitCaster, count=count, crit=crit}
+	local function buildSpellTrigger(spellId, name, harmful, unitCaster, count, crit, cname)
+		return { spellId = spellId, name=name, harmful=harmful, unitCaster=unitCaster, count=count, crit=crit, cname=cname}
 	end
 
 
@@ -109,11 +109,12 @@ function ExiWoW.Character:onEvent(event, ...)
 		
 		local function addAura(spellId, name, harmful, unitCaster, count)
 
-			local aura = buildSpellTrigger(spellId, name, harmful, unitCaster, count)
+			local uc = unitCaster;
+			if not uc then uc = "??" else uc = UnitName(unitCaster) end
+
+			local aura = buildSpellTrigger(spellId, name, harmful, unitCaster, count, uc)
 			table.insert(active, aura)
 			if not auraExists(ExiWoW.Character.AURAS, aura) then
-				local uc = unitCaster;
-				if not uc then uc = "??" else uc = UnitName(unitCaster) end
 				ExiWoW.SpellBinding:onAdd(ExiWoW.Character:buildNPC(unitCaster, uc), aura)
 			end
 
@@ -177,7 +178,8 @@ function ExiWoW.Character:onEvent(event, ...)
 				harmful, 
 				sourceName, 
 				1,
-				arguments[21] -- Crit
+				arguments[21], -- Crit
+				sourceName
 			)
 			ExiWoW.SpellBinding:onTick(npc, trig)
 
@@ -343,6 +345,25 @@ function ExiWoW.Character:export(full)
 	return out;
 end
 
+function ExiWoW.Character:hasAura(names)
+	if type(names) ~= "table" then print("Invalid name var for aura check, type was", type(names)); return false end 
+	for k,v in pairs(names) do
+		if type(v) ~= "table" then
+			print("Error in hasAura, value is not a table")
+		else
+			local name = v.name;
+			local caster = v.caster;
+			for _,aura in pairs(ExiWoW.Character.AURAS) do
+				if (aura.name == name or name == nil) and (aura.cname == caster or caster == nil) then
+					return true
+				end
+			end
+		end
+		
+	end
+	return false;
+end
+
 -- Gets a clamped excitement value
 function ExiWoW.Character:getExcitementPerc()
 	return max(min(self.excitement,1),0);
@@ -350,9 +371,10 @@ end
 
 -- Raised when you max or drop off max excitement --
 function ExiWoW.Character:onCapChange()
+
 	local maxed = self.excitement >= 1
 
-	ExiWoW.Timer:clear(ExiWoW.capFlashTimer);
+	ExiWoW.Timer:clear(self.capFlashTimer);
 	local se = self
 	if maxed then
 		self.capFlashTimer = ExiWoW.Timer:set(function()
@@ -369,8 +391,10 @@ end
 
 function ExiWoW.Character:addExcitement(amount, set, multiplyMasochism)
 
-	if multiplyMasochism then amount = amount*self.masochism end
 	local pre = self.excitement >= 1
+
+	if multiplyMasochism then amount = amount*self.masochism end
+	
 	if not set then
 		self.excitement = self.excitement+tonumber(amount);
 	else

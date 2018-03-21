@@ -181,7 +181,7 @@ function ExiWoW.RPText:getSynonym(tag, target, spelldata)
 			tags = {"large", "big", "sizeable"}
 		end
 
-		if next(tags) == nil or math.random(2)==1 then 
+		if next(tags) == nil or math.random() < 0.5 then 
 			return "" 
 		end	
 		return tags[math.random(#tags)].." "
@@ -283,6 +283,8 @@ RTYPE_RACE = "race",							-- {raceEN=true, raceEn=true...} Table of races that 
 RTYPE_CLASS = "class",							-- {englishClass=true, englishClass=true...} Table of classes that are accepted. Example: {DEATHKNIGHT=true, MONK=true}
 RTYPE_TYPE = "type",							-- {typeOne=true, typeTwo=true...} For players this is always "player", otherwise refer to the type of NPC, such as "Humanoid"
 RTYPE_NAME = "name",							-- {nameOne=true, nameTwo=true...} Primairly useful for NPCs
+RTYPE_RANDOM = "rand",							-- {chance=0-1} 1 = 100%
+RTYPE_HAS_AURA = "aura",						-- {{name=name, caster=casterName}...} Player has one or more of these auras
 -- The following will only validate from spells received --
 RTYPE_CRIT = "crit",						-- Spell was a critical hit
 RTYPE_DETRIMENTAL = "detrimental",			-- Spell was detrimental
@@ -316,6 +318,7 @@ function ExiWoW.RPText.Req:validate(sender, receiver, spelldata, spelltype)
 	local inverse = self.inverse;
 	local name = targ:getName();
 	local ty = ExiWoW.RPText.Req.Types;
+	local ch = ExiWoW.ME;
 
 	-- Try to find errors
 	local out = false
@@ -360,6 +363,10 @@ function ExiWoW.RPText.Req:validate(sender, receiver, spelldata, spelltype)
 		out = spelltype == ty.RTYPE_SPELL_REM;
 	elseif t == ty.RTYPE_SPELL_TICK then
 		out = spelltype == ty.RTYPE_SPELL_TICK;
+	elseif t == ty.RTYPE_RANDOM then
+		out = math.random() < spelldata.chance;
+	elseif t == ty.RTYPE_HAS_AURA then
+		out = ch:hasAura(data);
 	else print("Unknown validation type", t)
 	end
 

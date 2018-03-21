@@ -61,4 +61,32 @@ function ExiWoW.SpellBinding:buildLibrary()
 		procChance = 0.5
 	}))
 
+	table.insert(R, sb:new({
+		name = spellKits.sand,
+		procChance = 0.5
+	}))
+	table.insert(R, sb:new({
+		name = spellKits.dirt,
+		procChance = 0.5
+	}))
+
+	table.insert(R, sb:new({
+		name = "Bone Toss",
+		procChance = 0.5
+	}))
+
+	-- Lasher in ungoro
+	table.insert(R, sb:new({
+		name = "Lashing Flurry",
+		alias = "SWING",
+		procChance = 0.25
+	}))
+	table.insert(R, sb:new({
+		name = "Flaying Vine",
+		alias = "SWING",
+		procChance = 0.5
+	}))
+
+	
+
 end

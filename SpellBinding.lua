@@ -18,7 +18,8 @@ function ExiWoW.SpellBinding:new(data)
 	self.fnOnRemove = data.onRemove
 	self.fnOnTick = data.onTick
 	self.procChance = data.procChance or 0.5
-	
+	self.alias = data.alias							-- Lets you convert a spell into another
+
 	self.detrimental_only = data.detrimental_only
 	self.beneficial_only = data.beneficial_only
 
@@ -34,7 +35,10 @@ end
 -- Runs (and returns if found) an RP text bound to a this spellbinding
 function ExiWoW.SpellBinding:runRpText(sender, data, t)
 	if not self:rollProc() then return end
-	local rpText = ExiWoW.SpellBinding:getRpText(sender, data, t)
+
+	local name = "SPELL_"..data.name;
+	if self.alias then print("Using alias", self.alias); name = self.alias end
+	local rpText = ExiWoW.SpellBinding:getRpText(sender, data, t, name)
 	if rpText then
 		rpText:convertAndReceive(sender, ExiWoW.ME, false, data)
 		ExiWoW.Character:setTakehitTimer();
@@ -91,7 +95,7 @@ function ExiWoW.SpellBinding:onRemove(sender, data)
 end
 
 -- Returns an RP text object
-function ExiWoW.SpellBinding:getRpText(sender, data, type)
-	return ExiWoW.RPText:get("SPELL_"..data.name, sender, ExiWoW.ME, data, type)
+function ExiWoW.SpellBinding:getRpText(sender, data, type, name)
+	return ExiWoW.RPText:get(name, sender, ExiWoW.ME, data, type)
 end
 

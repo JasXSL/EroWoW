@@ -25,5 +25,22 @@ function ExiWoW.RPText:buildLibrary()
 		fn = ef.addExcitementDefault
 	}))
 
+	-- Sand ADD
+	table.insert(R, ExiWoW.RPText:new({
+		id = getsk("sand"),
+		text_receiver = "Sand gets into your clothes!",
+		--sound = 35103,
+		requirements = {rtc.spellAdd},
+		fn = ef.addExcitementMasochisticDefault
+	}))
+
+	table.insert(R, ExiWoW.RPText:new({
+		id = getsk("dirt"),
+		text_receiver = "Some dirt gets into your clothes!",
+		--sound = 35103,
+		requirements = {rtc.spellTick},
+		fn = ef.addExcitementMasochisticDefault
+	}))
+
 
 end
