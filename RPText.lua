@@ -40,6 +40,8 @@ local TAG_GENERIC = {
 	HARDEN = "harden",					-- Synonym for harden
 	-- Only available from spells
 	SPELL = "spell",					-- Name of spell that was cast
+	-- Only available with an item condition
+	ITEM = "item",						-- Name of last item validated with the condition
 }
 
 -- RPText CLASS
@@ -54,6 +56,9 @@ function ExiWoW.RPText:new(data)
 	self.sound = data.sound;					-- Play this sound when sending or receiving this
 	self.fn = data.fn or nil;					-- Only supported for NPC/Spell events. Actions should use the action system instead
 
+	-- Automatic
+	self.item = ""								-- Populated automatically when you use an item condition, contains the last valid item name
+
 	if type(self.id) ~= "table" and self.id ~= "" then
 		local id = {};
 		id[self.id] = true;
@@ -65,6 +70,7 @@ end
 
 function ExiWoW.RPText:validate(sender, receiver, spelldata, spellType)
 
+	local se = self;
 	function validateThese(input, noOr)
 
 		for k,v in pairs(input) do
@@ -75,6 +81,9 @@ function ExiWoW.RPText:validate(sender, receiver, spelldata, spellType)
 				success = validateThese(v)	-- We must go deeper
 			else
 				success = v:validate(sender, receiver, spelldata, spellType) -- This entry was a condition
+				if v.type == ExiWoW.RPText.Req.Types.RTYPE_HAS_INVENTORY and success then
+					se.item = success;
+				end
 			end
 
 			if success and not noOr then 
@@ -94,7 +103,7 @@ function ExiWoW.RPText:validate(sender, receiver, spelldata, spellType)
 
 end
 
-function ExiWoW.RPText:convert(text, sender, receiver, spelldata)
+function ExiWoW.RPText:convert(text, sender, receiver, spelldata, item)
 
 	-- Do the suffixes
 	for k,v in pairs(TAG_SUFFIX_ORDER) do
@@ -102,10 +111,16 @@ function ExiWoW.RPText:convert(text, sender, receiver, spelldata)
 		text = string.gsub(text, "%%T"..v, ExiWoW.RPText:getSynonym(v, receiver, spelldata))
 	end
 
+	if item then 
+		text = string.gsub(text, "%%"..TAG_GENERIC.ITEM, item)
+	end
+
 	for k,v in pairs(TAG_GENERIC) do
 		text = string.gsub(text, "%%"..v, ExiWoW.RPText:getSynonym(v, receiver, spelldata))
 	end
 	
+	
+
 	-- Default names must go last because they're subsets
 	text = string.gsub(text, "%%S", sender:getName())
 	text = string.gsub(text, "%%T", receiver:getName())
@@ -117,7 +132,7 @@ end
 -- Converts and outputs text_receiver and audio, as well as triggering fn if applicable
 function ExiWoW.RPText:convertAndReceive(sender, receiver, noSound, spell)
 
-	local text = ExiWoW.RPText:convert(self.text_receiver, sender, receiver, spell);
+	local text = ExiWoW.RPText:convert(self.text_receiver, sender, receiver, spell, self.item);
 	ExiWoW.RPText:print(text)
 
 	if type(self.fn) == "function" then
@@ -140,9 +155,11 @@ function ExiWoW.RPText:get(id, sender, receiver, spelldata, spellType)
 	local isSelfCast = UnitIsUnit(sender:getName(), receiver:getName())
 	
 	for k,v in pairs(ExiWoW.RPText.Lib) do
+
+		local valid = v:validate(sender, receiver, spelldata, spellType)
 		--print(v.id, id, v:validate(sender, receiver), v.text_sender)
 		if
-			v.id[id] and v:validate(sender, receiver, spelldata, spellType) and 
+			v.id[id] and valid and 
 			(
 				(not v.text_sender and isSelfCast) or
 				((v.text_sender or sender.type ~= "player") and not isSelfCast) -- NPC spells don't have text_sender, so they need to be put here
@@ -191,7 +208,7 @@ function ExiWoW.RPText:getSynonym(tag, target, spelldata)
 	local function getRaceTag()
 		if math.random() < 0.5 then return "" end
 		local tags = {}
-		if string.lower(target.race) == "worgen" or lower(target.race) == "pandaren" then
+		if string.lower(target.race) == "worgen" or string.lower(target.race) == "pandaren" then
 			tags = {"fuzzy", "furry"}
 		end
 		if next(tags) ~= nil then
@@ -285,6 +302,7 @@ RTYPE_TYPE = "type",							-- {typeOne=true, typeTwo=true...} For players this i
 RTYPE_NAME = "name",							-- {nameOne=true, nameTwo=true...} Primairly useful for NPCs
 RTYPE_RANDOM = "rand",							-- {chance=0-1} 1 = 100%
 RTYPE_HAS_AURA = "aura",						-- {{name=name, caster=casterName}...} Player has one or more of these auras
+RTYPE_HAS_INVENTORY = "inv",					-- {{name=name, quant=min_quant}}
 -- The following will only validate from spells received --
 RTYPE_CRIT = "crit",						-- Spell was a critical hit
 RTYPE_DETRIMENTAL = "detrimental",			-- Spell was detrimental
@@ -364,9 +382,11 @@ function ExiWoW.RPText.Req:validate(sender, receiver, spelldata, spelltype)
 	elseif t == ty.RTYPE_SPELL_TICK then
 		out = spelltype == ty.RTYPE_SPELL_TICK;
 	elseif t == ty.RTYPE_RANDOM then
-		out = math.random() < spelldata.chance;
+		out = math.random() < data.chance;
 	elseif t == ty.RTYPE_HAS_AURA then
-		out = ch:hasAura(data);
+		out = ExiWoW.Character:hasAura(data);
+	elseif t == ty.RTYPE_HAS_INVENTORY then
+		out = ExiWoW.Character:hasInventory(data);
 	else print("Unknown validation type", t)
 	end
 

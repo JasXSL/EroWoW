@@ -52,6 +52,10 @@ local ef = ExiWoW.LibAssets.effects;
 	npc_pincer["Duneclaw Lasher"] = true
 	npc_pincer["Duneshore Crab"] = true
 	npc_pincer["Duneclaw Matriarch"] = true
+	npc_pincer["Scorpid Worker"] = true
+	npc_pincer["Surf Crawler"] = true
+	
+	
 	
 	-- Things that can lash you
 	local npc_lasher = {}
@@ -61,6 +65,9 @@ local ef = ExiWoW.LibAssets.effects;
 	npc_lasher["Bloodpetal Thresher"] = true
 	npc_lasher["Bloodpetal Trapper"] = true
 	
+	-- Ooze type NPCs
+	local npc_ooze = {}
+	npc_ooze["%Ooze"] = true
 	
 	
 	-- Similar to tentacle fiends except the flowery kind with vines
@@ -74,6 +81,8 @@ local ef = ExiWoW.LibAssets.effects;
 	
 	local npc_wasp = {}
 	npc_wasp["Hazzali Stinger"] = true
+	npc_wasp["Gorishi Wasp"] = true
+	
 
 
 -- RPText Condition templates
@@ -101,7 +110,6 @@ local rtc = ExiWoW.LibAssets.rpTextConds
 	rtc.victimPenis = req:new({type = ty.RTYPE_HAS_PENIS})
 	rtc.victimVagina = req:new({type = ty.RTYPE_HAS_VAGINA})
 	
-
 	rtc.spellAdd = req:new({type=ty.RTYPE_SPELL_ADD})
 	rtc.spellRem = req:new({type=ty.RTYPE_SPELL_REM})
 	rtc.spellTick = req:new({type=ty.RTYPE_SPELL_TICK})
@@ -113,12 +121,17 @@ local rtc = ExiWoW.LibAssets.rpTextConds
 	rtc.attackerIsWasp = req:new({type=ty.RTYPE_NAME, data=npc_wasp, sender=true})
 	rtc.attackerIsLasher = req:new({type=ty.RTYPE_NAME, data=npc_lasher, sender=true})
 	rtc.attackerIsVines = req:new({type=ty.RTYPE_NAME, data=npc_vines, sender=true})
-	
+	rtc.attackerIsOoze = req:new({type=ty.RTYPE_NAME, data=npc_ooze, sender=true});
 	
 	-- AURAS
 	local knockdown = {};
 	table.insert(knockdown, {name="lash", caster="Bloodpetal Lasher"})
 	rtc.victimKnockedDown = req:new({type = ty.RTYPE_HAS_AURA, data=knockdown});
+
+	-- Inv items
+	local feathers = {};
+	table.insert(feathers, {name="Light Feather"})
+	rtc.invFeathers = req:new({type=ty.RTYPE_HAS_INVENTORY, data=feathers})
 
 
 -- Spell kits
@@ -147,7 +160,7 @@ local sk = ExiWoW.LibAssets.spell_kits;
 	sk.electric["Lightning Bolt"] = true
 	sk.electric["Chain Lightning"] = true
 	sk.electric["Lightning Breath"] = true
-	
+	sk.electric["Shock"] = true
 
 	-- Basilisk freeze
 	sk.basilisk["Crystal Gaze"] = true

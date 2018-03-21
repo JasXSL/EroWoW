@@ -19,6 +19,7 @@ function ExiWoW.SpellBinding:new(data)
 	self.fnOnTick = data.onTick
 	self.procChance = data.procChance or 0.5
 	self.alias = data.alias							-- Lets you convert a spell into another
+	self.allow_in_vehicle = data.allow_in_vehicle
 
 	self.detrimental_only = data.detrimental_only
 	self.beneficial_only = data.beneficial_only
@@ -56,7 +57,10 @@ end
 function ExiWoW.SpellBinding:runOnThese(name, callback)
 	if not internal.checkHardlimits(nil,nil,true) then return end
 	for k,v in pairs(ExiWoW.SpellBinding.Lib) do
-		if v.name[name] then
+		if 
+			v.name[name] and 
+			(self.allow_in_vehicle or not UnitInVehicle("player"))
+		then
 			callback(v);
 		end
 	end

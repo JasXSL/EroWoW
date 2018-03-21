@@ -74,6 +74,8 @@ function ExiWoW.Action:new(data)
 	self.allow_caster_dead = data.allow_caster_dead or false;		-- Allow if caster is dead
 	self.allow_targ_dead = data.allow_targ_dead or false;			-- Allow if target is dead
 
+	self.allow_in_vehicle = data.allow_in_vehicle or false;			-- Allow if either player is in a vehicle
+
 	-- These CASTER conditions are used in filtering
 	self.allowed_classes = data.allowed_classes or false;			-- Allowable classes, use classIndex: http://wowwiki.wikia.com/wiki/API_UnitClass
 	self.allowed_races = data.allowed_races or false;				-- Allowable races, use raceEn: http://wowwiki.wikia.com/wiki/API_UnitRace
@@ -274,6 +276,10 @@ function ExiWoW.Action:validate(unitCaster, unitTarget, suppressErrors)
 
 	if not UnitIsPlayer(unitCaster) or not UnitIsPlayer(unitTarget) then
 		return ExiWoW:reportError("Target is not a player", suppressErrors);
+	end
+
+	if not self.allow_in_vehicle and (UnitInVehicle(unitCaster) or UnitInVehicle(unitTarget)) then
+		return ExiWoW:reportError("Target is in a vehicle", suppressErrors);
 	end
 
 	if not internal.checkHardlimits(unitCaster, unitSender, suppressErrors) then
@@ -526,11 +532,13 @@ function ExiWoW.Action:sendRPText(sender, target, suppressErrors)
 	if UnitIsUnit(target, "player") then tt = ts; end -- Self cast
 
 	local rptext = ExiWoW.RPText:get(self.id, ts, tt);
+	if not rptext then return false end
 	-- We only need a callback for this
 	return {
 		text=rptext.text_receiver,
 		sender=ts:export(true),
-		sound=rptext.sound
+		sound=rptext.sound,
+		item=rptext.item
 	}, 
 	function(se, success, data) 
 		if success then
@@ -538,7 +546,7 @@ function ExiWoW.Action:sendRPText(sender, target, suppressErrors)
 				PlaySound(rptext.sound, "SFX");
 			end
 			if rptext.text_sender then 
-				ExiWoW.RPText:print(ExiWoW.RPText:convert(rptext.text_sender, ts, tt))
+				ExiWoW.RPText:print(ExiWoW.RPText:convert(rptext.text_sender, ts, tt, nil, rptext.item))
 			end
 		end
 	end
@@ -548,7 +556,7 @@ function ExiWoW.Action:receiveRPText( sender, target, args)
 
 	if args.text and args.sender then
 		local ts = ExiWoW.Character:new(args.sender, sender);
-		ExiWoW.RPText:print(ExiWoW.RPText:convert(args.text, ts, ExiWoW.ME))
+		ExiWoW.RPText:print(ExiWoW.RPText:convert(args.text, ts, ExiWoW.ME, nil, args.item))
 	end
 	
 	-- Play receiving sound if not self cast

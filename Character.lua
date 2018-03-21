@@ -272,6 +272,66 @@ function ExiWoW.Character:setTakehitTimer()
 	end, rate)
 end
 
+function ExiWoW.Character:hasAura(names)
+	if type(names) ~= "table" then print("Invalid name var for aura check, type was", type(names)); return false end 
+	for k,v in pairs(names) do
+		if type(v) ~= "table" then
+			print("Error in hasAura, value is not a table")
+		else
+			local name = v.name;
+			local caster = v.caster;
+			for _,aura in pairs(ExiWoW.Character.AURAS) do
+				if (aura.name == name or name == nil) and (aura.cname == caster or caster == nil) then
+					return true
+				end
+			end
+		end
+		
+	end
+	return false;
+end
+
+-- See RPText RTYPE_HAS_INVENTORY
+function ExiWoW.Character:hasInventory(names)
+	if type(names) ~= "table" then print("Invalid name var for inventory check, type was", type(names)); return false end 
+
+	for i=0,4 do
+		local slots = GetContainerNumSlots(i);
+		for slot=1,slots do
+			local id = GetContainerItemID(i, slot)
+			if id then
+				local quant = GetItemCount(id, false);
+				local name = GetItemInfo(id);
+				for _,cond in pairs(names) do
+					if (cond.name == name or cond.name == nil) and (cond.quant == quant or cond.quant == nil) then
+						return name
+					end
+				end
+			end
+		end
+	end
+	return false;
+end
+
+
+
+-- Removes an equipped item and puts it into inventory if possible
+function ExiWoW:removeEquipped( slot )
+
+	for i=0,4 do
+		local free = GetContainerNumFreeSlots(i);
+		if free > 0 then
+			PickupInventoryItem(slot)
+			if i == 0 then 
+				PutItemInBackpack() 
+			else
+				PutItemInBag(19+i)	
+			end
+			break
+		end
+	end
+
+end
 
 
 
@@ -345,24 +405,7 @@ function ExiWoW.Character:export(full)
 	return out;
 end
 
-function ExiWoW.Character:hasAura(names)
-	if type(names) ~= "table" then print("Invalid name var for aura check, type was", type(names)); return false end 
-	for k,v in pairs(names) do
-		if type(v) ~= "table" then
-			print("Error in hasAura, value is not a table")
-		else
-			local name = v.name;
-			local caster = v.caster;
-			for _,aura in pairs(ExiWoW.Character.AURAS) do
-				if (aura.name == name or name == nil) and (aura.cname == caster or caster == nil) then
-					return true
-				end
-			end
-		end
-		
-	end
-	return false;
-end
+
 
 -- Gets a clamped excitement value
 function ExiWoW.Character:getExcitementPerc()

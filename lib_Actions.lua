@@ -96,7 +96,7 @@ function ExiWoW.Action:buildLibrary()
 			end
 
 			local slot = equipped_slots[ math.random( #equipped_slots ) ];
-			ExiWoW:removeEquipped(slot);
+			ExiWoW.Character:removeEquipped(slot);
 			ExiWoW:reportError(ExiWoW:unitRpName(sender) .. " tugged off your "..ExiWoW:itemSlotToname(slot).."!");
 			if not UnitIsUnit(Ambiguate(sender, "ALL"), "player") then 
 				PlaySound(1202, "SFX");
@@ -170,6 +170,28 @@ function ExiWoW.Action:buildLibrary()
 			return nil, function(se, success, data) ExiWoW.Action:handleExcitementCallback(target, success, data) end
 		end,
 		fn_receive = ExiWoW.Action.returnExcitement
+	}));
+
+	-- Tickle --
+	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
+		id = "TICKLE",
+		name = "Tickle",
+		description = "Tickle a player.",
+		texture = "Spell_shadow_fingerofdeath",
+		cooldown = 6,
+		max_distance = ExiWoW.Action.MELEE_RANGE,
+		party_restricted = false,
+		fn_send = function(self, sender, target, suppressErrors)
+			if not UnitIsUnit(target, "player") then 
+				DoEmote("TICKLE", target);
+			end
+			return self:sendRPText(sender, target, suppressErrors);
+		end,
+		fn_receive = function(self, sender, target, args)
+			DoEmote("GIGGLE", target);
+			self:receiveRPText(sender, target, args)
+			return true
+		end
 	}));
 
 	

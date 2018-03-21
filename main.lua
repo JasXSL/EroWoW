@@ -276,23 +276,6 @@ function ExiWoW:unitRpName(unit)
 	return unit;
 end
 
--- Removes an equipped item and puts it into inventory if possible
-function ExiWoW:removeEquipped( slot )
-
-	for i=0,4 do
-		local free = GetContainerNumFreeSlots(i);
-		if free > 0 then
-			PickupInventoryItem(slot)
-			if i == 0 then 
-				PutItemInBackpack() 
-			else
-				PutItemInBag(19+i)	
-			end
-			break
-		end
-	end
-
-end
 
 function ExiWoW:timeFormat(seconds)
 
