@@ -3,7 +3,7 @@ ExiWoW.Callbacks = {};
 ExiWoW.Callbacks.WAITING = {}; -- {id:str token, timer:int timer, callback:fn callback}
 -- Adds a callback listener and returns the callback token
 function ExiWoW.Callbacks:add(fn)
-	local token = string.gsub("xxxxxxxx", '[x]', function (c)
+	local token = string.gsub("xxxxxx", '[x]', function (c)
 		local out = string.format('%x', math.random(0, 0xf))
 		return out
 	end)

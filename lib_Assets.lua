@@ -122,6 +122,9 @@ local rtc = ExiWoW.LibAssets.rpTextConds
 	rtc.attackerIsLasher = req:new({type=ty.RTYPE_NAME, data=npc_lasher, sender=true})
 	rtc.attackerIsVines = req:new({type=ty.RTYPE_NAME, data=npc_vines, sender=true})
 	rtc.attackerIsOoze = req:new({type=ty.RTYPE_NAME, data=npc_ooze, sender=true});
+
+	-- Underwear
+	rtc.targetWearsUnderwear = req:new({type=ty.RTYPE_UNDIES, data={true}});
 	
 	-- AURAS
 	local knockdown = {};
@@ -180,3 +183,42 @@ local sk = ExiWoW.LibAssets.spell_kits;
 	
 
 	sk.tossed_objects["Bone Toss"] = true
+
+
+
+
+-- Foraging
+	ExiWoW.LibAssets.foraging = {};
+	local f = ExiWoW.LibAssets.foraging
+	-- Syntax:
+	--[[
+		{
+			MajorZone = {
+				Subzone = {
+					{
+						type = "Underwear",
+						id = id,
+						text = rpText object (both targ and caster will be you),
+						chance = 0-1,
+						sound = successSoundID
+					}
+				}
+			}
+		}
+
+		Setting Subzone to * will be used for all subzones within the major zone
+	]]
+
+
+	f["Durotar"] = {}
+	f["Durotar"]["Razor Hill"] = {
+		{
+			type = "Underwear", 
+			id = "ORCISH_BRIEFS", 
+			chance = 1,
+			sound = 44577,
+			text = ExiWoW.RPText:new({
+				text_receiver = "You find some orcish briefs in a crate. They seem unused!"
+			})
+		}
+	}

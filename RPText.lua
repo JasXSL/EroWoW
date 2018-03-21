@@ -19,6 +19,7 @@ local TAG_SUFFIXES = {
 	RACETAG = "rtag",			-- Fuzzy for worgen and pandas, automatically included in breast(s), butt(cheek)
 	RACE = "race",
 	CLASS = "class",
+	UNDERWEAR = "undies",		-- Underwear name
 	-- These are converted into somewhat applicable pronouns, him->her->their etc 
 	HIM = "him",
 	HIS = "his",
@@ -269,6 +270,14 @@ function ExiWoW.RPText:getSynonym(tag, target, spelldata)
 		elseif target:isFemale() then return "her"
 		else return "their"
 		end
+	elseif tag == TAG_SUFFIXES.UNDERWEAR then
+		local und = target:getUnderwear();
+		local out = ""
+		if und then
+			if math.random() < 0.5 and und.color then out = out..und.color.." "; end
+			out = out..string.lower(und.name);
+		end
+		return out
 	elseif tag == TAG_SUFFIXES.HE then
 		if target:isMale() then return "he" 
 		elseif target:isFemale() then return "she"
@@ -303,6 +312,7 @@ RTYPE_NAME = "name",							-- {nameOne=true, nameTwo=true...} Primairly useful f
 RTYPE_RANDOM = "rand",							-- {chance=0-1} 1 = 100%
 RTYPE_HAS_AURA = "aura",						-- {{name=name, caster=casterName}...} Player has one or more of these auras
 RTYPE_HAS_INVENTORY = "inv",					-- {{name=name, quant=min_quant}}
+RTYPE_UNDIES = "undies",						-- false = none, true = req, {name=true, name2=true...} = limit by name
 -- The following will only validate from spells received --
 RTYPE_CRIT = "crit",						-- Spell was a critical hit
 RTYPE_DETRIMENTAL = "detrimental",			-- Spell was detrimental
@@ -387,6 +397,12 @@ function ExiWoW.RPText.Req:validate(sender, receiver, spelldata, spelltype)
 		out = ExiWoW.Character:hasAura(data);
 	elseif t == ty.RTYPE_HAS_INVENTORY then
 		out = ExiWoW.Character:hasInventory(data);
+	elseif t == ty.RTYPE_UNDIES then
+		local und = targ:getUnderwear();
+		out = 
+			(data[1] == false and und == false) or
+			(data[1] == true and und ~= false) or
+			data[und.id]
 	else print("Unknown validation type", t)
 	end
 

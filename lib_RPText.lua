@@ -45,6 +45,25 @@ function ExiWoW.RPText:buildLibrary()
 		--fn = ef.addExcitementMasochisticDefault
 	}))
 
+	-- Wedgie
+	table.insert(R, ExiWoW.RPText:new({
+		id = "WEDGIE",
+		text_sender = "You grab a hold of %T's %Tundies a wedgie!",
+		text_receiver = "%S grabs a hold of your %Tundies, giving you a wedgie!",
+		sound = 25626,
+		requirements = {},
+		--fn = ef.addExcitementMasochisticDefault
+	}))
+
+	table.insert(R, ExiWoW.RPText:new({
+		id = "WEDGIE",
+		text_receiver = "You grab a hold of your %Tundies and give yourself a wedgie!",
+		sound = 25626,
+		requirements = {rtc.targetWearsUnderwear},
+		--fn = ef.addExcitementMasochisticDefault
+	}))
+	
+
 	-- Insect swarm
 	table.insert(R, ExiWoW.RPText:new({
 		id = getsk("insects"),

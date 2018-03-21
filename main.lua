@@ -42,7 +42,9 @@ local lDefaults = {
 	butt_size = 2,
 	masochism = 0.25,			-- Value between 0 and 1
 	abilities = {},
-	excitement = 0
+	excitement = 0,
+	underwear_ids = {{id="DEFAULT",fav=false}},
+	underwear_worn = "DEFAULT"
 };
 
 -- Constants
@@ -68,13 +70,7 @@ function ExiWoW:ini()
 	-- Add character
 	ExiWoW.ME = ExiWoW.Character:new();
 
-	ExiWoW.ME.penis_size = ExiWoWLocalStorage.penis_size;
-	ExiWoW.ME.vagina_size = ExiWoWLocalStorage.vagina_size;
-	ExiWoW.ME.breast_size = ExiWoWLocalStorage.breast_size;
-	ExiWoW.ME.butt_size = ExiWoWLocalStorage.butt_size;
-	ExiWoW.ME.masochism = ExiWoWLocalStorage.masochism;
-	ExiWoW.ME.excitement = ExiWoWLocalStorage.excitement;
-	
+	ExiWoW:loadFromStorage()
 
 	ExiWoW:buildUnitFrames();
 	
@@ -85,6 +81,7 @@ function ExiWoW:ini()
 	ExiWoW.Character:ini()
 	ExiWoW.Menu:ini();
 	ExiWoW.ME:onCapChange()
+	ExiWoW.Underwear:buildLibrary()
 
 	ExiWoW.R = ExiWoW.Extension:import({id="ROOT"}, true);	-- Build the main extension for assets
 	
@@ -103,8 +100,8 @@ function ExiWoW:ini()
 	ExiWoW.Extension:index() -- Update the built libraries
 
 	-- Bind listener
-	RegisterAddonMessagePrefix(ExiWoW.APP_NAME.."_act")		-- Sends an action	 {cb:cbToken, id:action_id, data:(var)data}
-	RegisterAddonMessagePrefix(ExiWoW.APP_NAME.."_cb")		-- Receive a callback {cb:cbToken, success:(bool)success, data:(var)data}
+	RegisterAddonMessagePrefix(ExiWoW.APP_NAME.."a")		-- Sends an action	 {cb:cbToken, id:action_id, data:(var)data}
+	RegisterAddonMessagePrefix(ExiWoW.APP_NAME.."c")		-- Receive a callback {cb:cbToken, success:(bool)success, data:(var)data}
 	
 
 	print("ExiWoW online!");
@@ -116,8 +113,8 @@ internal.checkHardlimits = function(sender, receiver, suppressErrors)
 	-- Public toggle
 	if not ExiWoWGlobalStorage.enable_public then
 		local isSelf =
-			(sender == "player" and UnitIsUnit(sender, "player")) or
-			(receiver == "player" and UnitIsUnit(receiver, "player"));
+			(not sender or UnitIsUnit(sender, "player")) and
+			(not receiver or UnitIsUnit(receiver, "player"));
 
 		if sender and not UnitInRaid(sender) and not UnitInParty(sender) and not isSelf then
 			return ExiWoW:reportError("Sender is not in your party", suppressErrors);
@@ -145,9 +142,24 @@ function ExiWoW:resetSettings()
 	for k,v in pairs(gDefaults) do s[k] = v end
 	s = ExiWoWLocalStorage;
 	for k,v in pairs(lDefaults) do s[k] = v end
+	ExiWoW:loadFromStorage();
 	print("Settings reset")
 end
 
+function ExiWoW:loadFromStorage()
+	ExiWoW.ME.penis_size = ExiWoWLocalStorage.penis_size;
+	ExiWoW.ME.vagina_size = ExiWoWLocalStorage.vagina_size;
+	ExiWoW.ME.breast_size = ExiWoWLocalStorage.breast_size;
+	ExiWoW.ME.butt_size = ExiWoWLocalStorage.butt_size;
+	ExiWoW.ME.masochism = ExiWoWLocalStorage.masochism;
+	ExiWoW.ME.excitement = ExiWoWLocalStorage.excitement;
+	ExiWoW.ME.underwear_ids = ExiWoWLocalStorage.underwear_ids
+	ExiWoW.ME.underwear_worn = ExiWoWLocalStorage.underwear_worn
+end
+
+function internal:jencode(input)
+	return ExiWoW.json.encode(input);
+end
 
 	-- Primary event handler --
 	-- Handles addon commands and loading --
@@ -181,6 +193,8 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 		-- Redraw with cooldowns
 		ExiWoW.Action:libSort();
 		ExiWoW.Menu:refreshSpellsPage();
+		ExiWoW.Menu:refreshUnderwearPage();
+		
 
 	end
 
@@ -190,7 +204,9 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 		local l = ExiWoWLocalStorage;
 
 		l.excitement = ExiWoW.ME.excitement;
-
+		l.underwear_ids = ExiWoW.ME.underwear_ids
+		l.underwear_worn = ExiWoW.ME.underwear_worn
+		
 		l.abilities = {};
 		for k,v in pairs(ExiWoW.Action.LIB) do
 			if not v.hidden then
@@ -203,25 +219,25 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 	-- Action received
 	if event == "CHAT_MSG_ADDON" then 
 		
-		if prefix == ExiWoW.APP_NAME.."_act" then
+		if prefix == ExiWoW.APP_NAME.."a" then
 
 			local sname = Ambiguate(sender, "all") 			-- Sender name for use in units
 			local data = ExiWoW.json.decode(message); 		-- JSON decode message
 			local cb = data.cb								-- Callback if exists
 			local aID = data.id								-- Action ID
-			local success, data = ExiWoW.Action:receive(aID, sender, data.data);
+			local success, data = ExiWoW.Action:receive(aID, sender, data.da);
 			if cb then
 				ExiWoW:sendCallback(cb, sname, success, data);
 			end
 
 		end
 
-		if prefix == ExiWoW.APP_NAME.."_cb" then
+		if prefix == ExiWoW.APP_NAME.."c" then
 
 			local sname = Ambiguate(sender, "all")
 			local data = ExiWoW.json.decode(message);
 			local cb = data.cb
-			ExiWoW.Callbacks:trigger(cb, data.success, data.data, sender);
+			ExiWoW.Callbacks:trigger(cb, data.su, data.da, sender);
 
 		end
 
@@ -234,24 +250,24 @@ function ExiWoW:sendAction(unit, actionID, data, callback)
 
 	local out = {
 		id = actionID,
-		data = data
+		da = data
 	};
 
 	if type(callback) == "function" then
 		out.cb = ExiWoW.Callbacks:add(callback);
 	end
-	SendAddonMessage(ExiWoW.APP_NAME.."_act", ExiWoW.json.encode(out), "WHISPER", unit)
+	SendAddonMessage(ExiWoW.APP_NAME.."a", ExiWoW.json.encode(out), "WHISPER", unit)
 end
 
 function ExiWoW:sendCallback(token, unit, success, data)
 
 	local out = {
 		cb = token,
-		success = success,
-		data = data
+		su = success,
+		da = data
 	};
 
-	SendAddonMessage(ExiWoW.APP_NAME.."_cb", ExiWoW.json.encode(out), "WHISPER", unit)
+	SendAddonMessage(ExiWoW.APP_NAME.."c", ExiWoW.json.encode(out), "WHISPER", unit)
 
 end
 

@@ -76,7 +76,6 @@
 					<Anchor point="BOTTOMRIGHT"/>
 				</Anchors>
 				<Layers>
-
 					<Layer level="ARTWORK">
 						<FontString inherits="GameFontNormalLarge" text="1/1">
 							<Anchors>
@@ -89,17 +88,41 @@
 						</FontString>
 					</Layer>
 				</Layers>
-				<Frames>
-				</Frames> 
 			</Frame>   
 
-
-		   <Frame name="$parent_page_settings" hidden="true">
+			<!-- Underwear page -->
+			<Frame name="$parent_page_underwear" hidden="true">
 			   <Anchors>
 				   <Anchor point="TOPLEFT"/>
 				   <Anchor point="BOTTOMRIGHT"/>
 			   </Anchors>
-		   </Frame>
+			   <Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormalLarge" text="1/1">
+							<Anchors>
+								<Anchor point="BOTTOM" relativeTo="$parent">
+									<Offset>
+										<AbsDimension x="0" y="20"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+		   	</Frame>
+
+			<!-- Settings page -->
+			<Frame name="$parent_page_settings" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+					<Anchor point="BOTTOMRIGHT"/>
+				</Anchors>
+			</Frame>
+
+			
+
+			
+
 		   <Button name="$parentTab1" inherits="CharacterFrameTabButtonTemplate" id="1" text="Actions">
 			   <Anchors>
 				   <Anchor point="CENTER" relativePoint="BOTTOMLEFT">
@@ -109,7 +132,7 @@
 				   </Anchor>
 			   </Anchors>
 		   </Button>
-		   <Button name="$parentTab2" inherits="CharacterFrameTabButtonTemplate" id="2" text="Character">
+		   <Button name="$parentTab2" inherits="CharacterFrameTabButtonTemplate" id="2" text="Underwear">
 			   <Anchors>
 				   <Anchor point="LEFT" relativeTo="$parentTab1" relativePoint="RIGHT">
 					   <Offset>
@@ -118,6 +141,16 @@
 				   </Anchor>
 			   </Anchors>
 		   </Button>
+		   <Button name="$parentTab3" inherits="CharacterFrameTabButtonTemplate" id="3" text="Character">
+			   <Anchors>
+				   <Anchor point="LEFT" relativeTo="$parentTab2" relativePoint="RIGHT">
+					   <Offset>
+						   <AbsDimension x="-16" y="0"/>
+					   </Offset>
+				   </Anchor>
+			   </Anchors>
+		   </Button>
+
 	   </Frames>
 	   
    </Frame>

@@ -1,3 +1,4 @@
+local appName, internal = ...
 -- Library for Actions --
 function ExiWoW.Action:buildLibrary()
 
@@ -53,7 +54,9 @@ function ExiWoW.Action:buildLibrary()
 		cast_sound_loop = 6425,				-- Tailoring, see http://www.wowhead.com/sound=6425/tailoring
 		max_distance = ExiWoW.Action.MELEE_RANGE,
 		-- allow_self = false,
-
+		fn_cast = function(self, sender, target, suppressErrors)
+			DoEmote("KNEEL", target);
+		end,
 		-- Custom sending logic
 		fn_send = function(self, sender, target, suppressErrors)
 
@@ -190,6 +193,49 @@ function ExiWoW.Action:buildLibrary()
 		fn_receive = function(self, sender, target, args)
 			DoEmote("GIGGLE", target);
 			self:receiveRPText(sender, target, args)
+			return true
+		end
+	}));
+
+	-- Wedgie --
+	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
+		id = "WEDGIE",
+		name = "Wedgie",
+		description = "Give a player a wedgie, provided they're wearing underwear.",
+		texture = "Spell_holy_fistofjustice",
+		cooldown = 6,
+		max_distance = ExiWoW.Action.MELEE_RANGE,
+		target_has_underwear = true,
+		party_restricted = false,
+		fn_send = function(self, sender, target, suppressErrors)
+			return self:sendRPText(sender, target, suppressErrors);
+		end,
+		fn_receive = function(self, sender, target, args)
+			DoEmote("GASP");
+			self:receiveRPText(sender, target, args)
+			return true
+		end
+	}));
+
+	-- Forage --
+	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
+		id = "FORAGE",
+		name = "Forage",
+		description = "Search your active area for items.",
+		texture = "icon_treasuremap",
+		cooldown = 6,
+		self_only = true,
+		cast_sound_loop = 1104,
+		allow_caster_moving = false,
+		cast_time = 3,
+		fn_cast = function(self, sender, target, suppressErrors)
+			DoEmote("KNEEL", target);
+		end,
+		fn_send = function(self, sender, target, suppressErrors)
+			return nil;
+		end,
+		fn_receive = function(self, sender, target, args)
+			ExiWoW.Character:forage()
 			return true
 		end
 	}));

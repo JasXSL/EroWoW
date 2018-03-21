@@ -316,7 +316,7 @@ end
 
 
 -- Removes an equipped item and puts it into inventory if possible
-function ExiWoW:removeEquipped( slot )
+function ExiWoW.Character:removeEquipped( slot )
 
 	for i=0,4 do
 		local free = GetContainerNumFreeSlots(i);
@@ -332,6 +332,70 @@ function ExiWoW:removeEquipped( slot )
 	end
 
 end
+
+
+
+
+-- Forage
+function ExiWoW.Character:forage()
+	
+	local topzone = GetRealZoneText()
+	local subzone = GetSubZoneText()
+	local f = ExiWoW.LibAssets.foraging
+
+	local available = {}
+	local scan = f[topzone]
+	if not scan then return end
+
+	if scan["*"] then
+		for _,v in pairs(scan["*"]) do
+			table.insert(available, v)
+		end
+	end
+	if scan[subzone] then
+		for _,v in pairs(scan[subzone]) do
+			table.insert(available, v)
+		end
+	end
+
+	local size = #available
+	for i = size, 1, -1 do
+		local rand = math.random(size)
+		available[i], available[rand] = available[rand], available[i]
+	end
+
+	for _,v in ipairs(available) do
+
+		local chance = 1
+		if v.chance then chance = v.chance end
+
+		if math.random() < v.chance then 
+			
+			if ExiWoW.ME:addItem(v.type, v.id, 1) then
+				if v.text then 
+					v.text:convertAndReceive(ExiWoW.ME, ExiWoW.ME);
+				end
+				if v.sound then PlaySound(v.sound, "Dialog") end
+				return v;
+			end
+
+		end
+
+		
+		PlaySound(1142, "Dialog")
+		ExiWoW.RPText:print("You found nothing");
+
+	end
+
+	return false
+
+end
+
+
+
+
+
+
 
 
 
@@ -359,16 +423,20 @@ function ExiWoW.Character:new(settings, name)
 
 	-- Stats & Conf
 	self.name = name;					-- Nil for player self
-	self.excitement = 0;
+	self.excitement = settings.ex or 0;
 	self.hasControl = true;
 	self.meditating = false;			-- Losing excitement 
 	self.masochism = 0.25;
 	
+	-- Inventory
+	self.underwear_ids = {{id="DEFAULT",fav=false}};			-- Unlocked underwear
+	self.underwear_worn = "DEFAULT";
+	
 	-- These are automatically set on export if full is set.
 	-- They still need to be fetched from settings though when received by a unit for an RP text
-	self.class = settings.class or UnitClass("player");
-	self.race = settings.race or UnitRace("player");
-
+	self.class = settings.cl or UnitClass("player");
+	self.race = settings.ra or UnitRace("player");
+	
 	-- These are not sent on export, but can be used locally for NPC events
 	self.type = "player";				-- Can be overridden like humanoid etc. 
 	
@@ -377,11 +445,15 @@ function ExiWoW.Character:new(settings, name)
 	-- Importable properties
 	-- Use ExiWoW.Character:getnSize
 	-- If all these are false, size will be set to 2 for penis/breasts, 0 for vagina. Base on character sex in WoW 
-	self.penis_size = getVar(settings.penis_size, false);				-- False or range between 0 and 4
-	self.vagina_size = getVar(settings.vagina_size, false);				-- False or 0
-	self.breast_size = getVar(settings.breast_size, false);				-- False or range between 0 and 4
-	self.butt_size = getVar(settings.butt_size, 2);						-- Always a number
-	
+	self.penis_size = getVar(settings.ps, false);				-- False or range between 0 and 4
+	self.vagina_size = getVar(settings.vs, false);				-- False or 0
+	self.breast_size = getVar(settings.ts, false);				-- False or range between 0 and 4
+	self.butt_size = getVar(settings.bs, 2);						-- Always a number
+	self.underwear = false										-- This is a cache of underwear only set when received from another player via an action
+
+	if settings.uw then self.underwear = ExiWoW.Underwear:import(settings.uw) end
+
+
 	-- Feature tests
 	--self:addExcitement(1.1);
 
@@ -390,27 +462,78 @@ end
 
 -- Exporting
 function ExiWoW.Character:export(full)
+
+	local underwear = ExiWoW.Underwear:get(self.underwear_worn)
+	if underwear then underwear = underwear:export() end
 	local out = {
-		excitement = self.excitement,
-		penis_size = self.penis_size,
-		vagina_size = self.vagina_size,
-		breast_size = self.breast_size,
-		butt_size = self.butt_size,
+		ex = self.excitement,
+		ps = self.penis_size,
+		vs = self.vagina_size,
+		ts = self.breast_size,
+		bs = self.butt_size,
+		uw = underwear
 	};
 	-- Should only be used for "player"
 	if full then
-		out.class = UnitClass("player");
-		out.race = UnitRace("player");
+		out.cl = UnitClass("player");
+		out.ra = UnitRace("player");
 	end
 	return out;
 end
-
 
 
 -- Gets a clamped excitement value
 function ExiWoW.Character:getExcitementPerc()
 	return max(min(self.excitement,1),0);
 end
+
+-- Underwear --
+-- Returns an underwear object
+function ExiWoW.Character:getUnderwear()
+	-- Received from other players
+	if self.underwear then return self.underwear end
+	return ExiWoW.Underwear:get(self.underwear_worn);
+end
+function ExiWoW.Character:useUnderwear(id)
+	local uw = ExiWoW.Underwear:get(id)
+	if self.underwear_worn == id then
+		self.underwear_worn = false
+		if uw then 
+			PlaySound(uw.unequip_sound, "Dialog")
+			ExiWoW.RPText:print("You take off your "..uw.name)
+		end
+	elseif self:ownsUnderwear(id) and uw then
+		self.underwear_worn = id
+		PlaySound(uw.equip_sound, "Dialog")
+		ExiWoW.RPText:print("You put on your "..uw.name)
+	else return false
+	end
+	ExiWoW.Menu:refreshUnderwearPage();
+	return true
+end
+
+function ExiWoW.Character:ownsUnderwear(id)
+	for _,u in pairs(self.underwear_ids) do
+		if id == u.id then return true end
+	end
+	return false
+end
+
+-- Items --
+function ExiWoW.Character:addItem(type, name, quant)
+
+	if type == "Underwear" then
+		if self:ownsUnderwear(name) then return false end
+		local exists = ExiWoW.Underwear:get(name)
+		if not exists then return false end
+		table.insert(self.underwear_ids, {id=name, fav=false})
+		ExiWoW.Menu:refreshUnderwearPage()
+		return true;
+	end
+
+end
+
+
 
 -- Raised when you max or drop off max excitement --
 function ExiWoW.Character:onCapChange()

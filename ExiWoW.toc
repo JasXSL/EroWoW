@@ -19,8 +19,11 @@ Menu.lua
 RPText.lua
 Extension.lua
 SpellBinding.lua
+Underwear.lua
 
 lib_RPText.lua
 lib_Actions.lua
 lib_SpellBindings.lua
 lib_Assets.lua
+lib_Underwear.lua
+

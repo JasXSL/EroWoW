@@ -55,7 +55,7 @@ function ExiWoW.Action:new(data)
 	-- Functions
 	self.fn_send = data.fn_send									-- Function to execute on the sender when sending
 	self.fn_receive = data.fn_receive							-- Function to execute on the receiver when receiving
-
+	self.fn_cast = data.fn_cast									-- Function to execute on the sender when starting a cast
 
 	-- Conditions
 	self.self_only = data.self_only or false;					-- Auto targets self
@@ -84,6 +84,8 @@ function ExiWoW.Action:new(data)
 	
 	self.charges = data.charges or math.huge;						-- Charges tied to this spell. Charges can be added by loot?
 	
+	self.target_has_underwear = data.target_has_underwear;			-- Nil = either, false = no underwear, true = has underwear, table = {name=true, name2=true...}
+
 	-- Convert to sets
 	if self.allowed_classes ~= false then self.allowed_classes = ExiWoW:Set(self.allowed_classes); end
 	if self.allowed_races ~= false then self.allowed_races = ExiWoW:Set(self.allowed_races); end
@@ -263,7 +265,6 @@ function ExiWoW.Action:validate(unitCaster, unitTarget, suppressErrors)
 		return ExiWoW:reportError("Can't be used in instances.", suppressErrors)
 	end
 
-
 	-- Make sure target and caster are actual units
 	unitCaster = Ambiguate(unitCaster, "all")
 	unitTarget = Ambiguate(unitTarget, "all")
@@ -309,10 +310,10 @@ function ExiWoW.Action:validate(unitCaster, unitTarget, suppressErrors)
 		return ExiWoW:reportError("You are dead.", suppressErrors);
 	end
 	if UnitIsDeadOrGhost(unitTarget) and not self.allow_targ_dead then
-		return ExiWoW:reportError("Your target is dead you creep", suppressErrors);
+		return ExiWoW:reportError("Your target is dead", suppressErrors);
 	end
 
-
+	
 
 	-- Unit in range
 	if self.max_distance ~= 0 and (not self:checkRange(unitTarget) or not self:checkRange(unitCaster)) then
@@ -326,7 +327,6 @@ function ExiWoW.Action:validate(unitCaster, unitTarget, suppressErrors)
 	if not self.allow_targ_combat and UnitAffectingCombat(unitTarget) then
 		return ExiWoW:reportError("You are in combat", suppressErrors);
 	end
-
 
 
 
@@ -356,8 +356,23 @@ function ExiWoW.Action:validate(unitCaster, unitTarget, suppressErrors)
 	else
 	end
 
-	
-
+	-- Underwear
+	if self.target_has_underwear ~= nil then
+		local pl = ExiWoW.TARGET;
+		if unitTarget == "player" then
+			pl = ExiWoW.ME;
+		end
+		local uw = pl:getUnderwear()
+		if not pl then 
+			return ExiWoW:reportError("Target data missing. Try re-targeting!", suppressErrors);
+		elseif self.target_has_underwear == false and uw ~= false then
+			return ExiWoW:reportError("Target is wearing underwear!", suppressErrors);
+		elseif self.target_has_underwear == true and uw == false then
+			return ExiWoW:reportError("Target is not wearing underwear!", suppressErrors);
+		elseif type(self.target_has_underwear) == "table" and (not uw or not self.target_has_underwear[uw.id]) then
+			return ExiWoW:reportError("Target is not wearing the required underwear!", suppressErrors);
+		end
+	end
 
 	return true
 
@@ -401,6 +416,7 @@ end
 function ExiWoW.Action:getRangeYards()
 	return 40;
 end
+
 
 function ExiWoW.Action:drawTooltip()
 
@@ -475,7 +491,6 @@ function ExiWoW.Action:drawTooltip()
 	GameTooltip:Show()
 
 end
-
 
 	-- CASTBAR --
 -- Shows castbar for this action, or can be used statically to turn off
@@ -718,6 +733,10 @@ function ExiWoW.Action:beginSpellCast(action, target)
 
 	-- Cast bar
 	action:toggleCastBar(true);
+
+	if type(action.fn_cast) == "function" then
+		action:fn_cast("player", target, suppressErrors)
+	end
 
 	local interrupt = function()
 		PlaySound(10846, "SFX");

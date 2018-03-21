@@ -91,7 +91,83 @@ function ExiWoW.Menu:refreshSpellsPage()
 end
 
 
+-- Refresh Underwear --
+function ExiWoW.Menu:refreshUnderwearPage()
 
+	local i = 0;
+	local unlocked = ExiWoW.ME.underwear_ids
+	table.sort(unlocked, function(a, b)
+		if a.fav and not b.fav then return true
+		elseif not a.fav and b.fav then return false
+		end
+
+		local obja = ExiWoW.Underwear:get(a.id)
+		local objb = ExiWoW.Underwear:get(b.id)
+		return obja.name < objb.name;
+	end)
+
+	for k,v in pairs(unlocked) do
+
+		local item = v.id
+		local fav = v.fav
+		local obj = ExiWoW.Underwear:get(item)
+		-- Make sure it's acceptable
+		if obj then
+
+			local f = _G["ExiWoWUnderwearButton_"..i]
+
+			f:SetScript("OnMouseUp", function (self, button)
+				if IsShiftKeyDown() then
+					v.fav = not v.fav;
+					ExiWoW.Menu:refreshUnderwearPage()
+				else
+					ExiWoW.ME:useUnderwear(item)
+				end
+				PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON);
+			end)
+
+			f.icon:SetTexture("Interface/Icons/"..obj.icon);
+
+			if fav then 
+				f.star:Show();
+			else
+				f.star:Hide();
+			end
+
+			if item == ExiWoW.ME.underwear_worn then
+				f:LockHighlight()
+			else
+				f:UnlockHighlight()
+			end
+
+			-- Generate tooltip
+			f:SetScript("OnEnter", function(frame)
+				obj:onTooltip(frame);
+			end);
+			f:SetScript("Onleave", function() 
+				obj:onTooltip();
+			end);
+
+			f:Show();
+			i = i+1;
+
+		end
+
+	end
+
+	for n=i,BUTTON_ROWS*BUTTON_COLS-1 do
+		local f = _G["ExiWoWUnderwearButton_"..i]
+		f:Hide();
+	end
+
+end
+
+
+function ExiWoW.Menu:hideAllTabs()
+	ExiWoWSettingsFrame_page_settings:Hide();
+	ExiWoWSettingsFrame_page_actions:Hide();
+	ExiWoWSettingsFrame_page_underwear:Hide();	
+end
 
 
 -- BUILD --
@@ -108,8 +184,9 @@ function ExiWoW.Menu:ini()
 	f:SetScript("OnDragStart", f.StartMoving)
 	f:SetScript("OnDragStop", f.StopMovingOrSizing)
 
-	PanelTemplates_SetNumTabs(f, 2);
+	PanelTemplates_SetNumTabs(f, 3);
 	PanelTemplates_SetTab(f, 1);
+	ExiWoW.Menu:toggle()
 	--ExiWoWSettingsFrame_page_settings:Show();
 	--ExiWoWSettingsFrame_page_actions:Hide();
 
@@ -143,6 +220,32 @@ function ExiWoW.Menu:ini()
 		end
 	end
 
+
+	-- Build underwear page
+	f = ExiWoWSettingsFrame_page_underwear;
+	for row=0,BUTTON_ROWS-1 do
+		for col=0,BUTTON_COLS-1 do
+
+			local ab = CreateFrame("Button", "ExiWoWUnderwearButton_"..tostring(col+row*col), f, "ActionButtonTemplate");
+			ab:SetAttribute("type", "action");
+			ab:SetAttribute("action", 1);
+			ab:SetPoint("TOPLEFT", 23+col*50*BUTTON_MARG, -50-row*50*BUTTON_MARG);
+			ab:SetSize(50,50);
+			ab.cooldown:SetSwipeTexture('', 0, 0, 0, 0.75)
+			ab:Hide();
+
+			local s = CreateFrame("Frame", nil, ab);
+			ab.star = s;
+			s:SetPoint("TOPLEFT", -5,5);
+			s:SetSize(16,16);
+			local tx = s:CreateTexture(nil, "OVERLAY");
+			tx:SetTexture("Interface/COMMON/ReputationStar");
+			tx:SetTexCoord(0,0.5,0,0.5)
+			tx:SetAllPoints();
+			s:Hide();
+
+		end
+	end
 
 
 	-- Build settings frame --
@@ -236,15 +339,21 @@ function ExiWoW.Menu:ini()
 
 	ExiWoWSettingsFrameTab1:SetScript("OnMouseUp", function (self, button)
 		PanelTemplates_SetTab(ExiWoW.Menu.FRAME, 1);
+		ExiWoW.Menu:hideAllTabs();
 		ExiWoWSettingsFrame_page_actions:Show();
-		ExiWoWSettingsFrame_page_settings:Hide();
 		PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON);
 	end)
 
 	ExiWoWSettingsFrameTab2:SetScript("OnMouseUp", function (self, button)
 		PanelTemplates_SetTab(ExiWoW.Menu.FRAME, 2);
+		ExiWoW.Menu:hideAllTabs();
+		ExiWoWSettingsFrame_page_underwear:Show();
+		PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON);
+	end)
+	ExiWoWSettingsFrameTab3:SetScript("OnMouseUp", function (self, button)
+		PanelTemplates_SetTab(ExiWoW.Menu.FRAME, 3);
+		ExiWoW.Menu:hideAllTabs();
 		ExiWoWSettingsFrame_page_settings:Show();
-		ExiWoWSettingsFrame_page_actions:Hide();
 		PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON);
 	end)
 
