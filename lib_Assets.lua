@@ -54,7 +54,6 @@ local ef = ExiWoW.LibAssets.effects;
 	npc_pincer["Duneclaw Matriarch"] = true
 	npc_pincer["Scorpid Worker"] = true
 	npc_pincer["Surf Crawler"] = true
-	npc_pincer["Clattering Scorpid"] = true
 	
 	
 	
@@ -204,7 +203,7 @@ local sk = ExiWoW.LibAssets.spell_kits;
 			MajorZone = {
 				Subzone = {
 					{
-						type = "Underwear",
+						type = "Underwear" | "Charges",
 						id = id,
 						text = rpText object (both targ and caster will be you),
 						chance = 0-1,
@@ -230,13 +229,24 @@ local sk = ExiWoW.LibAssets.spell_kits;
 			})
 		}
 	}
+	f["Durotar"]["*"] = {
+		{
+			type = "Charges", 
+			id = "THROW_SAND", 
+			chance = 0.8,
+			sound = 73172,
+			text = ExiWoW.RPText:new({
+				text_receiver = "You found a handful of sand!"
+			})
+		}
+	}
 
 
 
 
 -- Loot tables
 	ExiWoW.LibAssets.loot = {};
-	local f = ExiWoW.LibAssets.foraging
+	f = ExiWoW.LibAssets.loot
 	-- Syntax:
 	--[[
 		{
@@ -244,7 +254,7 @@ local sk = ExiWoW.LibAssets.spell_kits;
 				Subzone = {
 					NPCName = {
 						{
-							type = "Underwear",
+							type = "Underwear" | "Charges",
 							id = id,
 							text = rpText object (caster will be you, target will have the name of the downed npc),
 							chance = 0-1,

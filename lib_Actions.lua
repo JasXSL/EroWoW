@@ -240,6 +240,34 @@ function ExiWoW.Action:buildLibrary()
 		end
 	}));
 
+
+
+
+
+
+
+
+
+
+		-- Consumable --
+	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
+		id = "THROW_SAND",
+		name = "Throw Sand",
+		description = "Throw sand at your target.",
+		max_charges = 10,
+		charges = 0,
+		texture = "spell_sandexplosion",
+		cooldown = 0,
+		self_only = true,
+		cast_time = 0.5,
+		fn_send = function(self, sender, target, suppressErrors)
+			return self:sendRPText(sender, target, suppressErrors);
+		end,
+		fn_receive = function(self, sender, target, args)
+			self:receiveRPText(sender, target, args)
+			return true
+		end
+	}));
 	
 
 end

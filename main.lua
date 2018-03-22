@@ -3,7 +3,8 @@ local appName, internal = ...
 	/console scriptErrors 1
 
 	TODO:
-	- Add in more abilities & Spell triggers
+	- Tank mode: Adds a 5% chance of crits triggering from normal attack, since tanks can't be critically hit
+	- Add in more content
 	- Add pagination if you manage to fill up the whole first page
 	- Write VH Addon
 	- Alt click = create macro

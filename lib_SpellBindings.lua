@@ -97,6 +97,11 @@ function ExiWoW.SpellBinding:buildLibrary()
 		name = spellKits.slosh,
 		procChance = 1
 	}))
+
+	table.insert(R, sb:new({
+		name = "Bonk",
+		procChance = 0.4
+	}))
 	
 
 end

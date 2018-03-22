@@ -46,6 +46,13 @@ function ExiWoW.Menu:refreshSpellsPage()
 
 			local f = _G["ExiWoWActionButton_"..i]
 
+			local name = _G["ExiWoWActionButton_"..i.."Name"];
+			if v.charges and v.charges ~= math.huge then
+				name:SetText(v.charges)
+			else
+				name:SetText("")
+			end
+
 			f:SetScript("OnMouseUp", function (self, button)
 				if IsShiftKeyDown() then
 					v.favorite = not v.favorite;
@@ -206,6 +213,9 @@ function ExiWoW.Menu:ini()
 			ab:SetSize(50,50);
 			ab.cooldown:SetSwipeTexture('', 0, 0, 0, 0.75)
 			ab:Hide();
+
+			ab.Name:SetPoint("TOPRIGHT", 8,-30)
+			ab.Name:SetFontObject("GameFontHighlight");
 
 			local s = CreateFrame("Frame", nil, ab);
 			ab.star = s;

@@ -44,7 +44,7 @@ function ExiWoW.Action:new(data)
 	self.texture = data.texture or ""							-- Texture, does not need a path
 	self.cooldown = data.cooldown or 0							-- Internal cooldown
 	self.global_cooldown = getVar(data.global_cooldown, true)			-- Affected by global cooldown
-	
+	self.alias = data.alias or false							-- Lets you override the ID for a send
 	self.cast_time = data.cast_time or 0						-- Cast time of spell
 	self.cast_sound_loop = data.cast_sound_loop or false		-- Cast loop sound
 	self.cast_sound_start = data.cast_sound_start or false		-- Start cast sound, played once
@@ -73,6 +73,7 @@ function ExiWoW.Action:new(data)
 	self.allow_instance = data.allow_instance or false;				-- Allow in instances
 	self.allow_caster_dead = data.allow_caster_dead or false;		-- Allow if caster is dead
 	self.allow_targ_dead = data.allow_targ_dead or false;			-- Allow if target is dead
+	self.max_charges = type(data.max_charges) == "number" and data.max_charges or math.huge;
 
 	self.allow_in_vehicle = data.allow_in_vehicle or false;			-- Allow if either player is in a vehicle
 
@@ -133,11 +134,26 @@ function ExiWoW.Action:export()
 		id = self.id,
 		learned = self.learned,
 		favorite = self.favorite,
-		cooldown_started = self.cooldown_started
+		cooldown_started = self.cooldown_started,
+		charges = self.charges
 	};
 
 end
 
+
+-- Charges
+function ExiWoW.Action:consumeCharges(nr)
+	if not nr then nr = 1 end
+
+	-- Not enough charges
+	if self.charges-nr < 0 then return false end
+
+	self.charges = self.charges-nr;
+	if self.charges > self.max_charges then self.charges = self.max_charges end
+	ExiWoW.Menu:refreshSpellsPage();
+	return true;
+
+end
 
 
 function ExiWoW.Action:setCooldown(overrideTime, ignoreGlobal)
@@ -546,14 +562,16 @@ function ExiWoW.Action:sendRPText(sender, target, suppressErrors)
 	local tt = ExiWoW.CAST_TARGET;
 	if UnitIsUnit(target, "player") then tt = ts; end -- Self cast
 
-	local rptext = ExiWoW.RPText:get(self.id, ts, tt);
+	local id = self.id;
+	if self.alias then id = self.alias end
+	local rptext = ExiWoW.RPText:get(id, ts, tt);
 	if not rptext then return false end
 	-- We only need a callback for this
 	return {
-		text=rptext.text_receiver,
-		sender=ts:export(true),
-		sound=rptext.sound,
-		item=rptext.item
+		t=rptext.text_receiver,
+		se=ts:export(true),
+		so=rptext.sound,
+		i=rptext.item
 	}, 
 	function(se, success, data) 
 		if success then
@@ -569,14 +587,14 @@ end
 
 function ExiWoW.Action:receiveRPText( sender, target, args)
 
-	if args.text and args.sender then
-		local ts = ExiWoW.Character:new(args.sender, sender);
-		ExiWoW.RPText:print(ExiWoW.RPText:convert(args.text, ts, ExiWoW.ME, nil, args.item))
+	if args.t and args.se then
+		local ts = ExiWoW.Character:new(args.se, sender);
+		ExiWoW.RPText:print(ExiWoW.RPText:convert(args.t, ts, ExiWoW.ME, nil, args.i))
 	end
 	
 	-- Play receiving sound if not self cast
-	if not UnitIsUnit(Ambiguate(sender, "ALL"), "player") and args.sound then 
-		PlaySound(args.sound, "SFX");
+	if not UnitIsUnit(Ambiguate(sender, "ALL"), "player") and args.so then 
+		PlaySound(args.so, "SFX");
 	end
 
 end
@@ -667,7 +685,9 @@ function ExiWoW.Action:useOnTarget(id, target, castFinish)
 		target = "player"
 	end
 
-	
+	if action.charges-1 < 0 then
+		return ExiWoW:reportError("Not enough charges");
+	end
 
 	-- Validate conditions
 	if not action:validate("player", target, ignoreErrors) then return false end
@@ -691,7 +711,13 @@ function ExiWoW.Action:useOnTarget(id, target, castFinish)
 		-- Send to target
 		local first,last = UnitName(target)
 		if last then first = first.."-"..last end
-		ExiWoW:sendAction(Ambiguate(first, "all"), action.id, args, callback)
+		ExiWoW:sendAction(Ambiguate(first, "all"), action.id, args, function(...)
+			if type(callback) == "function" then callback(...) end
+			local self, success = ...
+			if success then
+				action:consumeCharges(1);
+			end
+		end)
 	else 
 		-- Start cast
 		ExiWoW.Action:beginSpellCast(action, target);

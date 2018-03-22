@@ -362,6 +362,7 @@ function ExiWoW.Character:forage()
 	local scan = f[topzone]
 	if not scan then return end
 
+
 	if scan["*"] then
 		for _,v in pairs(scan["*"]) do
 			table.insert(available, v)
@@ -372,6 +373,7 @@ function ExiWoW.Character:forage()
 			table.insert(available, v)
 		end
 	end
+
 
 	local size = #available
 	for i = size, 1, -1 do
@@ -384,7 +386,7 @@ function ExiWoW.Character:forage()
 		local chance = 1
 		if v.chance then chance = v.chance end
 
-		if math.random() < v.chance then 
+		if math.random() < chance then 
 			
 			if ExiWoW.ME:addItem(v.type, v.id, 1) then
 				if v.text then 
@@ -395,12 +397,10 @@ function ExiWoW.Character:forage()
 			end
 
 		end
-
-		
-		PlaySound(1142, "Dialog")
-		ExiWoW.RPText:print("You found nothing");
-
 	end
+
+	PlaySound(1142, "Dialog")
+	ExiWoW.RPText:print("You found nothing");
 
 	return false
 
@@ -594,6 +594,12 @@ function ExiWoW.Character:addItem(type, name, quant)
 		table.insert(self.underwear_ids, {id=name, fav=false})
 		ExiWoW.Menu:refreshUnderwearPage()
 		return exists;
+	elseif type == "Charges" then
+		local action = ExiWoW.Action:get(name)
+		if not action then return false end
+		if action.charges >= action.max_charges then return false end
+		if not action:consumeCharges(-quant) then return false end
+		return action
 	end
 
 end

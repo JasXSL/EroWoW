@@ -90,5 +90,19 @@ function ExiWoW.RPText:buildLibrary()
 		fn = ef.addExcitementMasochisticDefault
 	}))
 
+	table.insert(R, ExiWoW.RPText:new({
+		id = "THROW_SAND",
+		text_receiver = "You throw sand into the air, some of which falls back down on you and into your clothes!",
+		sound = 73172,
+		requirements = {}
+	}))
+
+	table.insert(R, ExiWoW.RPText:new({
+		id = "THROW_SAND",
+		text_sender = "You throw a handful of sand at %T!",
+		text_sender = "%S throws a handful of sand at you!",
+		sound = 907,
+		requirements = {}
+	}))
 
 end
