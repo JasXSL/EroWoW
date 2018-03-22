@@ -26,5 +26,13 @@ function ExiWoW.Underwear:buildLibrary()
 		tags = {},
 	}));
 
+	table.insert(lib, uw:new({
+		id = "KULTIRAS_BOXERS",
+		name = "Kul Tiras Boxers",
+		icon = "inv_misc_anchor",
+		description = "White boxer shorts made of anchor-patterned cotton. Made with gold colored trimmings.",
+		tags = {},
+	}));
+
 end
 

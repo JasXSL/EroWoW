@@ -54,6 +54,8 @@ local ef = ExiWoW.LibAssets.effects;
 	npc_pincer["Duneclaw Matriarch"] = true
 	npc_pincer["Scorpid Worker"] = true
 	npc_pincer["Surf Crawler"] = true
+	npc_pincer["Clattering Scorpid"] = true
+	
 	
 	
 	
@@ -152,6 +154,8 @@ local sk = ExiWoW.LibAssets.spell_kits;
 	sk.sand = {};										-- Sandblast stuff
 	sk.dirt = {};										-- Same as above but dirt
 	sk.tossed_objects = {};
+	sk.shield_bash = {}
+	sk.slosh = {}										-- Sloshing things, like water bolt
 
 	-- Ice
 	sk.ice_common["Chilled"]=true;
@@ -184,7 +188,11 @@ local sk = ExiWoW.LibAssets.spell_kits;
 
 	sk.tossed_objects["Bone Toss"] = true
 
+	-- Shield bash
+	sk.shield_bash["Shield Bash"] = true
 
+	-- Slosh
+	sk.slosh["Water Bolt"] = true
 
 
 -- Foraging
@@ -219,6 +227,59 @@ local sk = ExiWoW.LibAssets.spell_kits;
 			sound = 44577,
 			text = ExiWoW.RPText:new({
 				text_receiver = "You find some orcish briefs in a crate. They seem unused!"
+			})
+		}
+	}
+
+
+
+
+-- Loot tables
+	ExiWoW.LibAssets.loot = {};
+	local f = ExiWoW.LibAssets.foraging
+	-- Syntax:
+	--[[
+		{
+			MajorZone = {
+				Subzone = {
+					NPCName = {
+						{
+							type = "Underwear",
+							id = id,
+							text = rpText object (caster will be you, target will have the name of the downed npc),
+							chance = 0-1,
+							sound = successSoundID
+						}
+					}
+				}
+			}
+		}
+
+		Setting Subzone to * will be used for all subzones within the major zone
+	]]
+
+
+	f["Durotar"] = {}
+	f["Durotar"]["*"] = {}
+	f["Durotar"]["*"]["Sergeant Curtis"] = {
+		{
+			type = "Underwear", 
+			id = "KULTIRAS_BOXERS", 
+			chance = 1,
+			sound = 1185,
+			text = ExiWoW.RPText:new({
+				text_receiver = "You found a folded pair of %item that %T was carrying!"
+			})
+		}
+	}
+	f["Durotar"]["*"]["Lieutenant Palliter"] = {
+		{
+			type = "Underwear", 
+			id = "KULTIRAS_BOXERS", 
+			chance = 1,
+			sound = 1185,
+			text = ExiWoW.RPText:new({
+				text_receiver = "You found a folded pair of %item that %T was carrying!"
 			})
 		}
 	}

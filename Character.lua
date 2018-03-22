@@ -9,6 +9,7 @@ ExiWoW.Character.eventBindingIndex = 0;
 
 ExiWoW.Character.takehitCD = nil			-- Cooldown for takehit texts
 
+local myGUID = UnitGUID("player")
 
 -- Consts
 ExiWoW.Character.EXCITEMENT_FADE_PER_SEC = 0.05;
@@ -27,7 +28,7 @@ function ExiWoW.Character:ini()
 	ExiWoW.Character.evtFrame:RegisterUnitEvent("UNIT_SPELLCAST_START", "player");
 	ExiWoW.Character.evtFrame:RegisterUnitEvent("UNIT_SPELLCAST_SENT", "player");
 	ExiWoW.Character.evtFrame:RegisterEvent("SOUNDKIT_FINISHED");
-	ExiWoW.Character.evtFrame:RegisterEvent("COMBAT_LOG_EVENT")
+	ExiWoW.Character.evtFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	ExiWoW.Character.evtFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
 	ExiWoW.Character.evtFrame:RegisterUnitEvent("UNIT_AURA", "player")
 	ExiWoW.Character.evtFrame:RegisterEvent("PLAYER_DEAD");
@@ -59,6 +60,89 @@ function ExiWoW.Character:onEvent(event, ...)
 		return { spellId = spellId, name=name, harmful=harmful, unitCaster=unitCaster, count=count, crit=crit, cname=cname}
 	end
 
+	-- Handle combat log
+	-- This needs to go first as it should only handle event bindings on the player
+	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
+
+		local timestamp, combatEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags =  ...; -- Those arguments appear for all combat event variants.
+		local eventPrefix, eventSuffix = combatEvent:match("^(.-)_?([^_]*)$");
+
+		-- See if a viable unit exists
+		local u = false
+		if sourceGUID == UnitGUID("target") then u = "target"
+		elseif sourceGUID == UnitGUID("focus") then u = "focus"
+		elseif sourceGUID == UnitGUID("mouseover") then u = "mouseover"
+		elseif sourceGUID == UnitGUID("player") then u = "player"
+		end
+
+		if combatEvent == "UNIT_DIED" then
+			if 
+				bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) == 0 and
+				bit.band(destFlags, COMBATLOG_OBJECT_CONTROL_NPC) > 0
+			then
+				ExiWoW.Character:rollLoot(destName);
+			end
+		end
+
+		-- Only player themselves after this point
+		if bit.band(destFlags, COMBATLOG_OBJECT_TYPE_PLAYER) == 0 then return end 
+
+		
+		-- These only work for healing or damage
+		if not ExiWoW.Character.takehitCD and (eventPrefix == "SPELL" or eventPrefix == "SPELL_PERIODIC") and (eventSuffix == "DAMAGE" or eventSuffix=="HEAL") then
+			local npc = ExiWoW.Character:new({}, sourceName);
+			if u then npc = ExiWoW.Character:buildNPC(u, sourceName) end
+
+			-- Todo: Add spell triggers
+			damage = arguments[15]
+			local harmful = true
+			if eventSuffix ~= "DAMAGE" then harmful = false end
+
+			local trig = buildSpellTrigger(
+				arguments[12], -- Spell ID
+				arguments[13], --Spell Name
+				harmful, 
+				sourceName, 
+				1,
+				arguments[21], -- Crit
+				sourceName
+			)
+			ExiWoW.SpellBinding:onTick(npc, trig)
+
+		elseif eventSuffix == "DAMAGE" and eventPrefix == "SWING" then
+
+			local crit = ""
+			if arguments[18] then crit = "_CRIT" end
+
+
+			local damage = 0
+			
+
+			damage = arguments[12]
+
+			
+			local chance = ExiWoWGlobalStorage.swing_text_freq;
+			if crit ~= "" then chance = chance*4 end -- Crits have 3x chance for swing text
+
+			local rand = math.random()
+			if not ExiWoW.Character.takehitCD and rand < chance and u and not UnitIsPlayer(u) then
+
+				local npc = ExiWoW.Character:buildNPC(u, sourceName)
+				local rp = ExiWoW.RPText:get(eventPrefix..crit, npc, ExiWoW.ME)
+				if rp then
+					ExiWoW.Character:setTakehitTimer();
+					rp:convertAndReceive(npc, ExiWoW.ME)
+				end
+
+			end
+
+			if damage <= 0 then return end
+			local percentage = damage/UnitHealthMax("player");
+			ExiWoW.ME:addExcitement(percentage*0.1, false, true);
+			
+
+	   end
+	end
 
 	for k,v in pairs(ExiWoW.Character.eventBindings) do
 
@@ -148,75 +232,6 @@ function ExiWoW.Character:onEvent(event, ...)
 
 	end
 
-	-- Handle combat log
-	if event == "COMBAT_LOG_EVENT" then
-		local timestamp, combatEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags =  ...; -- Those arguments appear for all combat event variants.
-		local eventPrefix, eventSuffix = combatEvent:match("^(.-)_?([^_]*)$");
-
-		-- See if a viable unit exists
-		local u = false
-		if sourceGUID == UnitGUID("target") then u = "target"
-		elseif sourceGUID == UnitGUID("focus") then u = "focus"
-		elseif sourceGUID == UnitGUID("mouseover") then u = "mouseover"
-		elseif sourceGUID == UnitGUID("player") then u = "player"
-		end
-
-		-- These only work for healing or damage
-		if not ExiWoW.Character.takehitCD and (eventPrefix == "SPELL" or eventPrefix == "SPELL_PERIODIC") and (eventSuffix == "DAMAGE" or eventSuffix=="HEAL") then
-
-			local npc = ExiWoW.Character:new({}, sourceName);
-			if u then npc = ExiWoW.Character:buildNPC(u, sourceName) end
-
-			-- Todo: Add spell triggers
-			damage = arguments[15]
-			local harmful = true
-			if eventSuffix ~= "DAMAGE" then harmful = false end
-
-			local trig = buildSpellTrigger(
-				arguments[12], -- Spell ID
-				arguments[13], --Spell Name
-				harmful, 
-				sourceName, 
-				1,
-				arguments[21], -- Crit
-				sourceName
-			)
-			ExiWoW.SpellBinding:onTick(npc, trig)
-
-		elseif eventSuffix == "DAMAGE" and eventPrefix == "SWING" then
-
-			local crit = ""
-			if arguments[18] then crit = "_CRIT" end
-
-
-			local damage = 0
-			
-
-			damage = arguments[12]
-
-			
-			local chance = ExiWoWGlobalStorage.swing_text_freq;
-			if crit ~= "" then chance = chance*4 end -- Crits have 3x chance for swing text
-
-			local rand = math.random()
-			if not ExiWoW.Character.takehitCD and rand < chance and u and not UnitIsPlayer(u) then
-
-				local npc = ExiWoW.Character:buildNPC(u, sourceName)
-				local rp = ExiWoW.RPText:get(eventPrefix..crit, npc, ExiWoW.ME)
-				if rp then
-					ExiWoW.Character:setTakehitTimer();
-					rp:convertAndReceive(npc, ExiWoW.ME)
-				end
-
-			end
-
-			if damage <= 0 then return end
-			local percentage = damage/UnitHealthMax("player");
-			ExiWoW.ME:addExcitement(percentage*0.1, false, true);
-			
-
-	   end
-	end
 end
 
 function ExiWoW.Character:bind(evt, fn, numTriggers)
@@ -391,6 +406,56 @@ function ExiWoW.Character:forage()
 
 end
 
+function ExiWoW.Character:rollLoot(npc)
+	
+	local topzone = GetRealZoneText()
+	local subzone = GetSubZoneText()
+	local f = ExiWoW.LibAssets.foraging
+
+	local available = {}
+	local scan = f[topzone]
+	if not scan then return end
+
+	if type(scan["*"]) == "table" and type(scan["*"][npc]) == "table" then
+		for k,v in pairs(scan["*"][npc]) do
+			table.insert(available, v)
+		end
+	end
+	if type(scan[subzone]) == "table" and type(scan[subzone][npc]) == "table" then
+		for _,v in pairs(scan[subzone][npc]) do
+			table.insert(available, v)
+		end
+	end
+
+	local size = #available
+	for i = size, 1, -1 do
+		local rand = math.random(size)
+		available[i], available[rand] = available[rand], available[i]
+	end
+
+	for _,v in ipairs(available) do
+
+		local chance = 1
+		if v.chance then chance = v.chance end
+
+		if math.random() < v.chance then 
+			
+			local item = ExiWoW.ME:addItem(v.type, v.id, 1);
+			if item then
+				if v.text then 
+					v.text.item = item.name;
+					v.text:convertAndReceive(ExiWoW.ME, ExiWoW.Character:buildNPC(u, npc));
+				end
+				if v.sound then PlaySound(v.sound, "Dialog") end
+				return v;
+			end
+
+		end
+	end
+
+	return false
+
+end
 
 
 
@@ -528,11 +593,10 @@ function ExiWoW.Character:addItem(type, name, quant)
 		if not exists then return false end
 		table.insert(self.underwear_ids, {id=name, fav=false})
 		ExiWoW.Menu:refreshUnderwearPage()
-		return true;
+		return exists;
 	end
 
 end
-
 
 
 -- Raised when you max or drop off max excitement --

@@ -87,6 +87,16 @@ function ExiWoW.SpellBinding:buildLibrary()
 		procChance = 0.5
 	}))
 
+	-- Bash
+	table.insert(R, sb:new({
+		name = spellKits.shield_bash,
+		procChance = 0.5
+	}))
+
+	table.insert(R, sb:new({
+		name = spellKits.slosh,
+		procChance = 1
+	}))
 	
 
 end
