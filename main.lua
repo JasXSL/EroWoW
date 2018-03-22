@@ -294,6 +294,23 @@ function ExiWoW:unitRpName(unit)
 end
 
 
+-- Searches name in acceptable {name=true, name2=true...}, if acceptable is nil, then it's a wildcard
+-- If name is not a string, then it's false
+function ExiWoW:multiSearch(name, acceptable)
+
+	if acceptable == nil then return true end
+	if type(name) ~= "string" then return false end
+
+	local itm = {}
+	if type(acceptable) ~= "table" then itm[acceptable] = true
+	else itm = acceptable
+	end
+	for v,_ in pairs(itm) do
+		if name == v or (v:sub(1,1) == "%" and name:find(v:sub(2))) then return true end				
+	end
+	return false
+end
+
 function ExiWoW:timeFormat(seconds)
 
 	if seconds > 3600 then return tostring(math.ceil(seconds/3600)).." Hr" end

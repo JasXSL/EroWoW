@@ -374,12 +374,7 @@ function ExiWoW.Character:rollLoot(npc)
 	local subzone = GetSubZoneText()
 	local f = ExiWoW.LibAssets.foraging
 
-	local function multiSearch(name, acceptable)
-		for v,_ in pairs(acceptable) do
-			if npc == v or (v:sub(1,1) == "%" and npc:find(v:sub(2))) then return true end				
-		end
-		return false
-	end
+	
 
 	local function isCloseToPoints(points)
 		local px,py = GetPlayerMapPosition("player")
@@ -400,20 +395,10 @@ function ExiWoW.Character:rollLoot(npc)
 		
 		local add = true
 		if 
-			(item.zone ~= nil and item.zone ~= topzone) or
-			(item.sub ~= nil and item.sub ~= subzone)
+			not ExiWoW:multiSearch(topzone, item.zone) or
+			not ExiWoW:multiSearch(subzone, item.sub) or
+			not ExiWoW:multiSearch(npc, item.name)
 		then add = false end
-
-		-- Search names
-		if add and item.name ~= nil then
-
-			local itm = {}
-			if type(item.name) ~= "table" then itm[item.name] = true
-			else itm = item.name
-			end
-			add = multiSearch(npc, itm);
-
-		end
 
 		if add and type(item.points) == "table" then
 			add = isCloseToPoints(item.points)

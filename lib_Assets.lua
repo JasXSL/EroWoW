@@ -280,12 +280,30 @@ local sk = ExiWoW.LibAssets.spell_kits;
 			}
 		}
 	})
+	table.insert(f, {
+		sub = "%Strand",
+		name = "_FORAGE_",
+		items={
+			{
+				type = "Charges", 
+				id = "THROW_SAND", 
+				chance = 0.8,
+				sound = 73172,
+				text = ExiWoW.RPText:new({
+					text_receiver = "You found a handful of sand!"
+				})
+			}
+		}
+	})
 
 	table.insert(f, {
 		zone = "Swamp of Sorrows",
 		sub = "Bogpaddle",
 		name = "_FORAGE_",
-		points = {{x = 72.41, y=16.89, rad=0.22}},
+		points = {
+			{x = 72.41, y=16.89, rad=0.22},
+			{x = 72.39, y=12.77, rad=0.32},
+		},
 		items={
 			{
 				type = "Underwear", 
