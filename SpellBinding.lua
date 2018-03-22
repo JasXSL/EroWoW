@@ -58,7 +58,7 @@ function ExiWoW.SpellBinding:runOnThese(name, callback)
 	if not internal.checkHardlimits(nil,nil,true) then return end
 	for k,v in pairs(ExiWoW.SpellBinding.Lib) do
 		if 
-			v.name[name] and 
+			ExiWoW:multiSearch(name, v.name) and 
 			(self.allow_in_vehicle or not UnitInVehicle("player"))
 		then
 			callback(v);

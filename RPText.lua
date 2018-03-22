@@ -357,18 +357,7 @@ function ExiWoW.RPText.Req:validate(sender, receiver, spelldata, spelltype)
 	elseif t == ty.RTYPE_HAS_BREASTS then 
 		out = targ:getBreastSize() ~= false;
 	elseif t == ty.RTYPE_NAME then
-		if data[name] == true then out = true
-		else
-			-- Full scan
-			for na,t in pairs(data) do
-				if na:sub(1,1) == "%" then
-					if name:find(na:sub(2)) then
-						out = true;
-						break
-					end
-				end
-			end
-		end
+		out = ExiWoW:multiSearch(name, data)
 	elseif t == ty.RTYPE_PENIS_GREATER then 
 		out = targ:getPenisSize() ~= false and targ:getPenisSize() > data[1];
 	elseif t == ty.RTYPE_BREASTS_GREATER then 
@@ -376,11 +365,11 @@ function ExiWoW.RPText.Req:validate(sender, receiver, spelldata, spelltype)
 	elseif t == ty.RTYPE_BUTT_GREATER then 
 		out = targ:getButtSize() > data[1];
 	elseif t == ty.RTYPE_RACE then 
-		out = targ.race ~= nil and data[targ.race] ~= nil;
+		out = ExiWoW:multiSearch(targ.race, data)
 	elseif t == ty.RTYPE_CLASS then 
-		out = targ.class ~= nil and data[targ.class] ~= nil;
+		out = ExiWoW:multiSearch(targ.class, data)
 	elseif t == ty.RTYPE_TYPE then 
-		out = targ.type ~= nil and data[targ.type] ~= nil;
+		out = ExiWoW:multiSearch(targ.type, data)
 	elseif t == ty.RTYPE_CRIT then
 		out = type(spelldata) == "table" and spelldata.crit;
 	elseif t == ty.RTYPE_DETRIMENTAL then

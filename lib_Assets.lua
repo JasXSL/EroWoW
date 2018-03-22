@@ -163,13 +163,9 @@ local sk = ExiWoW.LibAssets.spell_kits;
 	sk.ice["Frostbolt"]=true;
  
 	-- Electric
-	sk.electric_common["Lightning Shield"] = true
 	sk.electric["Stormstrike"] = true
-	sk.electric["Lightning Bolt"] = true
-	sk.electric["Chain Lightning"] = true
-	sk.electric["Lightning Breath"] = true
+	sk.electric["%Lightning"] = true
 	sk.electric["Shock"] = true
-	sk.electric["Lightning Discharge"] = true
 	
 
 	-- Basilisk freeze
