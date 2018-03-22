@@ -100,9 +100,32 @@ function ExiWoW.RPText:buildLibrary()
 	table.insert(R, ExiWoW.RPText:new({
 		id = "THROW_SAND",
 		text_sender = "You throw a handful of sand at %T!",
-		text_sender = "%S throws a handful of sand at you!",
+		text_receiver = "%S throws a handful of sand at you!",
 		sound = 907,
 		requirements = {}
 	}))
+
+	table.insert(R, ExiWoW.RPText:new({
+		id = "CLAW_PINCH",
+		text_sender = "You pinch %T's side with your big claw!",
+		text_receiver = "%S pinches your side with %Shis big claw!",
+		sound = 36721,
+		requirements = {}
+	}))
+	table.insert(R, ExiWoW.RPText:new({
+		id = "CLAW_PINCH",
+		text_sender = "You pinch %T's nose with your big claw!",
+		text_receiver = "%S pinches your nose with %Shis big claw!",
+		sound = 36721,
+		requirements = {}
+	}))
+	table.insert(R, ExiWoW.RPText:new({
+		id = "CLAW_PINCH",
+		text_receiver = "You pinch your nose with your big claw!",
+		sound = 36721,
+		requirements = {}
+	}))
+
+	
 
 end

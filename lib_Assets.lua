@@ -53,7 +53,9 @@ local ef = ExiWoW.LibAssets.effects;
 	npc_pincer["Duneshore Crab"] = true
 	npc_pincer["Duneclaw Matriarch"] = true
 	npc_pincer["Scorpid Worker"] = true
-	npc_pincer["Surf Crawler"] = true
+	npc_pincer["%Surf Crawler"] = true
+	npc_pincer["Silt Crawler"] = true
+	npc_pincer["%Makrura"] = true
 	
 	
 	
@@ -167,6 +169,8 @@ local sk = ExiWoW.LibAssets.spell_kits;
 	sk.electric["Chain Lightning"] = true
 	sk.electric["Lightning Breath"] = true
 	sk.electric["Shock"] = true
+	sk.electric["Lightning Discharge"] = true
+	
 
 	-- Basilisk freeze
 	sk.basilisk["Crystal Gaze"] = true
@@ -194,54 +198,11 @@ local sk = ExiWoW.LibAssets.spell_kits;
 	sk.slosh["Water Bolt"] = true
 
 
--- Foraging
-	ExiWoW.LibAssets.foraging = {};
-	local f = ExiWoW.LibAssets.foraging
-	-- Syntax:
-	--[[
-		{
-			MajorZone = {
-				Subzone = {
-					{
-						type = "Underwear" | "Charges",
-						id = id,
-						text = rpText object (both targ and caster will be you),
-						chance = 0-1,
-						sound = successSoundID
-					}
-				}
-			}
-		}
-
-		Setting Subzone to * will be used for all subzones within the major zone
-	]]
 
 
-	f["Durotar"] = {}
-	f["Durotar"]["Razor Hill"] = {
-		{
-			type = "Underwear", 
-			id = "ORCISH_BRIEFS", 
-			chance = 1,
-			sound = 44577,
-			text = ExiWoW.RPText:new({
-				text_receiver = "You find some orcish briefs in a crate. They seem unused!"
-			})
-		}
-	}
-	f["Durotar"]["*"] = {
-		{
-			type = "Charges", 
-			id = "THROW_SAND", 
-			chance = 0.8,
-			sound = 73172,
-			text = ExiWoW.RPText:new({
-				text_receiver = "You found a handful of sand!"
-			})
-		}
-	}
 
 
+	-- LOOT TABLES --
 
 
 -- Loot tables
@@ -250,46 +211,108 @@ local sk = ExiWoW.LibAssets.spell_kits;
 	-- Syntax:
 	--[[
 		{
-			MajorZone = {
-				Subzone = {
-					NPCName = {
-						{
-							type = "Underwear" | "Charges",
-							id = id,
-							text = rpText object (caster will be you, target will have the name of the downed npc),
-							chance = 0-1,
-							sound = successSoundID
-						}
-					}
-				}
+			{
+				zone=ZoneName|ZoneNames|nil, 
+				sub=SubZone|SubZones|nil, 
+				name=npcname|npcnames|_FORAGE_|nil,
+				points = {{x = xCoord, y=yCoord, rad=radius}...} OR nil, (You can use the pace ability to detect coordinates)
+				items={{
+					type = "Underwear" | "Charges",
+					id = assetID,
+					text = rpTextObject, (caster will be you, target will be the NPC on kill, otherwise you)
+					chance = 0-1,
+					quant = 1,
+					sound = successSoundID
+				}...}}
+			...
+		}
+	]]
+	local kultirasBoxers = {}
+	kultirasBoxers["Sergeant Curtis"] = true
+	kultirasBoxers["Lieutenant Palliter"] = true
+	table.insert(f, {
+		zone = "Durotar",
+		name = kultirasBoxers,
+		items = {
+			{
+				type = "Underwear", 
+				id = "KULTIRAS_BOXERS", 
+				chance = 1,
+				sound = 1185,
+				text = ExiWoW.RPText:new({
+					text_receiver = "You found a folded pair of %item that %T was carrying!"
+				})
 			}
 		}
-
-		Setting Subzone to * will be used for all subzones within the major zone
-	]]
+	})
 
 
-	f["Durotar"] = {}
-	f["Durotar"]["*"] = {}
-	f["Durotar"]["*"]["Sergeant Curtis"] = {
-		{
-			type = "Underwear", 
-			id = "KULTIRAS_BOXERS", 
-			chance = 1,
-			sound = 1185,
-			text = ExiWoW.RPText:new({
-				text_receiver = "You found a folded pair of %item that %T was carrying!"
-			})
+
+	-- Foraged loot
+	table.insert(f, {
+		zone = "Durotar",
+		sub = "Razor Hill",
+		name = "_FORAGE_",
+		items={
+			{
+				type = "Underwear", 
+				id = "ORCISH_BRIEFS", 
+				chance = 1,
+				sound = 44577,
+				text = ExiWoW.RPText:new({
+					text_receiver = "You find some orcish briefs in a crate. They seem unused!"
+				})
+			}
 		}
-	}
-	f["Durotar"]["*"]["Lieutenant Palliter"] = {
-		{
-			type = "Underwear", 
-			id = "KULTIRAS_BOXERS", 
-			chance = 1,
-			sound = 1185,
-			text = ExiWoW.RPText:new({
-				text_receiver = "You found a folded pair of %item that %T was carrying!"
-			})
+	})
+	table.insert(f, {
+		zone = "Durotar",
+		name = "_FORAGE_",
+		items={
+			{
+				type = "Charges", 
+				id = "THROW_SAND", 
+				chance = 0.8,
+				sound = 73172,
+				text = ExiWoW.RPText:new({
+					text_receiver = "You found a handful of sand!"
+				})
+			}
 		}
-	}
+	})
+
+	table.insert(f, {
+		zone = "Swamp of Sorrows",
+		sub = "Bogpaddle",
+		name = "_FORAGE_",
+		points = {{x = 72.41, y=16.89, rad=0.22}},
+		items={
+			{
+				type = "Underwear", 
+				id = "HIGH_RISING_BIKINI_THONG_PINK", 
+				chance = 1,
+				sound = 1185,
+				text = ExiWoW.RPText:new({
+					text_receiver = "You find a crate of pink bikini thongs, hopefully nobody will notice if one goes missing!"
+				})
+			}
+		}
+	})
+
+	table.insert(f, {
+		name = npc_pincer,
+		items={
+			{
+				type = "Charges", 
+				id = "CLAW_PINCH", 
+				chance = 0.05,
+				quant = math.huge,
+				text = ExiWoW.RPText:new({
+					text_receiver = "This big claw is pristine! I'll polish it and take it with me!"
+				})
+			}
+		}
+	})
+
+
+	

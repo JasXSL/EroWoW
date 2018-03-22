@@ -34,5 +34,13 @@ function ExiWoW.Underwear:buildLibrary()
 		tags = {},
 	}));
 
+	table.insert(lib, uw:new({
+		id = "HIGH_RISING_BIKINI_THONG_PINK",
+		name = "High Rising Bikini Thong",
+		icon = "inv_belt_cloth_draenei_c_01",
+		description = "A pink high rising bikini thong, made out of a stretchy material.",
+		tags = {},
+	}));
+	
 end
 

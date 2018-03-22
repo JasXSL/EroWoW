@@ -2,7 +2,7 @@ local appName, internal = ...
 -- Library for Actions --
 function ExiWoW.Action:buildLibrary()
 
-
+	local ef = ExiWoW.LibAssets.effects
 			-- LIBRARY --
 
 	-- Meta action that checks if target has ExiWoW --
@@ -240,6 +240,38 @@ function ExiWoW.Action:buildLibrary()
 		end
 	}));
 
+	-- Pace --
+	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
+		id = "PACE",
+		name = "Pace",
+		description = "First use: Stake a starting point. Second use: Get the distance from the starting point, measured in map coordinates.",
+		texture = "ability_tracking",
+		cooldown = 0,
+		self_only = true,
+		fn_send = function(self, sender, target, suppressErrors)
+			return nil;
+		end,
+		fn_receive = function(self, sender, target, args)
+			local px,py = GetPlayerMapPosition("player")
+			px = px*100
+			py = py*100
+
+			if self.starting_point then
+				local x = self.starting_point.x
+				local y = self.starting_point.y
+				local dist = math.floor(math.sqrt((px-x)*(px-x)+(py-y)*(py-y))*100)/100
+				self.starting_point = nil
+				ExiWoW.RPText:print("You are comfortable that you paced a distance of "..dist.." units")
+				PlaySound(73276, "SFX")
+			else
+				self.starting_point = {x=px, y=py}
+				PlaySound(42485, "SFX")
+				ExiWoW.RPText:print("You stake a starting point at X:"..(math.floor(px*100)/100)..", Y:"..(math.floor(py*100)/100))
+			end
+			return true
+		end
+	}));
+
 
 
 
@@ -265,6 +297,24 @@ function ExiWoW.Action:buildLibrary()
 		end,
 		fn_receive = function(self, sender, target, args)
 			self:receiveRPText(sender, target, args)
+			ef:addExcitementMasochisticDefault();
+			return true
+		end
+	}));
+
+	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
+		id = "CLAW_PINCH",
+		name = "Claw Pinch",
+		description = "Use your large claw to pinch your target.",
+		charges = 0,
+		texture = "inv_misc_claw_lobstrok_red",
+		cooldown = 0,
+		fn_send = function(self, sender, target, suppressErrors)
+			return self:sendRPText(sender, target, suppressErrors);
+		end,
+		fn_receive = function(self, sender, target, args)
+			self:receiveRPText(sender, target, args)
+			ef:addExcitementMasochisticDefault();
 			return true
 		end
 	}));

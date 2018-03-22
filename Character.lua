@@ -56,8 +56,8 @@ function ExiWoW.Character:onEvent(event, ...)
 	local arguments = {...}
 
 	-- Builds data for a spell trigger
-	local function buildSpellTrigger(spellId, name, harmful, unitCaster, count, crit, cname)
-		return { spellId = spellId, name=name, harmful=harmful, unitCaster=unitCaster, count=count, crit=crit, cname=cname}
+	local function buildSpellTrigger(spellId, name, harmful, unitCaster, count, crit, char)
+		return { spellId = spellId, name=name, harmful=harmful, unitCaster=unitCaster, count=count, crit=crit, char=char}
 	end
 
 	-- Handle combat log
@@ -90,30 +90,34 @@ function ExiWoW.Character:onEvent(event, ...)
 		
 		-- These only work for healing or damage
 		if not ExiWoW.Character.takehitCD and (eventPrefix == "SPELL" or eventPrefix == "SPELL_PERIODIC") and (eventSuffix == "DAMAGE" or eventSuffix=="HEAL") then
+			
 			local npc = ExiWoW.Character:new({}, sourceName);
 			if u then npc = ExiWoW.Character:buildNPC(u, sourceName) end
+
+			local crit = arguments[21]
+			if ExiWoWLocalStorage.tank_mode then crit = math.random() < ExiWoW.TANK_MODE_PERC end
 
 			-- Todo: Add spell triggers
 			damage = arguments[15]
 			local harmful = true
 			if eventSuffix ~= "DAMAGE" then harmful = false end
 
+			--spellId, name, harmful, unitCaster, count, crit, char
 			local trig = buildSpellTrigger(
 				arguments[12], -- Spell ID
 				arguments[13], --Spell Name
 				harmful, 
 				sourceName, 
 				1,
-				arguments[21], -- Crit
-				sourceName
+				crit, -- Crit
+				npc
 			)
 			ExiWoW.SpellBinding:onTick(npc, trig)
 
 		elseif eventSuffix == "DAMAGE" and eventPrefix == "SWING" then
 
 			local crit = ""
-			if arguments[18] then crit = "_CRIT" end
-
+			if arguments[18] or (ExiWoWLocalStorage.tank_mode and math.random() < ExiWoW.TANK_MODE_PERC) then crit = "_CRIT" end
 
 			local damage = 0
 			
@@ -123,6 +127,7 @@ function ExiWoW.Character:onEvent(event, ...)
 			
 			local chance = ExiWoWGlobalStorage.swing_text_freq;
 			if crit ~= "" then chance = chance*4 end -- Crits have 3x chance for swing text
+
 
 			local rand = math.random()
 			if not ExiWoW.Character.takehitCD and rand < chance and u and not UnitIsPlayer(u) then
@@ -196,10 +201,12 @@ function ExiWoW.Character:onEvent(event, ...)
 			local uc = unitCaster;
 			if not uc then uc = "??" else uc = UnitName(unitCaster) end
 
-			local aura = buildSpellTrigger(spellId, name, harmful, unitCaster, count, uc)
+			local char = ExiWoW.Character:buildNPC(unitCaster, uc)
+			--spellId, name, harmful, unitCaster, count, crit, char
+			local aura = buildSpellTrigger(spellId, name, harmful, unitCaster, count, false, char)
 			table.insert(active, aura)
 			if not auraExists(ExiWoW.Character.AURAS, aura) then
-				ExiWoW.SpellBinding:onAdd(ExiWoW.Character:buildNPC(unitCaster, uc), aura)
+				ExiWoW.SpellBinding:onAdd(char, aura)
 			end
 
 		end
@@ -222,9 +229,7 @@ function ExiWoW.Character:onEvent(event, ...)
 		-- See what auras were removed
 		for i,a in pairs(ExiWoW.Character.AURAS) do
 			if not auraExists(active, a) then
-				local uc = unitCaster;
-				if not uc then uc = "??" else uc = UnitName(unitCaster) end
-				ExiWoW.SpellBinding:onRemove(ExiWoW.Character:buildNPC(a.unitCaster, uc), a)
+				ExiWoW.SpellBinding:onRemove(a.char, a)
 			end
 		end
 
@@ -354,50 +359,7 @@ end
 -- Forage
 function ExiWoW.Character:forage()
 	
-	local topzone = GetRealZoneText()
-	local subzone = GetSubZoneText()
-	local f = ExiWoW.LibAssets.foraging
-
-	local available = {}
-	local scan = f[topzone]
-	if not scan then return end
-
-
-	if scan["*"] then
-		for _,v in pairs(scan["*"]) do
-			table.insert(available, v)
-		end
-	end
-	if scan[subzone] then
-		for _,v in pairs(scan[subzone]) do
-			table.insert(available, v)
-		end
-	end
-
-
-	local size = #available
-	for i = size, 1, -1 do
-		local rand = math.random(size)
-		available[i], available[rand] = available[rand], available[i]
-	end
-
-	for _,v in ipairs(available) do
-
-		local chance = 1
-		if v.chance then chance = v.chance end
-
-		if math.random() < chance then 
-			
-			if ExiWoW.ME:addItem(v.type, v.id, 1) then
-				if v.text then 
-					v.text:convertAndReceive(ExiWoW.ME, ExiWoW.ME);
-				end
-				if v.sound then PlaySound(v.sound, "Dialog") end
-				return v;
-			end
-
-		end
-	end
+	if ExiWoW.Character:rollLoot("_FORAGE_") then return true end
 
 	PlaySound(1142, "Dialog")
 	ExiWoW.RPText:print("You found nothing");
@@ -412,19 +374,57 @@ function ExiWoW.Character:rollLoot(npc)
 	local subzone = GetSubZoneText()
 	local f = ExiWoW.LibAssets.foraging
 
-	local available = {}
-	local scan = f[topzone]
-	if not scan then return end
-
-	if type(scan["*"]) == "table" and type(scan["*"][npc]) == "table" then
-		for k,v in pairs(scan["*"][npc]) do
-			table.insert(available, v)
+	local function multiSearch(name, acceptable)
+		for v,_ in pairs(acceptable) do
+			if npc == v or (v:sub(1,1) == "%" and npc:find(v:sub(2))) then return true end				
 		end
+		return false
 	end
-	if type(scan[subzone]) == "table" and type(scan[subzone][npc]) == "table" then
-		for _,v in pairs(scan[subzone][npc]) do
-			table.insert(available, v)
+
+	local function isCloseToPoints(points)
+		local px,py = GetPlayerMapPosition("player")
+		px = px*100
+		py = py*100
+		for _,v in pairs(points) do
+			local x = v.x
+			local y = v.y
+			local radius = v.rad
+			local dist = math.sqrt((px-x)*(px-x)+(py-y)*(py-y))
+			if dist <= radius then return true end
 		end
+		return false
+	end
+
+	local available = {}
+	for _,item in pairs(ExiWoW.LibAssets.loot) do
+		
+		local add = true
+		if 
+			(item.zone ~= nil and item.zone ~= topzone) or
+			(item.sub ~= nil and item.sub ~= subzone)
+		then add = false end
+
+		-- Search names
+		if add and item.name ~= nil then
+
+			local itm = {}
+			if type(item.name) ~= "table" then itm[item.name] = true
+			else itm = item.name
+			end
+			add = multiSearch(npc, itm);
+
+		end
+
+		if add and type(item.points) == "table" then
+			add = isCloseToPoints(item.points)
+		end
+
+		if add then
+			for _,it in pairs(item.items) do
+				table.insert(available, it)
+			end
+		end
+
 	end
 
 	local size = #available
@@ -440,7 +440,7 @@ function ExiWoW.Character:rollLoot(npc)
 
 		if math.random() < v.chance then 
 			
-			local item = ExiWoW.ME:addItem(v.type, v.id, 1);
+			local item = ExiWoW.ME:addItem(v.type, v.id, v.quant);
 			if item then
 				if v.text then 
 					v.text.item = item.name;
@@ -587,18 +587,21 @@ end
 -- Items --
 function ExiWoW.Character:addItem(type, name, quant)
 
+	if not quant then quant = 1 end
 	if type == "Underwear" then
 		if self:ownsUnderwear(name) then return false end
 		local exists = ExiWoW.Underwear:get(name)
 		if not exists then return false end
 		table.insert(self.underwear_ids, {id=name, fav=false})
 		ExiWoW.Menu:refreshUnderwearPage()
+		ExiWoW.Menu:drawLoot(exists.name, exists.icon)
 		return exists;
 	elseif type == "Charges" then
 		local action = ExiWoW.Action:get(name)
 		if not action then return false end
 		if action.charges >= action.max_charges then return false end
 		if not action:consumeCharges(-quant) then return false end
+		ExiWoW.Menu:drawLoot(action.name, action.texture)
 		return action
 	end
 

@@ -49,6 +49,7 @@ function ExiWoW.Action:new(data)
 	self.cast_sound_loop = data.cast_sound_loop or false		-- Cast loop sound
 	self.cast_sound_start = data.cast_sound_start or false		-- Start cast sound, played once
 	self.cast_sound_success = data.cast_sound_success or false	-- Cast success sound, played once
+	
 
 	self.suppress_all_errors = data.suppress_all_errors or false
 
@@ -84,7 +85,7 @@ function ExiWoW.Action:new(data)
 	self.disallowed_races = data.disallowed_races or false;			-- Nonallowed races, use raceEn: http://wowwiki.wikia.com/wiki/API_UnitRace
 	
 	self.charges = data.charges or math.huge;						-- Charges tied to this spell. Charges can be added by loot?
-	
+
 	self.target_has_underwear = data.target_has_underwear;			-- Nil = either, false = no underwear, true = has underwear, table = {name=true, name2=true...}
 
 	-- Convert to sets
@@ -124,18 +125,21 @@ function ExiWoW.Action:import(data)
 		self:setCooldown(self.cooldown+data.cooldown_started-GetTime(), true);
 		self.cooldown_started = data.cooldown_started;
 	end
-	if data.charges ~= nil then self.charges = data.charges end
+	if data.charges then self.charges = data.charges end
+	if self.charges == "INF" then self.charges = math.huge end
 
 end
 
 function ExiWoW.Action:export()
 
+	local charges = self.charges
+	if charges == math.huge then charges = "INF" end
 	return {
 		id = self.id,
 		learned = self.learned,
 		favorite = self.favorite,
 		cooldown_started = self.cooldown_started,
-		charges = self.charges
+		charges = charges
 	};
 
 end
@@ -596,7 +600,6 @@ function ExiWoW.Action:receiveRPText( sender, target, args)
 	if not UnitIsUnit(Ambiguate(sender, "ALL"), "player") and args.so then 
 		PlaySound(args.so, "SFX");
 	end
-
 end
 
 

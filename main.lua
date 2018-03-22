@@ -1,13 +1,14 @@
 local appName, internal = ...
+UIParentLoadAddOn("Blizzard_DebugTools")
 --[[
 	/console scriptErrors 1
 
 	TODO:
-	- Tank mode: Adds a 5% chance of crits triggering from normal attack, since tanks can't be critically hit
 	- Add in more content
 	- Add pagination if you manage to fill up the whole first page
 	- Write VH Addon
 	- Alt click = create macro
+	- Settings export
 	 
 ]]
 
@@ -34,6 +35,7 @@ local gDefaults = {
 	takehit_rp_rate = 6,			-- RP texts from being hit by spells and abilities can only trigger this often
 	enable_in_dungeons = false,
 	enable_public = false,
+	tank_mode = false			-- Tank mode grants a chance for normal texts to trigger a critical, since tanks can't be critically hit
 };
 -- LocalStorage defaults
 local lDefaults = {
@@ -49,9 +51,7 @@ local lDefaults = {
 };
 
 -- Constants
-ExiWoW.GENITALS_PENIS = 1;
-ExiWoW.GENITALS_VAGINA = 2;
-ExiWoW.GENITALS_BREASTS = 4;
+ExiWoW.TANK_MODE_PERC = 0.05;
 
 -- Register main frame
 ExiWoW.MAIN = CreateFrame("Frame")
@@ -74,7 +74,7 @@ function ExiWoW:ini()
 	ExiWoW:loadFromStorage()
 
 	ExiWoW:buildUnitFrames();
-	
+
 
 	-- Initialize timer and character
 	

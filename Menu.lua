@@ -4,6 +4,7 @@ ExiWoW.Menu = {}
 ExiWoW.Menu.open = false -- Set to false when done debugging. Setting to false by default will have it visible by default
 ExiWoW.Menu.FRAME = false
 ExiWoW.Menu.globalSettings = nil
+ExiWoW.Menu.lootQueue = {}		-- {{name=name, icon=icon}}
 
 -- Action page
 local BUTTON_ROWS = 4;
@@ -85,13 +86,12 @@ function ExiWoW.Menu:refreshSpellsPage()
 
 			f:Show();
 			i = i+1;
-
 		end
 
 	end
 
 	for n=i,BUTTON_ROWS*BUTTON_COLS-1 do
-		local f = _G["ExiWoWActionButton_"..i]
+		local f = _G["ExiWoWActionButton_"..n]
 		f:Hide();
 	end
 
@@ -163,7 +163,7 @@ function ExiWoW.Menu:refreshUnderwearPage()
 	end
 
 	for n=i,BUTTON_ROWS*BUTTON_COLS-1 do
-		local f = _G["ExiWoWUnderwearButton_"..i]
+		local f = _G["ExiWoWUnderwearButton_"..n]
 		f:Hide();
 	end
 
@@ -206,7 +206,7 @@ function ExiWoW.Menu:ini()
 	for row=0,BUTTON_ROWS-1 do
 		for col=0,BUTTON_COLS-1 do
 
-			local ab = CreateFrame("Button", "ExiWoWActionButton_"..tostring(col+row*col), f, "ActionButtonTemplate");
+			local ab = CreateFrame("Button", "ExiWoWActionButton_"..tostring(col+row*BUTTON_COLS), f, "ActionButtonTemplate");
 			ab:SetAttribute("type", "action");
 			ab:SetAttribute("action", 1);
 			ab:SetPoint("TOPLEFT", 23+col*50*BUTTON_MARG, -50-row*50*BUTTON_MARG);
@@ -236,7 +236,7 @@ function ExiWoW.Menu:ini()
 	for row=0,BUTTON_ROWS-1 do
 		for col=0,BUTTON_COLS-1 do
 
-			local ab = CreateFrame("Button", "ExiWoWUnderwearButton_"..tostring(col+row*col), f, "ActionButtonTemplate");
+			local ab = CreateFrame("Button", "ExiWoWUnderwearButton_"..tostring(col+row*BUTTON_COLS), f, "ActionButtonTemplate");
 			ab:SetAttribute("type", "action");
 			ab:SetAttribute("action", 1);
 			ab:SetPoint("TOPLEFT", 23+col*50*BUTTON_MARG, -50-row*50*BUTTON_MARG);
@@ -337,6 +337,17 @@ function ExiWoW.Menu:ini()
 		ExiWoW.ME.vagina_size = arg1;
 		ExiWoWLocalStorage.vagina_size = ExiWoW.ME.vagina_size;
 	end, 60);
+
+	-- Tank mode
+	item = item+1
+	local checkbutton = CreateFrame("CheckButton",  "ExiWoWSettingsFrame_page_settings_tank_mode", f, "ChatConfigCheckButtonTemplate");
+	checkbutton.tooltip = "Adds a small chance of crit texts to trigger from normal hits. Useful on tanks since they can't be critically hit.";
+	checkbutton:SetPoint("TOP", 0, top+spacing*item);
+	getglobal(checkbutton:GetName() .. 'Text'):SetText("Tank Mode");
+	checkbutton:SetScript("OnClick", function(self)
+		ExiWoWLocalStorage.tank_mode = self:GetChecked();
+		PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
+	end)
 	
 	ExiWoW.Menu.drawLocalSettings();
 	
@@ -371,7 +382,7 @@ function ExiWoW.Menu:ini()
 
 
 
-	-- Bind events
+	-- Global settings
 	local panel = CreateFrame("Frame", appName.."_globalConf", UIParent)
 	ExiWoW.Menu.globalSettings = panel
 	panel.name = "ExiWoW"
@@ -408,7 +419,7 @@ function ExiWoW.Menu:ini()
 		setValueInTitle(self, " ("..math.floor(val*100).."%)");
 	end);
 	
-	
+			
 
 	ExiWoW.Menu.drawGlobalSettings();
 
@@ -427,6 +438,32 @@ function ExiWoW.Menu:ini()
     panel.cancel = function (self)  ExiWoW.Menu.drawGlobalSettings(); end;
 	
 
+end
+
+
+hooksecurefunc(LootAlertSystem,"ShowAlert",function()
+	if #ExiWoW.Menu.lootQueue == 0 then return end
+	local lootAlertPool = LootAlertSystem.alertFramePool
+	for alertFrame in lootAlertPool:EnumerateActive() do
+		if alertFrame.ItemName:GetText() == "Weapon Enhancement Token" then
+			local item = ExiWoW.Menu.lootQueue[1]
+			local name = item.name
+			local icon = item.icon
+			--DisplayTableInspectorWindow(alertFrame)
+			alertFrame.ItemName:SetText(name)
+			alertFrame.hyperlink = ""
+			alertFrame:SetScript("OnEnter", function(frame)	end);
+			alertFrame:SetScript("Onleave", function() end);
+			alertFrame.Icon:SetTexture("Interface/Icons/"..icon);
+			table.remove(ExiWoW.Menu.lootQueue, 1)
+		end
+	end	
+end)
+
+function ExiWoW.Menu:drawLoot(name, icon)
+	table.insert(ExiWoW.Menu.lootQueue, {name=name, icon=icon})
+	LootAlertSystem:AddAlert("|cffffaaff|Hitem:120302::::::::110:::::|h[Different name]|h|r", 1, 0, nil, nil, nil, nil, nil, nil, false);
+	PlaySound(50893, "Dialog")
 end
 
 function ExiWoW.Menu.drawLocalSettings()
@@ -449,6 +486,8 @@ function ExiWoW.Menu.drawLocalSettings()
 	ExiWoWSettingsFrame_page_settings_breast_size:SetValue(tsize)
 	ExiWoWSettingsFrame_page_settings_butt_size:SetValue(bsize);
 	ExiWoWSettingsFrame_page_settings_vagina_size:SetValue(vsize);
+	ExiWoWSettingsFrame_page_settings_tank_mode:SetChecked(ExiWoWLocalStorage.tank_mode);
+	
 end
 
 
