@@ -5,6 +5,8 @@ ExiWoW.RPText.Lib = {}
 ExiWoW.RPText.Req = {}
 ExiWoW.RPText.Req.__index = ExiWoW.RPText.Req;
 
+ExiWoW.RPText.DEBUG = false
+
 -- The syntax of these are %S<type> for sender %T<type> for receiver. If no extra type is specified, it gets name
 local TAG_SENDER_NAME = "%S";
 local TAG_RECEIVER_NAME = "%T";
@@ -157,17 +159,22 @@ function ExiWoW.RPText:get(id, sender, receiver, spelldata, spellType)
 	
 	for k,v in pairs(ExiWoW.RPText.Lib) do
 
-		local valid = v:validate(sender, receiver, spelldata, spellType)
-		--print(v.id, id, v:validate(sender, receiver), v.text_sender)
-		if
-			v.id[id] and valid and 
-			(
-				(not v.text_sender and isSelfCast) or
-				((v.text_sender or sender.type ~= "player") and not isSelfCast) -- NPC spells don't have text_sender, so they need to be put here
-			)
-		then
-			table.insert(viable, v)
+		if ExiWoW:multiSearch(id, v.id) then
+
+			local valid = v:validate(sender, receiver, spelldata, spellType)
+			--print(v.id, id, v:validate(sender, receiver), v.text_sender)
+			if 
+				valid and 
+				(
+					(not v.text_sender and isSelfCast) or
+					((v.text_sender or sender.type ~= "player") and not isSelfCast) -- NPC spells don't have text_sender, so they need to be put here
+				)
+			then
+				table.insert(viable, v)
+			end
+
 		end
+
 	end
 
 	-- Pick a random element
@@ -394,6 +401,8 @@ function ExiWoW.RPText.Req:validate(sender, receiver, spelldata, spelltype)
 			data[und.id]
 	else print("Unknown validation type", t)
 	end
+
+	if ExiWoW.RPText.DEBUG and not out then print("Failed on", t, ExiWoW.json.encode(data)) end
 
 	if inverse then out = not out end
 	return out; 

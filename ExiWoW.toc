@@ -6,24 +6,43 @@
 ## SavedVariables: ExiWoWGlobalStorage
 ## SavedVariablesPerCharacter: ExiWoWLocalStorage
 
-panel.xml
+# XML templates 
+xml/panel.xml
 
-main.lua
+# Entry point
+_index.lua
+
+# Libraries
+libraries/json.lua
+libraries/Timer.lua
+libraries/Callbacks.lua
+
+# Main classes
 Settings.lua
 Action.lua
 Character.lua
-Timer.lua
-Callbacks.lua
-json.lua
 Menu.lua
 RPText.lua
 Extension.lua
 SpellBinding.lua
 Underwear.lua
 
-lib_RPText.lua
-lib_Actions.lua
-lib_SpellBindings.lua
-lib_Assets.lua
-lib_Underwear.lua
+# Collections of NPCs, spell effects etc that can be reused. Also loot tables
+collections/_index.lua
+collections/zones.lua
+collections/effects.lua
+collections/npc.lua
+collections/rptext_conditions.lua
+collections/spells.lua
+collections/loot.lua
+
+
+
+
+
+# Asset database
+assets/lib_RPText.lua
+assets/lib_Actions.lua
+assets/lib_SpellBindings.lua
+assets/lib_Underwear.lua
 

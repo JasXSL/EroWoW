@@ -28,6 +28,8 @@ ExiWoW.Frames.PORTRAIT_FRAME_WIDTH = 19;
 ExiWoW.Frames.PORTRAIT_FRAME_HEIGHT = 19;
 ExiWoW.Frames.PORTRAIT_PADDING = 7;
 
+local coms = {}; 							-- cbid = {parts:[part1,part2...], timeout:(int)timer}
+
 -- GlobalStorage defaults
 local gDefaults = {
 	swing_text_freq = 0.15,		-- Percent chance of a swing triggering a special text. Crits are 4x this value
@@ -183,7 +185,22 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 		-- From here we can initialize
 		ExiWoW:ini();
 
-		
+		-- Debug
+
+		--[[
+		local f=CreateFrame("ScrollFrame", "DebugBox", UIParent, "InputScrollFrameTemplate")
+		f:SetSize(300,300)
+		f:SetPoint("CENTER")
+		f.EditBox:SetFontObject("ChatFontNormal")
+		f.EditBox:SetMaxLetters(1024)
+		f.CharCount:Hide()
+		local editBox = f.EditBox -- already created in above template
+		editBox:SetFontObject("ChatFontNormal")
+		editBox:SetAllPoints(true)
+		editBox:SetWidth(f:GetWidth()) -- multiline editboxes need a width declared!!
+		-- when ESC is hit while editbox has focus, clear focus (a second ESC closes window)
+		editBox:SetScript("OnEscapePressed",editBox.ClearFocus)
+		]]
 
 		-- Load in abilities
 		for k,v in pairs(ExiWoWLocalStorage.abilities) do
@@ -220,30 +237,77 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 	-- Action received
 	if event == "CHAT_MSG_ADDON" then 
 		
+		local function getChunkedMessage(input, debug)
+
+			local timer = ExiWoW.Timer;
+			local data = {}
+			for msg in input:gmatch("([^,]+)") do
+				table.insert(data, msg)
+			end
+			local token = data[1]
+			local section = tonumber(data[2])
+			local total = tonumber(data[3])
+			local out = ""
+			for i=4,#data do
+				out = out..data[i]
+				if i ~= #data then out = out.."," end
+			end
+			if debug then print(out) end
+			if not token or not section or not total then return false end
+
+			if not coms[token] then 
+				coms[token] = {parts={}, timeout=timer:set(function() coms[token] = nil end, 5)} 
+			end
+			coms[token].parts[section] = out
+			
+			local joined = ""
+			for i=1,total do
+				if coms[token].parts[i] == nil then return false end
+				joined = joined..coms[token].parts[i]
+			end
+
+			-- Remove from coms
+			timer:clear(coms[token].timeout)
+			coms[token] = nil
+
+			return joined, token
+
+		end
+
 		if prefix == ExiWoW.APP_NAME.."a" then
 
+			--coms
+			local data, cb = getChunkedMessage(message)
+			if data == false then return end
+
 			local sname = Ambiguate(sender, "all") 			-- Sender name for use in units
-			local data = ExiWoW.json.decode(message); 		-- JSON decode message
-			local cb = data.cb								-- Callback if exists
-			local aID = data.id								-- Action ID
-			local success, data = ExiWoW.Action:receive(aID, sender, data.da);
+			
+			
+			local da = ExiWoW.json.decode(data); 		-- JSON decode message
+			local aID = da.id								-- Action ID
+			local success, response = ExiWoW.Action:receive(aID, sender, da.da);
 			if cb then
-				ExiWoW:sendCallback(cb, sname, success, data);
+				ExiWoW:sendCallback(cb, sname, success, da);
 			end
+			
 
 		end
 
 		if prefix == ExiWoW.APP_NAME.."c" then
 
+			local data, cb = getChunkedMessage(message)
+			if data == false then return end
+
 			local sname = Ambiguate(sender, "all")
-			local data = ExiWoW.json.decode(message);
-			local cb = data.cb
-			ExiWoW.Callbacks:trigger(cb, data.su, data.da, sender);
+			local response = ExiWoW.json.decode(data);
+			ExiWoW.Callbacks:trigger(cb, response.su, response.da, sender);
 
 		end
 
 	end
 end
+
+
 
 
 	-- Communications --
@@ -253,22 +317,40 @@ function ExiWoW:sendAction(unit, actionID, data, callback)
 		id = actionID,
 		da = data
 	};
+	local text = ExiWoW.json.encode(out);
+	local cb = ExiWoW.Callbacks:add(callback);
+	ExiWoW:sendChunks("a", cb, ExiWoW.json.encode(out), unit)
 
-	if type(callback) == "function" then
-		out.cb = ExiWoW.Callbacks:add(callback);
-	end
-	SendAddonMessage(ExiWoW.APP_NAME.."a", ExiWoW.json.encode(out), "WHISPER", unit)
 end
 
 function ExiWoW:sendCallback(token, unit, success, data)
 
 	local out = {
-		cb = token,
 		su = success,
 		da = data
 	};
 
-	SendAddonMessage(ExiWoW.APP_NAME.."c", ExiWoW.json.encode(out), "WHISPER", unit)
+	--DebugBox.EditBox:SetText(ExiWoW.json.encode(out))
+	ExiWoW:sendChunks("c", token, ExiWoW.json.encode(out), unit)
+
+end
+
+function ExiWoW:sendChunks(suffix, token, text, unit)
+
+	-- Allowed chunk size
+	local tl = 255-(ExiWoW.APP_NAME..suffix):len()-13		-- Prefix length
+
+	local chunks = {}
+	for i=0,math.floor(text:len()/tl) do
+		local chunk = text:sub(i*tl+1, i*tl+tl)
+		table.insert(chunks, chunk)
+	end
+	
+	--DebugBox.EditBox:SetText(ExiWoW.json.encode(out))
+	local total = #chunks
+	for i,ch in ipairs(chunks) do
+		SendAddonMessage(ExiWoW.APP_NAME..suffix, token..","..i..","..total..","..ch, "WHISPER", unit)
+	end	
 
 end
 

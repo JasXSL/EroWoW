@@ -37,8 +37,8 @@ end
 function ExiWoW.SpellBinding:runRpText(sender, data, t)
 	if not self:rollProc() then return end
 
-	local name = "SPELL_"..data.name;
-	if self.alias then print("Using alias", self.alias); name = self.alias end
+	local name = data.name;
+	if self.alias then name = self.alias end
 	local rpText = ExiWoW.SpellBinding:getRpText(sender, data, t, name)
 	if rpText then
 		rpText:convertAndReceive(sender, ExiWoW.ME, false, data)
