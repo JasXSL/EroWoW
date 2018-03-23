@@ -41,6 +41,14 @@ function ExiWoW.Underwear:buildLibrary()
 		description = "A pink high rising bikini thong, made out of a stretchy material.",
 		tags = {},
 	}));
+
+	table.insert(lib, uw:new({
+		id = "SKULL_STRAP",
+		name = "Skull Strap",
+		icon = "inv_helm_laughingskull_01",
+		description = "A hollowed out skull with straps attached to it, just about covers your crotch.",
+		tags = {},
+	}));
 	
 end
 

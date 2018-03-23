@@ -584,7 +584,7 @@ function ExiWoW.Character:addItem(type, name, quant)
 	elseif type == "Charges" then
 		local action = ExiWoW.Action:get(name)
 		if not action then return false end
-		if action.charges >= action.max_charges then return false end
+		if action.charges >= action.max_charges or action.charges == math.huge then return false end
 		if not action:consumeCharges(-quant) then return false end
 		ExiWoW.Menu:drawLoot(action.name, action.texture)
 		return action

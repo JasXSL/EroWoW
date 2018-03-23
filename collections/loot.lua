@@ -1,6 +1,6 @@
 	-- LOOT TABLES --
 local zones = ExiWoW.LibAssets.zones
-
+local npc = ExiWoW.LibAssets.npcs
 
 -- Loot tables
 	ExiWoW.LibAssets.loot = {};
@@ -62,6 +62,24 @@ local f = ExiWoW.LibAssets.loot
 			}
 		}
 	})
+
+
+	table.insert(f, {
+		zone = "Burning Steppes",
+		sub = "The Skull Warren",
+		name = "_FORAGE_",
+		items={
+			{
+				type = "Underwear", 
+				id = "SKULL_STRAP", 
+				chance = 0.5,
+				sound = 1199,
+				text = ExiWoW.RPText:new({
+					text_receiver = "You find a skull with waist straps tucked away under some mushrooms"
+				})
+			}
+		}
+	})
 	
 	table.insert(f, {
 		zone = zones.sandy,
@@ -116,7 +134,7 @@ local f = ExiWoW.LibAssets.loot
 	})
 
 	table.insert(f, {
-		name = npc_pincer,
+		name = npc.pincer,
 		items={
 			{
 				type = "Charges", 
