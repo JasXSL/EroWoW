@@ -4,6 +4,8 @@ local npcs = ExiWoW.LibAssets.npcs
 
 	local npc_tentacleFiend = {}
 	npc_tentacleFiend["Writhing Terror"] = true;
+	npc_tentacleFiend["Fiendling Flesh Beast"] = true;
+	
 
 	-- NPCs that can pinch
 	local npc_pincer = {}
@@ -32,6 +34,8 @@ local npcs = ExiWoW.LibAssets.npcs
 	npc_lasher["Bloodpetal Flayer"] = true
 	npc_lasher["Bloodpetal Thresher"] = true
 	npc_lasher["Bloodpetal Trapper"] = true
+	npc_lasher["Fiendling Flesh Beast"] = true
+	
 	
 	-- Ooze type NPCs
 	local npc_ooze = {}

@@ -49,6 +49,14 @@ function ExiWoW.Underwear:buildLibrary()
 		description = "A hollowed out skull with straps attached to it, just about covers your crotch.",
 		tags = {},
 	}));
+
+	table.insert(lib, uw:new({
+		id = "RAZAANI_SOULTHONG",
+		name = "Razaani Soulthong",
+		icon = "inv_cloth_raidmage_p_01shoulder",
+		description = "A thong made of light pink silk wrappings with sparkling soulgems attached around the waist straps.",
+		tags = {},
+	}));
 	
 end
 

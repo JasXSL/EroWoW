@@ -436,12 +436,11 @@ function ExiWoW.Menu:ini()
 
 	end;
     panel.cancel = function (self)  ExiWoW.Menu.drawGlobalSettings(); end;
-	
-
 end
 
 
 hooksecurefunc(LootAlertSystem,"ShowAlert",function()
+	
 	if #ExiWoW.Menu.lootQueue == 0 then return end
 	local lootAlertPool = LootAlertSystem.alertFramePool
 	for alertFrame in lootAlertPool:EnumerateActive() do
@@ -462,7 +461,7 @@ end)
 
 function ExiWoW.Menu:drawLoot(name, icon)
 	table.insert(ExiWoW.Menu.lootQueue, {name=name, icon=icon})
-	LootAlertSystem:AddAlert("|cffffaaff|Hitem:120302::::::::110:::::|h[Different name]|h|r", 1, 0, nil, nil, nil, nil, nil, nil, false);
+	LootAlertSystem.AddAlert(LootAlertSystem, "|cff1eff00|Hitem:120302::::::::110:::::|h[Weapon Enhancement Token]|h|r", 1, 0, 0, 0, false, false, nil, false, false, true, false);
 	PlaySound(50893, "Dialog")
 end
 
