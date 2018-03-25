@@ -378,6 +378,7 @@ function ExiWoW.Character:rollLoot(npc)
 	
 
 	local function isCloseToPoints(points)
+		SetMapToCurrentZone()
 		local px,py = GetPlayerMapPosition("player")
 		px = px*100
 		py = py*100
@@ -505,6 +506,8 @@ function ExiWoW.Character:new(settings, name)
 	self.intelligence = getVar(settings.int, 5);
 	self.muscle_tone = getVar(settings.str, 5);
 	self.fat = getVar(settings.fat, 5);
+	self.wisdom = getVar(settings.wis, 5);
+	
 
 	if settings.uw then self.underwear = ExiWoW.Underwear:import(settings.uw) end
 
@@ -530,6 +533,7 @@ function ExiWoW.Character:export(full)
 		fat = self.fat,
 		int = self.intelligence,
 		str = self.muscle_tone,
+		wis = self.wisdom
 	};
 	-- Should only be used for "player"
 	if full then

@@ -52,7 +52,8 @@ local lDefaults = {
 	underwear_worn = "DEFAULT",
 	muscle_tone = 5,
 	intelligence = 5,
-	fat = 5
+	fat = 5,
+	wisdom = 5,
 };
 
 -- Constants
@@ -75,8 +76,6 @@ function ExiWoW:ini()
 
 	-- Add character
 	ExiWoW.ME = ExiWoW.Character:new();
-
-	ExiWoW:loadFromStorage()
 
 	ExiWoW:buildUnitFrames();
 
@@ -109,7 +108,7 @@ function ExiWoW:ini()
 	RegisterAddonMessagePrefix(ExiWoW.APP_NAME.."a")		-- Sends an action	 {cb:cbToken, id:action_id, data:(var)data}
 	RegisterAddonMessagePrefix(ExiWoW.APP_NAME.."c")		-- Receive a callback {cb:cbToken, success:(bool)success, data:(var)data}
 	
-
+	ExiWoW.Timer:set(ExiWoW.loadFromStorage, 1)
 	print("ExiWoW online!");
 end
 
@@ -153,6 +152,7 @@ function ExiWoW:resetSettings()
 end
 
 function ExiWoW:loadFromStorage()
+
 	ExiWoW.ME.penis_size = ExiWoWLocalStorage.penis_size;
 	ExiWoW.ME.vagina_size = ExiWoWLocalStorage.vagina_size;
 	ExiWoW.ME.breast_size = ExiWoWLocalStorage.breast_size;
@@ -164,6 +164,21 @@ function ExiWoW:loadFromStorage()
 	ExiWoW.ME.muscle_tone = ExiWoWLocalStorage.muscle_tone
 	ExiWoW.ME.fat = ExiWoWLocalStorage.fat
 	ExiWoW.ME.intelligence = ExiWoWLocalStorage.intelligence
+	ExiWoW.ME.wisdom = ExiWoWLocalStorage.wisdom
+	
+	-- Load in abilities
+	for k,v in pairs(ExiWoWLocalStorage.abilities) do
+		local abil = ExiWoW.Action:get(v.id)
+		if abil then abil:import(v) end
+	end
+
+	-- Redraw with cooldowns
+	--ExiWoW.Action:libSort();
+	ExiWoW.Menu:refreshSpellsPage();
+	ExiWoW.Menu:refreshUnderwearPage();
+	ExiWoW.Menu:drawLocalSettings();
+	ExiWoW.Menu:drawGlobalSettings();
+	
 	
 end
 
@@ -178,6 +193,9 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 
 	if event == "ADDON_LOADED" and prefix == ExiWoW.APP_NAME then
 		
+		
+
+		-- Debug
 		if not ExiWoWLocalStorage then ExiWoWLocalStorage = {} end
 		if not ExiWoWGlobalStorage then ExiWoWGlobalStorage = {} end
 		
@@ -192,8 +210,7 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 		-- From here we can initialize
 		ExiWoW:ini();
 
-		-- Debug
-
+		
 		--[[
 		local f=CreateFrame("ScrollFrame", "DebugBox", UIParent, "InputScrollFrameTemplate")
 		f:SetSize(300,300)
@@ -209,16 +226,7 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 		editBox:SetScript("OnEscapePressed",editBox.ClearFocus)
 		]]
 
-		-- Load in abilities
-		for k,v in pairs(ExiWoWLocalStorage.abilities) do
-			local abil = ExiWoW.Action:get(v.id)
-			if abil then abil:import(v) end
-		end
-
-		-- Redraw with cooldowns
-		ExiWoW.Action:libSort();
-		ExiWoW.Menu:refreshSpellsPage();
-		ExiWoW.Menu:refreshUnderwearPage();
+		
 		
 
 	end
@@ -313,8 +321,6 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 
 	end
 end
-
-
 
 
 	-- Communications --

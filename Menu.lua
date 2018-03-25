@@ -365,10 +365,16 @@ function ExiWoW.Menu:ini()
 		ExiWoWLocalStorage.fat = ExiWoW.ME.fat;
 	end)
 	item = item+1
-	createSlider("ExiWoWSettingsFrame_page_settings_intelligence", f, "TOPRIGHT", -left, top+spacing*item, "Dumb", "Scholarly", "Intelligence", 0, 10, 1, "How smart are you compared to your race/class average?", 
+	createSlider("ExiWoWSettingsFrame_page_settings_intelligence", f, "TOPRIGHT", -left, top+spacing*item, "Dumb", "Scholarly", "Intelligence", 0, 10, 1, "How smart are you compared to your race/class average when it comes to solving problems?", 
 	function(self, arg1)
 		ExiWoW.ME.intelligence = arg1;
 		ExiWoWLocalStorage.intelligence = ExiWoW.ME.intelligence;
+	end)
+	item = item+1
+	createSlider("ExiWoWSettingsFrame_page_settings_wisdom", f, "TOPRIGHT", -left, top+spacing*item, "Gullible", "Astute", "Wisdom", 0, 10, 1, "What social skills does your character possess?", 
+	function(self, arg1)
+		ExiWoW.ME.wisdom = arg1;
+		ExiWoWLocalStorage.wisdom = ExiWoW.ME.wisdom;
 	end)
 	
 	
@@ -486,8 +492,8 @@ end)
 
 function ExiWoW.Menu:drawLoot(name, icon)
 	table.insert(ExiWoW.Menu.lootQueue, {name=name, icon=icon})
-	LootAlertSystem.AddAlert(LootAlertSystem, "|cff1eff00|Hitem:120302::::::::110:::::|h[Weapon Enhancement Token]|h|r", 1, 0, 0, 0, false, false, nil, false, false, true, false);
 	PlaySound(50893, "Dialog")
+	LootAlertSystem.AddAlert(LootAlertSystem, "|cff1eff00|Hitem:120302::::::::110:::::|h[Weapon Enhancement Token]|h|r", 1, 0, 0, 0, false, false, nil, false, false, true, false);
 end
 
 function ExiWoW.Menu.drawLocalSettings()
@@ -513,6 +519,8 @@ function ExiWoW.Menu.drawLocalSettings()
 	ExiWoWSettingsFrame_page_settings_fat:SetValue(ExiWoW.ME.fat);
 	ExiWoWSettingsFrame_page_settings_muscle_tone:SetValue(ExiWoW.ME.muscle_tone);
 	ExiWoWSettingsFrame_page_settings_intelligence:SetValue(ExiWoW.ME.intelligence);
+	ExiWoWSettingsFrame_page_settings_wisdom:SetValue(ExiWoW.ME.wisdom);
+	
 	
 	ExiWoWSettingsFrame_page_settings_tank_mode:SetChecked(ExiWoWLocalStorage.tank_mode);
 

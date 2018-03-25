@@ -57,6 +57,7 @@ function ExiWoW.Action:new(data)
 	self.fn_send = data.fn_send									-- Function to execute on the sender when sending
 	self.fn_receive = data.fn_receive							-- Function to execute on the receiver when receiving
 	self.fn_cast = data.fn_cast									-- Function to execute on the sender when starting a cast
+	self.fn_done = data.fn_done									-- Function sent on both success and interrupt
 
 	-- Conditions
 	self.self_only = data.self_only or false;					-- Auto targets self
@@ -582,8 +583,13 @@ function ExiWoW.Action:sendRPText(sender, target, suppressErrors)
 			if rptext.sound then
 				PlaySound(rptext.sound, "SFX");
 			end
-			if rptext.text_sender then 
-				ExiWoW.RPText:print(ExiWoW.RPText:convert(rptext.text_sender, ts, tt, nil, rptext.item))
+			local tx = rptext.text_sender
+
+			if type(data) == "table" and data.receiver then 
+				tx = rptext.text_receiver 
+			end
+			if tx then 
+				ExiWoW.RPText:print(ExiWoW.RPText:convert(tx, ts, tt, nil, rptext.item))
 			end
 		end
 	end
@@ -700,15 +706,21 @@ function ExiWoW.Action:useOnTarget(id, target, castFinish)
 	-- Use special function, if it returns false, then prevent default behavior
 	local args = {}
 	local callback = nil
-	if type(action.fn_send) == "function" then
-		args, callback = action:fn_send("player", target, suppressErrors);
-		if args == false then return false end -- Return false from your custom function to prevent a send
-	end
-
+	
 	-- Default send logic
 
 	ExiWoW.CAST_TARGET = ExiWoW.TARGET
+
+
 	if action.cast_time <= 0 or castFinish then 
+
+		if type(action.fn_send) == "function" then
+			args, callback = action:fn_send("player", target, suppressErrors);
+			if args == false then return false end -- Return false from your custom function to prevent a send
+		end
+
+		if type(action.fn_done) == "function" then action:fn_done(true) end
+
 		-- Finish cast
 		action:setCooldown();
 		-- Send to target
@@ -721,6 +733,7 @@ function ExiWoW.Action:useOnTarget(id, target, castFinish)
 				action:consumeCharges(1);
 			end
 		end)
+		
 	else 
 		-- Start cast
 		ExiWoW.Action:beginSpellCast(action, target);
@@ -741,8 +754,10 @@ function ExiWoW.Action:receive(id, sender, args, allowErrors)
 	end
 
 	-- Returns (bool)success, (var)data
-	return action:fn_receive(sender, "player", args);
-
+	if type(action.fn_receive) == "function" then
+		return action:fn_receive(sender, "player", args);
+	else return true
+	end
 end
 
 -- Tools for conditions
@@ -771,6 +786,7 @@ function ExiWoW.Action:beginSpellCast(action, target)
 		PlaySound(10846, "SFX");
 		ExiWoW:reportError("Interrupted");
 		ExiWoW.Action:endSpellCast(false);
+		if type(action.fn_done) == "function" then action:fn_done(false) end
 	end
 
 	if action.cast_sound_start then

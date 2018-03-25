@@ -252,6 +252,7 @@ function ExiWoW.Action:buildLibrary()
 			return nil;
 		end,
 		fn_receive = function(self, sender, target, args)
+			SetMapToCurrentZone()
 			local px,py = GetPlayerMapPosition("player")
 			px = px*100
 			py = py*100
