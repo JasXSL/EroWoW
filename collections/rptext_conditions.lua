@@ -39,6 +39,7 @@ local ty = req.Types;			-- Local filter types
 	rtc.attackerIsVines = req:new({type=ty.RTYPE_NAME, data=npc.vines, sender=true})
 	rtc.attackerIsOoze = req:new({type=ty.RTYPE_NAME, data=npc.ooze, sender=true});
 
+	
 	-- Underwear
 	rtc.targetWearsUnderwear = req:new({type=ty.RTYPE_UNDIES, data={true}});
 	
@@ -52,3 +53,7 @@ local ty = req.Types;			-- Local filter types
 	table.insert(feathers, {name="Light Feather"})
 	rtc.invFeathers = req:new({type=ty.RTYPE_HAS_INVENTORY, data=feathers})
 
+	-- Armor
+	rtc.chestPlate = req:new({type=ty.RTYPE_EQUIPMENT, data={slot=5, type="Plate"}})
+	rtc.crotchPlate = req:new({type=ty.RTYPE_EQUIPMENT, data={slot=7, type="Plate"}})
+	

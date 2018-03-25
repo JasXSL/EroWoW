@@ -102,6 +102,11 @@ function ExiWoW.SpellBinding:buildLibrary()
 		name = "Bonk",
 		procChance = 0.4
 	}))
+
+	table.insert(R, sb:new({
+		name = "Shoot",
+		procChance = 0.1
+	}))
 	
 
 end

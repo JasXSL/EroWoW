@@ -49,7 +49,10 @@ local lDefaults = {
 	abilities = {},
 	excitement = 0,
 	underwear_ids = {{id="DEFAULT",fav=false}},
-	underwear_worn = "DEFAULT"
+	underwear_worn = "DEFAULT",
+	muscle_tone = 5,
+	intelligence = 5,
+	fat = 5
 };
 
 -- Constants
@@ -158,6 +161,10 @@ function ExiWoW:loadFromStorage()
 	ExiWoW.ME.excitement = ExiWoWLocalStorage.excitement;
 	ExiWoW.ME.underwear_ids = ExiWoWLocalStorage.underwear_ids
 	ExiWoW.ME.underwear_worn = ExiWoWLocalStorage.underwear_worn
+	ExiWoW.ME.muscle_tone = ExiWoWLocalStorage.muscle_tone
+	ExiWoW.ME.fat = ExiWoWLocalStorage.fat
+	ExiWoW.ME.intelligence = ExiWoWLocalStorage.intelligence
+	
 end
 
 function internal:jencode(input)

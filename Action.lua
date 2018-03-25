@@ -796,7 +796,7 @@ function ExiWoW.Action:beginSpellCast(action, target)
 	ExiWoW.Action.CASTING_SPELL_BINDING = ExiWoW.Character:bind("UNIT_SPELLCAST_START", function(data)
 		if UnitIsUnit(data[1], "PLAYER") then interrupt() end
 	end)
-	ExiWoW.Action.FINISHING_SPELL_BINDING = ExiWoW.Character:bind("UNIT_SPELLCAST_SENT", function(data)
+	ExiWoW.Action.FINISHING_SPELL_BINDING = ExiWoW.Character:bind("UNIT_SPELLCAST_SUCCESS", function(data)
 		if UnitIsUnit(data[1], "PLAYER") then interrupt() end
 	end)
 

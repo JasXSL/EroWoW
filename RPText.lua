@@ -25,7 +25,7 @@ local TAG_SUFFIXES = {
 	-- These are converted into somewhat applicable pronouns, him->her->their etc 
 	HIM = "him",
 	HIS = "his",
-	HE = "he"
+	HE = "he",
 }
 -- Prevents issues, longer ones should be first
 local TAG_SUFFIX_ORDER = {}
@@ -174,6 +174,7 @@ function ExiWoW.RPText:get(id, sender, receiver, spelldata, spellType)
 			end
 
 		end
+		
 
 	end
 
@@ -326,6 +327,7 @@ RTYPE_DETRIMENTAL = "detrimental",			-- Spell was detrimental
 RTYPE_SPELL_ADD = "spell_add",				-- Spell was just added
 RTYPE_SPELL_REM = "spell_rem",				-- Spell was just removed
 RTYPE_SPELL_TICK = "spell_tick",			-- Spell was ticking
+RTYPE_EQUIPMENT = "equipment",				-- {slot=(int)equipmentSlot(http://wowwiki.wikia.com/wiki/InventorySlotId), type="Plate/Mail/Leather/Cloth"}
 }
 
 
@@ -393,6 +395,23 @@ function ExiWoW.RPText.Req:validate(sender, receiver, spelldata, spelltype)
 		out = ExiWoW.Character:hasAura(data);
 	elseif t == ty.RTYPE_HAS_INVENTORY then
 		out = ExiWoW.Character:hasInventory(data);
+	elseif t == ty.RTYPE_EQUIPMENT then
+		local unit = false
+		if targ == ExiWoW.ME then unit = "player" 
+		elseif targ == ExiWoW.TARGET then unit = "target"
+		end
+		-- /dump GetItemInfo(GetInventoryItemID("player", 7))
+		if unit then 
+			local id = GetInventoryItemID(unit, data.slot)
+			if not id then 
+				out = false
+			else
+				local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice =
+					GetItemInfo(id)
+				out = itemType == "Armor" and (data.type ~= nil and data.type == itemSubType)
+			end
+			out = ExiWoW.Character:hasInventory(data);
+		end
 	elseif t == ty.RTYPE_UNDIES then
 		local und = targ:getUnderwear();
 		out = 

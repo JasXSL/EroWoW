@@ -26,7 +26,8 @@ function ExiWoW.Character:ini()
 	ExiWoW.Character.evtFrame:RegisterEvent("PLAYER_STARTED_MOVING")
 	ExiWoW.Character.evtFrame:RegisterEvent("PLAYER_STOPPED_MOVING")
 	ExiWoW.Character.evtFrame:RegisterUnitEvent("UNIT_SPELLCAST_START", "player");
-	ExiWoW.Character.evtFrame:RegisterUnitEvent("UNIT_SPELLCAST_SENT", "player");
+	ExiWoW.Character.evtFrame:RegisterUnitEvent("UNIT_SPELLCAST_SUCCESS", "player");
+	
 	ExiWoW.Character.evtFrame:RegisterEvent("SOUNDKIT_FINISHED");
 	ExiWoW.Character.evtFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	ExiWoW.Character.evtFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
@@ -55,10 +56,10 @@ function ExiWoW.Character:onEvent(event, ...)
 
 	local arguments = {...}
 
-	-- Builds data for a spell trigger
 	local function buildSpellTrigger(spellId, name, harmful, unitCaster, count, crit, char)
 		return { spellId = spellId, name=name, harmful=harmful, unitCaster=unitCaster, count=count, crit=crit, char=char}
 	end
+
 
 	-- Handle combat log
 	-- This needs to go first as it should only handle event bindings on the player
@@ -501,6 +502,10 @@ function ExiWoW.Character:new(settings, name)
 	self.butt_size = getVar(settings.bs, 2);						-- Always a number
 	self.underwear = false										-- This is a cache of underwear only set when received from another player via an action
 
+	self.intelligence = getVar(settings.int, 5);
+	self.muscle_tone = getVar(settings.str, 5);
+	self.fat = getVar(settings.fat, 5);
+
 	if settings.uw then self.underwear = ExiWoW.Underwear:import(settings.uw) end
 
 
@@ -521,7 +526,10 @@ function ExiWoW.Character:export(full)
 		vs = self.vagina_size,
 		ts = self.breast_size,
 		bs = self.butt_size,
-		uw = underwear
+		uw = underwear,
+		fat = self.fat,
+		int = self.intelligence,
+		str = self.muscle_tone,
 	};
 	-- Should only be used for "player"
 	if full then
@@ -592,6 +600,29 @@ function ExiWoW.Character:addItem(type, name, quant)
 
 end
 
+-- Stats
+function ExiWoW.Character:getStat(unit, stat)
+	local statlist = {Strength=1, Agility=2, Stamina=3, Intellect=4}
+	if not UnitExists(unit) then return 0 end
+	if not statlist[stat] then return 0 end
+
+	local am = 0.5;
+	if self.fat > 5 then
+		am = 0.5-(self.fat-5)/10;
+	end
+	local multipliers = {
+		Strength=(self.muscle_tone/10)+0.5, 
+		Intelligence=(self.intelligence/10)+0.5, 
+		Agility=am+0.5, 
+	}
+	local multi = 1;
+	if multipliers[stat] then multi = multipliers[stat] end
+	local base, stat, posBuff, negBuff = UnitStat(unit, statlist[stat]);
+	local out = math.floor((base-posBuff)*multi);
+
+	print("Base", out)
+
+end
 
 -- Raised when you max or drop off max excitement --
 function ExiWoW.Character:onCapChange()

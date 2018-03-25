@@ -264,6 +264,7 @@ function ExiWoW.Menu:ini()
 		
 	local top = -50;
 	local spacing = -40;
+	local left = 30
 
 	local function createSlider(id, parent, point, x,y, low, high, label, min,max, step, tooltip, callback, width, height)
 		
@@ -293,7 +294,7 @@ function ExiWoW.Menu:ini()
 
 	-- Masochism slider
 	local item = 0
-	createSlider("ExiWoWSettingsFrame_page_settings_masochism", f, "TOP", 0, -50, "0", "100", "Masochism", 0, 100, 1, "Affects amount of excitement you gain from taking hits or masochistic actions and spells.", 
+	createSlider("ExiWoWSettingsFrame_page_settings_masochism", f, "TOPLEFT", left, -50, "0", "100", "Masochism", 0, 100, 1, "Affects amount of excitement you gain from taking hits or masochistic actions and spells.", 
 	function(self,arg1) 
 		ExiWoW.ME.masochism = arg1/100;
 		ExiWoWLocalStorage.masochism = ExiWoW.ME.masochism;
@@ -301,7 +302,7 @@ function ExiWoW.Menu:ini()
 
 	-- Penis size slider
 	item = item+1
-	createSlider("ExiWoWSettingsFrame_page_settings_penis_size", f, "TOP", 0, top+spacing*item, "Off", "Huge", "Male Endowment", 0, 5, 1, "How well endowed is your character?", 
+	createSlider("ExiWoWSettingsFrame_page_settings_penis_size", f, "TOPLEFT", left, top+spacing*item, "Off", "Huge", "Male Endowment", 0, 5, 1, "How well endowed is your character?", 
 	function(self,arg1) 
 		arg1 = arg1-1;
 		if arg1 == -1 then arg1 = false end
@@ -311,7 +312,7 @@ function ExiWoW.Menu:ini()
 
 	-- Breast size slider
 	item = item+1
-	createSlider("ExiWoWSettingsFrame_page_settings_breast_size", f, "TOP", 0, top+spacing*item, "Off", "Huge", "Female Endowment", 0, 5, 1, "How large are your character's breasts?", 
+	createSlider("ExiWoWSettingsFrame_page_settings_breast_size", f, "TOPLEFT", left, top+spacing*item, "Off", "Huge", "Female Endowment", 0, 5, 1, "How large are your character's breasts?", 
 	function(self,arg1) 
 		arg1 = arg1-1;
 		if arg1 == -1 then arg1 = false end
@@ -322,7 +323,7 @@ function ExiWoW.Menu:ini()
 
 	-- Butt size
 	item = item+1
-	createSlider("ExiWoWSettingsFrame_page_settings_butt_size", f, "TOP", 0, top+spacing*item, "Tiny", "Huge", "Rear Size", 0, 4, 1, "How much junk in the trunk?", 
+	createSlider("ExiWoWSettingsFrame_page_settings_butt_size", f, "TOPLEFT", left, top+spacing*item, "Tiny", "Huge", "Rear Size", 0, 4, 1, "How much junk in the trunk?", 
 	function(self,arg1) 
 		ExiWoW.ME.butt_size = arg1;
 		ExiWoWLocalStorage.butt_size = ExiWoW.ME.butt_size;
@@ -330,7 +331,7 @@ function ExiWoW.Menu:ini()
 
 	-- Toggle vagina
 	item = item+1
-	createSlider("ExiWoWSettingsFrame_page_settings_vagina_size", f, "TOP", 0, top+spacing*item, "Off", "On", "Female Genitalia", 0, 1, 1, "Does your character have female genitalia?", 
+	createSlider("ExiWoWSettingsFrame_page_settings_vagina_size", f, "TOPLEFT", left+40, top+spacing*item, "Off", "On", "Female Genitalia", 0, 1, 1, "Does your character have female genitalia?", 
 	function(self,arg1) 
 		arg1 = arg1-1;
 		if arg1 == -1 then arg1 = false end
@@ -342,12 +343,36 @@ function ExiWoW.Menu:ini()
 	item = item+1
 	local checkbutton = CreateFrame("CheckButton",  "ExiWoWSettingsFrame_page_settings_tank_mode", f, "ChatConfigCheckButtonTemplate");
 	checkbutton.tooltip = "Adds a small chance of crit texts to trigger from normal hits. Useful on tanks since they can't be critically hit.";
-	checkbutton:SetPoint("TOP", 0, top+spacing*item);
+	checkbutton:SetPoint("TOPLEFT", left, top+spacing*item);
 	getglobal(checkbutton:GetName() .. 'Text'):SetText("Tank Mode");
 	checkbutton:SetScript("OnClick", function(self)
 		ExiWoWLocalStorage.tank_mode = self:GetChecked();
 		PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
 	end)
+
+
+	-- Right side
+	item = 0
+	createSlider("ExiWoWSettingsFrame_page_settings_muscle_tone", f, "TOPRIGHT", -left, top+spacing*item, "Scrawny", "Bodybuilder", "Muscle Tone", 0, 10, 1, "How muscular are you compared to your race/class average?", 
+	function(self, arg1)
+		ExiWoW.ME.muscle_tone = arg1;
+		ExiWoWLocalStorage.muscle_tone = ExiWoW.ME.muscle_tone;
+	end)
+	item = item+1
+	createSlider("ExiWoWSettingsFrame_page_settings_fat", f, "TOPRIGHT", -left, top+spacing*item, "Emaciated", "Obese", "Body Fat", 0, 10, 1, "How fat are you compared to your race/class average?", 
+	function(self, arg1)
+		ExiWoW.ME.fat = arg1;
+		ExiWoWLocalStorage.fat = ExiWoW.ME.fat;
+	end)
+	item = item+1
+	createSlider("ExiWoWSettingsFrame_page_settings_intelligence", f, "TOPRIGHT", -left, top+spacing*item, "Dumb", "Scholarly", "Intelligence", 0, 10, 1, "How smart are you compared to your race/class average?", 
+	function(self, arg1)
+		ExiWoW.ME.intelligence = arg1;
+		ExiWoWLocalStorage.intelligence = ExiWoW.ME.intelligence;
+	end)
+	
+	
+	
 	
 	ExiWoW.Menu.drawLocalSettings();
 	
@@ -485,7 +510,12 @@ function ExiWoW.Menu.drawLocalSettings()
 	ExiWoWSettingsFrame_page_settings_breast_size:SetValue(tsize)
 	ExiWoWSettingsFrame_page_settings_butt_size:SetValue(bsize);
 	ExiWoWSettingsFrame_page_settings_vagina_size:SetValue(vsize);
+	ExiWoWSettingsFrame_page_settings_fat:SetValue(ExiWoW.ME.fat);
+	ExiWoWSettingsFrame_page_settings_muscle_tone:SetValue(ExiWoW.ME.muscle_tone);
+	ExiWoWSettingsFrame_page_settings_intelligence:SetValue(ExiWoW.ME.intelligence);
+	
 	ExiWoWSettingsFrame_page_settings_tank_mode:SetChecked(ExiWoWLocalStorage.tank_mode);
+
 	
 end
 

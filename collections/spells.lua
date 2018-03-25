@@ -50,6 +50,8 @@ local sk = ExiWoW.LibAssets.spell_kits;
 
 	-- Slosh
 	sk.slosh["Water Bolt"] = true
+	sk.slosh["Slime Spray"] = true
+	
 
 
 
