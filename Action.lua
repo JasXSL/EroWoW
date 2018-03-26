@@ -711,24 +711,28 @@ function ExiWoW.Action:useOnTarget(id, target, castFinish)
 
 	ExiWoW.CAST_TARGET = ExiWoW.TARGET
 
+	if not castFinish then ExiWoW.Action:setGlobalCooldown() end
 
 	if action.cast_time <= 0 or castFinish then 
 
+		ExiWoW.Event:raise(ExiWoW.Event.Types.ACTION_SENT, {id=id, target=target})
+		if type(action.fn_done) == "function" then action:fn_done(true) end
 		if type(action.fn_send) == "function" then
 			args, callback = action:fn_send("player", target, suppressErrors);
 			if args == false then return false end -- Return false from your custom function to prevent a send
 		end
 
-		if type(action.fn_done) == "function" then action:fn_done(true) end
+		
 
 		-- Finish cast
-		action:setCooldown();
+		action:setCooldown(false, true);
 		-- Send to target
 		local first,last = UnitName(target)
 		if last then first = first.."-"..last end
 		ExiWoW:sendAction(Ambiguate(first, "all"), action.id, args, function(...)
 			if type(callback) == "function" then callback(...) end
 			local self, success = ...
+			ExiWoW.Event:raise(ExiWoW.Event.Types.ACTION_USED, {id=id, target=target, args=args, success=success})
 			if success then
 				action:consumeCharges(1);
 			end
@@ -832,6 +836,7 @@ function ExiWoW.Action:endSpellCast(success)
 
 	-- Let it play the fade out animation
 	if not success then
+		ExiWoW.Event:raise(ExiWoW.Event.Types.ACTION_INTERRUPTED, {id=ExiWoW.Action.CASTING_SPELL.id, target=ExiWoW.Action.CASTING_TARGET})
 		ExiWoW.Action:toggleCastBar(false);
 	end
 

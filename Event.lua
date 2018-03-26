@@ -3,22 +3,21 @@ ExiWoW.Event.index = 0
 ExiWoW.Event.bindings = {}		-- {id={event:(str)event, callback:(str)callback}...}
 
 ExiWoW.Event.Types = {
-	EXADD = "EXADD",									-- Excitement has been added (float)val
+	EXADD = "EXADD",									-- {amount=amount, set=set, multiplyMasochism=multiplyMasochism} Excitement has been added or subtracted
 	EXADD_DEFAULT = "EXADD_DEFAULT",					-- Excitement add default
 	EXADD_CRIT = "EXADD_CRIT",							-- Excitement add crit
 	EXADD_M_DEFAULT = "EXADD_M_DEFAULT",				-- Excitement add masochistic default
 	EXADD_M_CRIT = "EXADD_M_CRIT",						-- Excitement add masochistic crit
 	
-	INVADD = "INVADD",									-- type, id, quant - Inventory has been added
+	INVADD = "INVADD",									-- {type=type, name=name, quant=quant} - Inventory has been added
 	
-	ACTION_CAST = "ACTION_USED",						-- Todo
-	ACTION_FAIL = "ACTION_FAIL",
-	ACTION_SUCCESS = "ACTION_SUCCESS",
-	ACTION_SENT = "ACTION_SENT",
+	ACTION_USED = "ACTION_USED",						-- {id=actionID, target=target, args=args, success=success} -- Target responded
+	ACTION_INTERRUPTED = "ACTION_INTERRUPTED",			-- {id=actionID, target=target}
+	ACTION_SENT = "ACTION_SENT",						-- {id=id, target=target} - Action sent to target
 
-	ACTION_UNDERWEAR_EQUIP = "ACTION_UNDERWEAR_EQUIP",			-- Character underwear equipped
-	ACTION_UNDERWEAR_UNEQUIP = "ACTION_UNDERWEAR_UNEQUIP",		-- Character underwear unequipped
-	ACTION_SETTING_CHANGE = "ACTION_SETTING_CHANGE",			-- Character settings have been changed
+	ACTION_UNDERWEAR_EQUIP = "ACTION_UNDERWEAR_EQUIP",			-- {id=id}
+	ACTION_UNDERWEAR_UNEQUIP = "ACTION_UNDERWEAR_UNEQUIP",		-- {id=id}
+	ACTION_SETTING_CHANGE = "ACTION_SETTING_CHANGE",			-- void
 
 }
 
@@ -37,7 +36,7 @@ function ExiWoW.Event:off(id)
 end
 
 function ExiWoW.Event:raise(evt, data)
-	for _,v in ExiWoW.Event.bindings do
+	for _,v in pairs(ExiWoW.Event.bindings) do
 		v.callback(data)
 	end
 end

@@ -563,11 +563,13 @@ function ExiWoW.Character:useUnderwear(id)
 		if uw then 
 			PlaySound(uw.unequip_sound, "Dialog")
 			ExiWoW.RPText:print("You take off your "..uw.name)
+			ExiWoW.Event:raise(ACTION_UNDERWEAR_UNEQUIP, {id=id})
 		end
 	elseif self:ownsUnderwear(id) and uw then
 		self.underwear_worn = id
 		PlaySound(uw.equip_sound, "Dialog")
 		ExiWoW.RPText:print("You put on your "..uw.name)
+		ExiWoW.Event:raise(ACTION_UNDERWEAR_EQUIP, {id=id})
 	else return false
 	end
 	ExiWoW.Menu:refreshUnderwearPage();
@@ -592,12 +594,14 @@ function ExiWoW.Character:addItem(type, name, quant)
 		table.insert(self.underwear_ids, {id=name, fav=false})
 		ExiWoW.Menu:refreshUnderwearPage()
 		ExiWoW.Menu:drawLoot(exists.name, exists.icon)
+		ExiWoW.Event:raise(ExiWoW.Event.Types.INVADD, {type=type, name=name, quant=quant})
 		return exists;
 	elseif type == "Charges" then
 		local action = ExiWoW.Action:get(name)
 		if not action then return false end
 		if action.charges >= action.max_charges or action.charges == math.huge then return false end
 		if not action:consumeCharges(-quant) then return false end
+		ExiWoW.Event:raise(ExiWoW.Event.Types.INVADD, {type=type, name=name, quant=quant})
 		ExiWoW.Menu:drawLoot(action.name, action.texture)
 		return action
 	end
@@ -659,6 +663,8 @@ function ExiWoW.Character:addExcitement(amount, set, multiplyMasochism)
 	else
 		self.excitement = tonumber(amount);
 	end
+
+	ExiWoW.Event:raise(ExiWoW.Event.Types.EXADD, {amount=amount, set=set, multiplyMasochism=multiplyMasochism})
 
 	self.excitement =max(min(self.excitement, ExiWoW.Character.EXCITEMENT_MAX), 0);
 	self:updateExcitementDisplay();

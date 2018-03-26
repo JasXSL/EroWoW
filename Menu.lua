@@ -191,6 +191,10 @@ function ExiWoW.Menu:ini()
 	f:SetScript("OnDragStart", f.StartMoving)
 	f:SetScript("OnDragStop", f.StopMovingOrSizing)
 
+	local function onSettingsChange()
+		ExiWoW.Event:raise(ACTION_SETTING_CHANGE)
+	end
+
 	PanelTemplates_SetNumTabs(f, 3);
 	PanelTemplates_SetTab(f, 1);
 	ExiWoW.Menu:toggle()
@@ -284,7 +288,10 @@ function ExiWoW.Menu:ini()
 		sl:SetValueStep(step)
 		sl:SetObeyStepOnDrag(true)
 		sl:Show();
-		sl:SetScript("OnValueChanged", callback)
+		sl:SetScript("OnValueChanged", function(...)
+			onSettingsChange()
+			callback(...);
+		end)
 
 	end
 
@@ -348,6 +355,7 @@ function ExiWoW.Menu:ini()
 	checkbutton:SetScript("OnClick", function(self)
 		ExiWoWLocalStorage.tank_mode = self:GetChecked();
 		PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
+		onSettingsChange()
 	end)
 
 
