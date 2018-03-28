@@ -212,6 +212,7 @@ function ExiWoW.Action:buildLibrary()
 		end,
 		fn_receive = function(self, sender, target, args)
 			DoEmote("GASP");
+			ExiWoW.LibAssets.effects.addExcitementMasochisticDefault();
 			self:receiveRPText(sender, target, args)
 			return true
 		end

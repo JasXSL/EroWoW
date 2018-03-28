@@ -3,6 +3,7 @@ ExiWoW.Event.index = 0
 ExiWoW.Event.bindings = {}		-- {id={event:(str)event, callback:(str)callback}...}
 
 ExiWoW.Event.Types = {
+	LOADED = "LOADED",									-- ExiWoW loaded
 	EXADD = "EXADD",									-- {amount=amount, set=set, multiplyMasochism=multiplyMasochism} Excitement has been added or subtracted
 	EXADD_DEFAULT = "EXADD_DEFAULT",					-- Excitement add default
 	EXADD_CRIT = "EXADD_CRIT",							-- Excitement add crit
@@ -25,9 +26,8 @@ ExiWoW.Event.Types = {
 function ExiWoW.Event:on(event, callback)
 	if type(callback) ~= "function" then print("Callback in event binding is not a function, got", type(callback)); return false end
 	if not ExiWoW.Event.Types[event] then print("Event not found", event); return false end
-	
 	ExiWoW.Event.index = ExiWoW.Event.index + 1;
-	ExiWoW.Event.bindings[index] = {event=event, callback=callback}
+	ExiWoW.Event.bindings[ExiWoW.Event.index] = {event=event, callback=callback}
 	return ExiWoW.Event.index
 end
 
@@ -37,7 +37,9 @@ end
 
 function ExiWoW.Event:raise(evt, data)
 	for _,v in pairs(ExiWoW.Event.bindings) do
-		v.callback(data)
+		if v.event == evt then
+			v.callback(data)
+		end
 	end
 end
 

@@ -20,6 +20,7 @@ ExiWoW.R = nil					-- Root extension
 ExiWoW.ME = nil					-- My character
 ExiWoW.TARGET = nil				-- Target character, do not use in actions
 ExiWoW.CAST_TARGET = nil		-- Cast target character, use this in actions
+ExiWoW.loaded = false
 
 ExiWoW.Frames = {}
 ExiWoW.Frames.targetHasExiWoWFrame = nil;	-- Gender display
@@ -108,7 +109,14 @@ function ExiWoW:ini()
 	RegisterAddonMessagePrefix(ExiWoW.APP_NAME.."a")		-- Sends an action	 {cb:cbToken, id:action_id, data:(var)data}
 	RegisterAddonMessagePrefix(ExiWoW.APP_NAME.."c")		-- Receive a callback {cb:cbToken, success:(bool)success, data:(var)data}
 	
-	ExiWoW.Timer:set(ExiWoW.loadFromStorage, 1)
+	ExiWoW.Timer:set(function()
+		ExiWoW.loadFromStorage()
+		ExiWoW.loaded = true
+		ExiWoW.Menu:refreshAll();
+		ExiWoW.Event:raise(ExiWoW.Event.Types.LOADED)
+	end, 1)
+	
+	
 	print("ExiWoW online!");
 end
 
@@ -173,12 +181,7 @@ function ExiWoW:loadFromStorage()
 	end
 
 	-- Redraw with cooldowns
-	--ExiWoW.Action:libSort();
-	ExiWoW.Menu:refreshSpellsPage();
-	ExiWoW.Menu:refreshUnderwearPage();
-	ExiWoW.Menu:drawLocalSettings();
-	ExiWoW.Menu:drawGlobalSettings();
-	
+	ExiWoW.Menu:refreshAll()
 	
 end
 
@@ -193,8 +196,6 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 
 	if event == "ADDON_LOADED" and prefix == ExiWoW.APP_NAME then
 		
-		
-
 		-- Debug
 		if not ExiWoWLocalStorage then ExiWoWLocalStorage = {} end
 		if not ExiWoWGlobalStorage then ExiWoWGlobalStorage = {} end
@@ -210,7 +211,6 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 		-- From here we can initialize
 		ExiWoW:ini();
 
-		
 		--[[
 		local f=CreateFrame("ScrollFrame", "DebugBox", UIParent, "InputScrollFrameTemplate")
 		f:SetSize(300,300)
@@ -225,8 +225,6 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 		-- when ESC is hit while editbox has focus, clear focus (a second ESC closes window)
 		editBox:SetScript("OnEscapePressed",editBox.ClearFocus)
 		]]
-
-		
 		
 
 	end
@@ -312,7 +310,7 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 
 			local data, cb = getChunkedMessage(message)
 			if data == false then return end
-
+			--DebugBox.EditBox:SetText(data)
 			local sname = Ambiguate(sender, "all")
 			local response = ExiWoW.json.decode(data);
 			ExiWoW.Callbacks:trigger(cb, response.su, response.da, sender);
@@ -351,11 +349,11 @@ end
 function ExiWoW:sendChunks(suffix, token, text, unit)
 
 	-- Allowed chunk size
-	local tl = 255-(ExiWoW.APP_NAME..suffix):len()-13		-- Prefix length
+	local tl = 255-(ExiWoW.APP_NAME..suffix):len()-20		-- Prefix length
 
 	local chunks = {}
 	for i=0,math.floor(text:len()/tl) do
-		local chunk = text:sub(i*tl+1, i*tl+tl)
+		local chunk = text:sub(i*tl+1, i*tl+tl+1)
 		table.insert(chunks, chunk)
 	end
 	

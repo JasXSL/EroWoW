@@ -30,7 +30,14 @@ end
 
 
 
-
+-- Refresh all--
+function ExiWoW.Menu:refreshAll()
+	ExiWoW.Action:libSort();
+	ExiWoW.Menu:refreshSpellsPage();
+	ExiWoW.Menu:refreshUnderwearPage();
+	ExiWoW.Menu:drawLocalSettings();
+	ExiWoW.Menu:drawGlobalSettings();
+end
 
 -- Refresh spells --
 function ExiWoW.Menu:refreshSpellsPage()
@@ -387,10 +394,6 @@ function ExiWoW.Menu:ini()
 	
 	
 	
-	
-	ExiWoW.Menu.drawLocalSettings();
-	
-
 	-- Bind events
 	ExiWoWSettingsFrame_close:SetScript("OnMouseUp", function (self, button)
 		ExiWoW.Menu:toggle();
@@ -459,9 +462,6 @@ function ExiWoW.Menu:ini()
 	end);
 	
 			
-
-	ExiWoW.Menu.drawGlobalSettings();
-
 	panel.okay = function (self) 
 
 		local gs = ExiWoWGlobalStorage;

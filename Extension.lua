@@ -85,9 +85,9 @@ function ExiWoW.Extension:import(data, isRoot)
 		if ex.id ~= "ROOT" then
 			print("-- Using: ", ex.id)
 		end
+		if ExiWoW.loaded then ExiWoW.Menu:refreshAll(); end
 		return ex
 	end
-	
 end
 
 -- Import from text --
