@@ -290,7 +290,7 @@ function ExiWoW.Action:buildLibrary()
 		-- Consumable --
 	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
 		id = "THROW_SAND",
-		name = "Throw Sand",
+		name = "Sand",
 		description = "Throw sand at your target.",
 		max_charges = 10,
 		charges = 0,

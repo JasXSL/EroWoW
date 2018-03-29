@@ -196,8 +196,6 @@ function ExiWoW.Menu:createMacro(id)
 	local sub = id:sub(1, 16)
 	local found = GetMacroIndexByName(sub);
 	if found == 0 then
-		print("Creating macro")
-		print(sub, action.texture)
 		local index = CreateMacro(sub, action.texture, "/ewact "..id)
 		if not index then 
 			print("Unable to create macro, make sure you have empty generic macro slots");
