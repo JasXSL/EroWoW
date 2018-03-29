@@ -67,7 +67,11 @@ function ExiWoW.Action:buildLibrary()
 					self:resetCooldown();
 				else
 					PlaySound(1202, "SFX");
-					ExiWoW:reportError(ExiWoW:unitRpName(sender) .. " successfully removed "..Ambiguate(UnitName(target), "all").."'s "..ExiWoW:itemSlotToname(data.slot).."!");
+					ExiWoW:reportError(
+						ExiWoW:unitRpName(sender) .. " successfully removed "..
+						Ambiguate(UnitName(target), "all").."'s "..
+						ExiWoW:itemSlotToname(data.slot).."!"
+					);
 				end
 			end
 		end,

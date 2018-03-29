@@ -300,7 +300,7 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 			local aID = da.id								-- Action ID
 			local success, response = ExiWoW.Action:receive(aID, sender, da.da);
 			if cb then
-				ExiWoW:sendCallback(cb, sname, success, da);
+				ExiWoW:sendCallback(cb, sname, success, response);
 			end
 			
 

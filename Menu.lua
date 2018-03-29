@@ -42,19 +42,14 @@ end
 -- Refresh spells --
 function ExiWoW.Menu:refreshSpellsPage()
 
-	local i = 0;
-	for k,v in pairs(ExiWoW.Action.LIB) do
+	for n=1,BUTTON_ROWS*BUTTON_COLS do
+		local f = _G["ExiWoWActionButton_"..(n-1)]
+		local v = ExiWoW.Menu:getAbilityAt(n);
+		if not v then
+			f:Hide();
+		else
 
-		-- Make sure it's acceptable
-		if 
-			v:validateFiltering("player", true) and
-			not v.hidden and
-			v.learned
-		then
-
-			local f = _G["ExiWoWActionButton_"..i]
-
-			local name = _G["ExiWoWActionButton_"..i.."Name"];
+			local name = _G["ExiWoWActionButton_"..(n-1).."Name"];
 			if v.charges and v.charges ~= math.huge then
 				name:SetText(v.charges)
 			else
@@ -92,16 +87,25 @@ function ExiWoW.Menu:refreshSpellsPage()
 			end);
 
 			f:Show();
-			i = i+1;
+
 		end
-
 	end
 
-	for n=i,BUTTON_ROWS*BUTTON_COLS-1 do
-		local f = _G["ExiWoWActionButton_"..n]
-		f:Hide();
-	end
+end
 
+function ExiWoW.Menu:getAbilityAt(index)
+	local out = 0;
+	for k,v in pairs(ExiWoW.Action.LIB) do
+		-- Make sure it's acceptable
+		if v:validateFiltering("player", true) and
+			not v.hidden and
+			v.learned
+		then
+			out = out+1;
+			if out == index then return v end
+		end
+	end
+	return false
 end
 
 
@@ -184,6 +188,29 @@ function ExiWoW.Menu:hideAllTabs()
 end
 
 
+-- Macro
+function ExiWoW.Menu:createMacro(id)
+	local action = ExiWoW.Action:get(id)
+	if not action then return false end
+
+	local sub = id:sub(1, 16)
+	local found = GetMacroIndexByName(sub);
+	if found == 0 then
+		print("Creating macro")
+		print(sub, action.texture)
+		local index = CreateMacro(sub, action.texture, "/ewact "..id)
+		if not index then 
+			print("Unable to create macro, make sure you have empty generic macro slots");
+			return false;
+		else 
+			PickupMacro(index)
+		end
+	else
+		PickupMacro(found)
+	end
+end
+
+
 -- BUILD --
 function ExiWoW.Menu:ini()
 
@@ -217,7 +244,8 @@ function ExiWoW.Menu:ini()
 	for row=0,BUTTON_ROWS-1 do
 		for col=0,BUTTON_COLS-1 do
 
-			local ab = CreateFrame("Button", "ExiWoWActionButton_"..tostring(col+row*BUTTON_COLS), f, "ActionButtonTemplate");
+			local idx = col+row*BUTTON_COLS;
+			local ab = CreateFrame("Button", "ExiWoWActionButton_"..tostring(idx), f, "ActionButtonTemplate");
 			ab:SetAttribute("type", "action");
 			ab:SetAttribute("action", 1);
 			ab:SetPoint("TOPLEFT", 23+col*50*BUTTON_MARG, -50-row*50*BUTTON_MARG);
@@ -227,6 +255,14 @@ function ExiWoW.Menu:ini()
 
 			ab.Name:SetPoint("TOPRIGHT", 8,-30)
 			ab.Name:SetFontObject("GameFontHighlight");
+
+			ab:RegisterForDrag("LeftButton");
+			ab:SetScript("OnDragStart", function(self)
+				local v = ExiWoW.Menu:getAbilityAt(idx+1)
+				if v then
+					ExiWoW.Menu:createMacro(v.id)
+				end
+			end);
 
 			local s = CreateFrame("Frame", nil, ab);
 			ab.star = s;
@@ -364,7 +400,7 @@ function ExiWoW.Menu:ini()
 		PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
 		onSettingsChange()
 	end)
-
+	
 
 	-- Right side
 	item = 0
