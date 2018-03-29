@@ -125,6 +125,8 @@ function ExiWoW.Action:import(data)
 	if data.cooldown_started and data.cooldown_started+self.cooldown > GetTime() then 
 		self:setCooldown(self.cooldown+data.cooldown_started-GetTime(), true);
 		self.cooldown_started = data.cooldown_started;
+	else
+		self.cooldown_started = 0;
 	end
 	if data.charges then self.charges = data.charges end
 	if self.charges == "INF" then self.charges = math.huge end
@@ -272,12 +274,13 @@ end
 -- Condition validation
 -- Validates for both receive and send --
 -- Returns boolean true on success
-function ExiWoW.Action:validate(unitCaster, unitTarget, suppressErrors)
+function ExiWoW.Action:validate(unitCaster, unitTarget, suppressErrors, isSend, isCastComplete)
 
 	if self.suppress_all_errors then suppressErrors = true end -- Allow actions to suppress errors - 
 	
 	-- Make sure it's not on cooldown
-	if unitCaster == "player" and (self.on_cooldown or (self.global_cooldown and ExiWoW.Action.GCD)) then
+	if isSend and not isCastComplete and (self.on_cooldown or (self.global_cooldown and ExiWoW.Action.GCD)) then
+		print("isSend", isSend)
 		return ExiWoW:reportError("Can't do that yet", suppressErrors);
 	end
 
@@ -699,7 +702,7 @@ function ExiWoW.Action:useOnTarget(id, target, castFinish)
 	end
 
 	-- Validate conditions
-	if not action:validate("player", target, ignoreErrors) then return false end
+	if not action:validate("player", target, ignoreErrors, true, castFinish) then return false end
 
 	-- Set cooldowns etc
 
@@ -753,7 +756,7 @@ function ExiWoW.Action:receive(id, sender, args, allowErrors)
 	if not action then return false end			-- Received Action not found
 
 	-- Received action is invalid
-	if not action:validate(sender, "player", not allowErrors) then 
+	if not action:validate(sender, "player", not allowErrors, false, false) then 
 		return false 
 	end
 

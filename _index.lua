@@ -254,7 +254,7 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 
 			local timer = ExiWoW.Timer;
 			local data = {}
-			for msg in input:gmatch("([^,]+)") do
+			for msg in input:gmatch("([^§]+)") do
 				table.insert(data, msg)
 			end
 			local token = data[1]
@@ -353,14 +353,14 @@ function ExiWoW:sendChunks(suffix, token, text, unit)
 
 	local chunks = {}
 	for i=0,math.floor(text:len()/tl) do
-		local chunk = text:sub(i*tl+1, i*tl+tl+1)
+		local chunk = text:sub(i*tl+1, i*tl+tl)
 		table.insert(chunks, chunk)
 	end
 	
 	--DebugBox.EditBox:SetText(ExiWoW.json.encode(out))
 	local total = #chunks
 	for i,ch in ipairs(chunks) do
-		SendAddonMessage(ExiWoW.APP_NAME..suffix, token..","..i..","..total..","..ch, "WHISPER", unit)
+		SendAddonMessage(ExiWoW.APP_NAME..suffix, token.."§"..i.."§"..total.."§"..ch, "WHISPER", unit)
 	end	
 
 end
