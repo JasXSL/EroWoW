@@ -61,7 +61,9 @@ function ExiWoW.SpellBinding:runOnThese(name, callback)
 			ExiWoW:multiSearch(name, v.name) and 
 			(self.allow_in_vehicle or not UnitInVehicle("player"))
 		then
-			callback(v);
+			if callback(v) == false then 
+				return 
+			end
 		end
 	end
 end
@@ -77,6 +79,9 @@ function ExiWoW.SpellBinding:onAdd(sender, data)
 		if self.fnOnAdd then
 			self:fnOnAdd(rpText, data);
 		end
+		if rpText then 
+			return false 
+		end
 	end);
 end
 
@@ -85,6 +90,9 @@ function ExiWoW.SpellBinding:onTick(sender, data)
 		local rpText = self:runRpText(sender, data, ExiWoW.RPText.Req.Types.RTYPE_SPELL_TICK);
 		if self.fnOnTick then
 			self:fnOnTick(rpText, data);
+		end
+		if rpText then 
+			return false 
 		end
 	end);
 end
@@ -95,6 +103,7 @@ function ExiWoW.SpellBinding:onRemove(sender, data)
 		if self.fnOnRemove then
 			self:fnOnRemove(rpText, data);
 		end
+		if rpText then return false end
 	end);
 end
 

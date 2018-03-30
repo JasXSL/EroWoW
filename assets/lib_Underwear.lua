@@ -57,6 +57,14 @@ function ExiWoW.Underwear:buildLibrary()
 		description = "A thong made of light pink silk wrappings with sparkling soulgems attached around the waist straps.",
 		tags = {},
 	}));
+
+	table.insert(lib, uw:new({
+		id = "FURBOLG_LOINCLOTH",
+		name = "Furbolg Loincloth",
+		icon = "inv_misc_leatherscrap_16",
+		description = "A tattered leather thong with rope straps, usually worn by furbolgs.",
+		tags = {},
+	}));
 	
 end
 

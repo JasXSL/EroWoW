@@ -43,7 +43,6 @@ local f = ExiWoW.LibAssets.loot
 		}
 	})
 
-	local razaaniSoulthong = {}
 	table.insert(f, {
 		zone = "Blade's Edge Mountains",
 		name = "%Razaani",
@@ -55,6 +54,22 @@ local f = ExiWoW.LibAssets.loot
 				sound = 1185,
 				text = ExiWoW.RPText:new({
 					text_receiver = "%T was holding a small gem studded garment, you decide to hold on to it!"
+				})
+			}
+		}
+	})
+
+	-- Furbolg loincloth
+	table.insert(f, {
+		name = npc.furbolg,
+		items = {
+			{
+				type = "Underwear", 
+				id = "FURBOLG_LOINCLOTH", 
+				chance = 0.1,
+				sound = 1185,
+				text = ExiWoW.RPText:new({
+					text_receiver = "You found a spare loincloth on the defeated furbolg!"
 				})
 			}
 		}

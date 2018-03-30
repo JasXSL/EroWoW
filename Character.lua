@@ -120,9 +120,7 @@ function ExiWoW.Character:onEvent(event, ...)
 			local crit = ""
 			if arguments[18] or (ExiWoWLocalStorage.tank_mode and math.random() < ExiWoW.TANK_MODE_PERC) then crit = "_CRIT" end
 
-			local damage = 0
-			
-
+			local damage = 0	
 			damage = arguments[12]
 
 			
@@ -206,7 +204,7 @@ function ExiWoW.Character:onEvent(event, ...)
 			--spellId, name, harmful, unitCaster, count, crit, char
 			local aura = buildSpellTrigger(spellId, name, harmful, unitCaster, count, false, char)
 			table.insert(active, aura)
-			if not auraExists(ExiWoW.Character.AURAS, aura) then
+			if not auraExists(ExiWoW.Character.AURAS, aura) and not ExiWoW.Character.takehitCD then
 				ExiWoW.SpellBinding:onAdd(char, aura)
 			end
 
@@ -229,7 +227,7 @@ function ExiWoW.Character:onEvent(event, ...)
 
 		-- See what auras were removed
 		for i,a in pairs(ExiWoW.Character.AURAS) do
-			if not auraExists(active, a) then
+			if not auraExists(active, a) and ExiWoW.Character.takehitCD then
 				ExiWoW.SpellBinding:onRemove(a.char, a)
 			end
 		end

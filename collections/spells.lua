@@ -15,6 +15,7 @@ local sk = ExiWoW.LibAssets.spell_kits;
 	sk.tossed_objects = {};
 	sk.shield_bash = {}
 	sk.slosh = {}										-- Sloshing things, like water bolt
+	sk.shards = {}										-- Small shards
 
 	-- Ice
 	sk.ice_common["Chilled"]=true;
@@ -24,6 +25,8 @@ local sk = ExiWoW.LibAssets.spell_kits;
 	sk.electric["Stormstrike"] = true
 	sk.electric["%Lightning"] = true
 	sk.electric["Shock"] = true
+	sk.electric["Zap"] = true
+	
 	
 
 	-- Basilisk freeze
@@ -51,7 +54,10 @@ local sk = ExiWoW.LibAssets.spell_kits;
 	-- Slosh
 	sk.slosh["Water Bolt"] = true
 	sk.slosh["Slime Spray"] = true
+	sk.slosh["Water Spout"] = true
 	
+	-- Small shards
+	sk.shards["Crystal Shards"] = true
 
 
 

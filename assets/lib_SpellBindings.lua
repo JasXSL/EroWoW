@@ -113,5 +113,19 @@ function ExiWoW.SpellBinding:buildLibrary()
 		procChance = 0.5
 	}))
 	
+	table.insert(R, sb:new({
+		name = spellKits.shards,
+		proChance = 0.05
+	}))
+
+	table.insert(R, sb:new({
+		name = "Bop Barrage",
+		proChance = 0.05
+	}))
+	table.insert(R, sb:new({
+		name = "Big Bop",
+		proChance = 0.5
+	}))
+	
 
 end

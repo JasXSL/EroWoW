@@ -20,8 +20,16 @@ local npcs = ExiWoW.LibAssets.npcs
 	npc_pincer["Scorpid Worker"] = true
 	npc_pincer["%Surf Crawler"] = true
 	npc_pincer["Silt Crawler"] = true
+	npc_pincer["Clattering Crawler"] = true
+	npc_pincer["Spined Crawler"] = true
 	npc_pincer["%Makrura"] = true
+	npc_pincer["Moonshell Crawler"] = true
 	
+	
+
+	local furbolg = {}
+	npcs.furbolg = furbolg
+	furbolg["%Thistlefur "] = true
 	
 	
 	
@@ -35,6 +43,7 @@ local npcs = ExiWoW.LibAssets.npcs
 	npc_lasher["Bloodpetal Thresher"] = true
 	npc_lasher["Bloodpetal Trapper"] = true
 	npc_lasher["Fiendling Flesh Beast"] = true
+	npc_lasher["Gloomshade Blossom"] = true
 	
 	
 	-- Ooze type NPCs
@@ -47,10 +56,8 @@ local npcs = ExiWoW.LibAssets.npcs
 	local npc_vines = {}
 	npcs.vines = npc_vines
 	npc_vines["Juvenile Bloodpetal"] = true
-	npc_vines["Bloodpetal Flayer"] = true
-	npc_vines["Bloodpetal Thresher"] = true
-	npc_vines["Bloodpetal Trapper"] = true
-	
+	npc_vines["%Bloodpetal"] = true
+	npc_lasher["Gloomshade Blossom"] = true
 	
 	
 	local npc_wasp = {}

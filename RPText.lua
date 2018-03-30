@@ -12,6 +12,7 @@ local TAG_SENDER_NAME = "%S";
 local TAG_RECEIVER_NAME = "%T";
 local TAG_SUFFIXES = {
 	GROIN = "groin",
+	GENITALS = "genitals",		-- Automatically picks one based on your gender
 	PENIS = "penis",
 	VAGINA = "vagina",
 	BREASTS = "breasts",
@@ -245,6 +246,15 @@ function ExiWoW.RPText:getSynonym(tag, target, spelldata)
 		return getRandom("harden", "stiffen")
 	end
 
+	if tag == TAG_SUFFIXES.GENITALS then
+		tag = TAG_SUFFIXES.GROIN		-- Default to groin
+		local r = {}
+		if target:getVaginaSize() ~= false then table.insert(r, TAG_SUFFIXES.VAGINA) end
+		if target:getPenisSize() ~= false then table.insert(r, TAG_SUFFIXES.PENIS) end
+		if #r > 0 then
+			tag = r[math.random(#r)]
+		end
+	end
 
 	-- Specific tags
 	if tag == TAG_SUFFIXES.PENIS then
