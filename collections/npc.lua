@@ -24,6 +24,7 @@ local npcs = ExiWoW.LibAssets.npcs
 	npc_pincer["Spined Crawler"] = true
 	npc_pincer["%Makrura"] = true
 	npc_pincer["Moonshell Crawler"] = true
+	npc_pincer["Skittering Doomstinger"] = true
 	
 	
 

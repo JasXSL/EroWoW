@@ -126,6 +126,11 @@ function ExiWoW.SpellBinding:buildLibrary()
 		name = "Big Bop",
 		proChance = 0.5
 	}))
+
+	table.insert(R, sb:new({
+		name = "Dancing Thorns",
+		proChance = 0.05
+	}))
 	
 
 end
