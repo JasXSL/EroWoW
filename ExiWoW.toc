@@ -27,6 +27,7 @@ Extension.lua
 SpellBinding.lua
 Underwear.lua
 Event.lua
+Effect.lua
 
 # Collections of NPCs, spell effects etc that can be reused. Also loot tables
 collections/_index.lua

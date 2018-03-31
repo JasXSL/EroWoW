@@ -140,7 +140,7 @@ function ExiWoW.Character:onEvent(event, ...)
 
 			end
 
-			if damage <= 0 then return end
+			if damage <= 0 or IsInInstance() then return end
 			local percentage = damage/UnitHealthMax("player");
 			ExiWoW.ME:addExcitement(percentage*0.1, false, true);
 			
@@ -554,6 +554,7 @@ function ExiWoW.Character:getUnderwear()
 	if self.underwear then return self.underwear end
 	return ExiWoW.Underwear:get(self.underwear_worn);
 end
+
 function ExiWoW.Character:useUnderwear(id)
 	local uw = ExiWoW.Underwear:get(id)
 	if self.underwear_worn == id then

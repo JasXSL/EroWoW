@@ -88,6 +88,7 @@ function ExiWoW:ini()
 	ExiWoW.Menu:ini();
 	ExiWoW.ME:onCapChange()
 	ExiWoW.Underwear:buildLibrary()
+	
 
 	ExiWoW.R = ExiWoW.Extension:import({id="ROOT"}, true);	-- Build the main extension for assets
 	
@@ -114,6 +115,7 @@ function ExiWoW:ini()
 		ExiWoW.loaded = true
 		ExiWoW.Menu:refreshAll();
 		ExiWoW.Event:raise(ExiWoW.Event.Types.LOADED)
+		ExiWoW.Effect:ini();
 	end, 1)
 	
 	
