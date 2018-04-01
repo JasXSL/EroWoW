@@ -26,6 +26,7 @@ local npcs = ExiWoW.LibAssets.npcs
 	npc_pincer["Moonshell Crawler"] = true
 	npc_pincer["Skittering Doomstinger"] = true
 	npc_pincer["%Scorpashi"] = true
+	npc_pincer["%Drysnap"] = true
 	
 	
 	
@@ -33,6 +34,14 @@ local npcs = ExiWoW.LibAssets.npcs
 	local furbolg = {}
 	npcs.furbolg = furbolg
 	furbolg["%Thistlefur"] = true
+	furbolg["%Deadwood"] = true
+	
+
+	local satyr = {}
+	npcs.satyr = satyr
+	satyr["Jadefire Felsworn"] = true
+	satyr["Jadefire Rogue"] = true
+	satyr["%Satyr"] = true
 	
 	
 	
@@ -47,6 +56,11 @@ local npcs = ExiWoW.LibAssets.npcs
 	npc_lasher["Bloodpetal Trapper"] = true
 	npc_lasher["Fiendling Flesh Beast"] = true
 	npc_lasher["Gloomshade Blossom"] = true
+	npc_lasher["Uprooted Lasher"] = true
+	npc_lasher["Nether Maiden"] = true
+	npc_lasher["Salia"] = true
+	npc_lasher["Moora"] = true
+	
 	
 	
 	-- Ooze type NPCs

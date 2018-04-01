@@ -679,7 +679,7 @@ function ExiWoW.Action:get(id)
 
 end
 
--- Send an action
+-- Send an action, id can also be an action
 function ExiWoW.Action:useOnTarget(id, target, castFinish)
 
 	if ExiWoW.Action.CASTING_SPELL then
@@ -687,9 +687,12 @@ function ExiWoW.Action:useOnTarget(id, target, castFinish)
 	end
 
 	-- Find the action
-	local action = ExiWoW.Action:get(id);
-	if not action then
-		return ExiWoW:reportError("Action not found: "..id);
+	local action = id
+	if type(action) ~= "table" then
+		action = ExiWoW.Action:get(id);
+		if not action then
+			return ExiWoW:reportError("Action not found: "..id);
+		end
 	end
 
 	-- Self cast actions don't need to send a message
@@ -718,7 +721,7 @@ function ExiWoW.Action:useOnTarget(id, target, castFinish)
 
 	if action.cast_time <= 0 or castFinish then 
 
-		ExiWoW.Event:raise(ExiWoW.Event.Types.ACTION_SENT, {id=id, target=target})
+		ExiWoW.Event:raise(ExiWoW.Event.Types.ACTION_SENT, {id=action.id, target=target})
 		if type(action.fn_done) == "function" then action:fn_done(true) end
 		if type(action.fn_send) == "function" then
 			args, callback = action:fn_send("player", target, suppressErrors);
@@ -778,6 +781,7 @@ function ExiWoW.Action:beginSpellCast(action, target)
 	ExiWoW.Action:endSpellCast(false);
 	ExiWoW.Action.CASTING_SPELL = action;
 	ExiWoW.Action.CASTING_TARGET = Ambiguate( UnitName(target), "all" );
+	-- Timer
 	ExiWoW.Action.CASTING_TIMER = ExiWoW.Timer:set(function()
 		ExiWoW.Action:endSpellCast(true);
 	end, action.cast_time);
@@ -812,10 +816,12 @@ function ExiWoW.Action:beginSpellCast(action, target)
 		end)
 	end
 
+	-- Move interrupt
 	if not action.allow_caster_moving then
 		ExiWoW.Action.CASTING_MOVEMENT_BINDING = ExiWoW.Character:bind("PLAYER_STARTED_MOVING", interrupt)
 	end
 
+	-- Official effect
 	ExiWoW.Action.CASTING_SPELL_BINDING = ExiWoW.Character:bind("UNIT_SPELLCAST_START", function(data)
 		if UnitIsUnit(data[1], "PLAYER") then interrupt() end
 	end)
@@ -855,11 +861,12 @@ function ExiWoW.Action:endSpellCast(success)
 	ExiWoW.Timer:clear(ExiWoW.Action.CASTING_TIMER);
 	ExiWoW.Timer:clear(ExiWoW.Action.CASTING_INTERVAL);
 	
-	local id = ExiWoW.Action.CASTING_SPELL.id;
+	local c = ExiWoW.Action.CASTING_SPELL
 	ExiWoW.Action.CASTING_SPELL = nil;
 	if success then
-		ExiWoW.Action:useOnTarget(id, ExiWoW.Action.CASTING_TARGET, true);
+		ExiWoW.Action:useOnTarget(c, ExiWoW.Action.CASTING_TARGET, true);
 	end
+	
 
 end
 

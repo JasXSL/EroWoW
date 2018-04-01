@@ -55,6 +55,7 @@ local lDefaults = {
 	intelligence = 5,
 	fat = 5,
 	wisdom = 5,
+	effects = {}
 };
 
 -- Constants
@@ -87,7 +88,6 @@ function ExiWoW:ini()
 	ExiWoW.Character:ini()
 	ExiWoW.Menu:ini();
 	ExiWoW.ME:onCapChange()
-	ExiWoW.Underwear:buildLibrary()
 	
 
 	ExiWoW.R = ExiWoW.Extension:import({id="ROOT"}, true);	-- Build the main extension for assets
@@ -101,6 +101,8 @@ function ExiWoW:ini()
 	ExiWoW.Action:ini()
 
 	-- Build libraries
+	ExiWoW.Underwear:buildLibrary()
+	ExiWoW.Effect:buildLibrary()
 	ExiWoW.RPText:buildLibrary()
 	ExiWoW.Action:buildLibrary()
 	ExiWoW.SpellBinding:buildLibrary()
@@ -182,6 +184,12 @@ function ExiWoW:loadFromStorage()
 		if abil then abil:import(v) end
 	end
 
+	for k,v in pairs(ExiWoWLocalStorage.effects) do
+		if v.expires > GetTime() then
+			ExiWoW.Effect:run(v.id, v.stacks, v);
+		end
+	end
+
 	-- Redraw with cooldowns
 	ExiWoW.Menu:refreshAll()
 	
@@ -245,6 +253,16 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 			if not v.hidden then
 				table.insert( l.abilities, v:export() )
 			end
+		end
+
+		l.effects = {}
+		for k,v in pairs(ExiWoW.Effect.applied) do
+			table.insert(l.effects, {
+				id = v.effect.id,
+				expires = v.expires,
+				ticks = v.ticks,
+				stacks = v.stacks,
+			})
 		end
 		
 	end

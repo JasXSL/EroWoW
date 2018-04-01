@@ -26,6 +26,9 @@ function ExiWoW.Extension:new(data, isRoot)
 	-- Import SpellBindings
 	self.spellBindings = importTable(data.spellBindings)
 
+	-- Effects
+	self.effects = importTable(data.effects)
+
 	return self
 end
 
@@ -53,11 +56,14 @@ function ExiWoW.Extension:index()
 	ExiWoW.RPText.Lib = {}
 	ExiWoW.SpellBinding.Lib = {}
 	ExiWoW.Action.LIB = {}
+	ExiWoW.Effect.LIB = {}
+	
 
 	for k,v in pairs(ExiWoW.Extension.LIB) do
 		ExiWoW.RPText.Lib = TableConcat(ExiWoW.RPText.Lib, v.rpTexts);
 		ExiWoW.Action.LIB = TableConcat(ExiWoW.Action.LIB, v.actions);
 		ExiWoW.SpellBinding.Lib = TableConcat(ExiWoW.SpellBinding.Lib, v.spellBindings);
+		ExiWoW.Effect.Lib = TableConcat(ExiWoW.Effect.Lib, v.effects);
 	end
 
 	-- Update the HUD

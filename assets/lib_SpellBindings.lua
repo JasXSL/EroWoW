@@ -115,32 +115,36 @@ function ExiWoW.SpellBinding:buildLibrary()
 	
 	table.insert(R, sb:new({
 		name = spellKits.shards,
-		proChance = 0.05
+		procChance = 0.05
 	}))
 
 	table.insert(R, sb:new({
 		name = "Bop Barrage",
-		proChance = 0.05
+		procChance = 0.05
 	}))
 	table.insert(R, sb:new({
 		name = "Big Bop",
-		proChance = 0.5
+		procChance = 0.5
 	}))
 
 	table.insert(R, sb:new({
 		name = "Dancing Thorns",
-		proChance = 0.05
+		procChance = 0.05
 	}))
 
 	table.insert(R, sb:new({
 		name = "Slitherstrike",
-		proChance = 0.25
+		procChance = 0.25
 	}))
 
 	table.insert(R, sb:new({
 		name = spellKits.magicWhip,
-		proChance = 0.5
+		procChance = 0.5
 	}))
 	
+	table.insert(R, sb:new({
+		name = spellKits.groundSpike,
+		procChance = 0.5
+	}))
 
 end

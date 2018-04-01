@@ -17,6 +17,7 @@ local sk = ExiWoW.LibAssets.spell_kits;
 	sk.slosh = {}										-- Sloshing things, like water bolt
 	sk.shards = {}										-- Small shards
 	sk.magicWhip = {}									-- Such as void whip, detached whips
+	sk.groundSpike = {}									-- Earth spike etc
 
 	-- Ice
 	sk.ice_common["Chilled"]=true;
@@ -65,7 +66,8 @@ local sk = ExiWoW.LibAssets.spell_kits;
 	-- Small shards
 	sk.shards["Crystal Shards"] = true
 
-
+	-- Ground spikes
+	sk.groundSpike["Earth Spike"] = true
 
 
 

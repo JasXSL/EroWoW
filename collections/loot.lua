@@ -59,7 +59,7 @@ local f = ExiWoW.LibAssets.loot
 		}
 	})
 
-	-- Furbolg loincloth
+	-- Furbolg drops
 	table.insert(f, {
 		name = npc.furbolg,
 		items = {
@@ -75,6 +75,21 @@ local f = ExiWoW.LibAssets.loot
 		}
 	})
 
+	-- Satyr drops
+	table.insert(f, {
+		name = npc.satyr,
+		items = {
+			{
+				type = "Underwear",
+				id = "FELCLOTH_PANTIES",
+				chance = 0.1,
+				sound = 1185,
+				text = ExiWoW.RPText:new({
+					text_receiver = "The satyr was holding onto a small pair of felcloth panties!"
+				})
+			}
+		}
+	})
 
 
 	-- Foraged loot

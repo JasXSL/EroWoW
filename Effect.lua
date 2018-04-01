@@ -2,11 +2,13 @@ ExiWoW.Effect = {}
 ExiWoW.Effect.__index = ExiWoW.Effect;
 ExiWoW.Effect.applied = {}					-- {index = {effect:ExiWoW.Effect:new(), expires:(float)GetTime()+duration}...}
 ExiWoW.Effect.index = 0
+ExiWoW.Effect.Lib = {}						-- Handled in extension
 
 function ExiWoW.Effect:new(data)
 	local self = {}
 	setmetatable(self, ExiWoW.Effect); 
 
+	self.id = data.id
 	self.detrimental = data.detrimental or false	-- 
 	self.duration = data.duration or 0				-- Total duration of effect, use 0 for passive
 	self.ticking = data.ticking or 0				-- Sec between ticks
@@ -15,10 +17,11 @@ function ExiWoW.Effect:new(data)
 	self.name = data.name
 	self.description = data.description
 	
-	self.onAdd = data.onAdd					
+	self.onAdd = data.onAdd							-- (obj)activeData, (bool)fromLogin
 	self.onRemove = data.onRemove
 	self.onTick = data.onTick
-	self.onStackChange = data.onStackChange
+	self.onStackChange = data.onStackChange			-- (obj)activeData, (bool)fromLogin
+	self.onRightClick = data.onRightClick			-- Right click binding
 
 	return self
 end
@@ -50,7 +53,8 @@ function ExiWoW.Effect:updateTooltip(buff)
 	GameTooltip:Show()
 end
 
-function ExiWoW.Effect:add(stacks)
+-- FromLogin is added when this is added when you login or reload UI. And it's the "out" object defined below
+function ExiWoW.Effect:add(stacks, fromLogin)
 
 	if not stacks or stacks < 1 then stacks = 1 end
 	local expires = 0
@@ -60,10 +64,23 @@ function ExiWoW.Effect:add(stacks)
 
 	local exists = self:isApplied()
 	local out = {}
+	local runOnAdd = false
+	local fLogin = type(fromLogin) == "table"
+	-- Insert the effect
+	if fLogin then
+		ExiWoW.Effect.index = ExiWoW.Effect.index+1
+		exists = ExiWoW.Effect.index
+		fromLogin.effect = self
+		fromLogin.id = exists
+		ExiWoW.Effect.applied[exists] = fromLogin
+		out = fromLogin
+		runOnAdd = true
+	end
 	
 	-- Newly added effect
 	if exists == false then
 
+		runOnAdd = true
 		ExiWoW.Effect.index = ExiWoW.Effect.index+1
 		exists = ExiWoW.Effect.index
 		out = {
@@ -80,19 +97,9 @@ function ExiWoW.Effect:add(stacks)
 		end
 
 		ExiWoW.Effect.applied[ExiWoW.Effect.index] = out
-		local se = self;
-		if self.ticking > 0 and type(self.onTick) == "function" then
-			out.timerTick = ExiWoW.Timer:set(function() 
-				se:onTick();
-				out.ticks = out.ticks+1;
-			end, self.ticking, math.huge);
-		end
 
-		if type(self.onAdd) == "function" then
-			self:onAdd();
-		end
-
-	else
+	-- Existing effect, but not if it was loaded from reload
+	elseif not fLogin then
 		out = ExiWoW.Effect.applied[exists]
 		ExiWoW.Timer:clear(effect.timerExpire);
 		out.expires = expires
@@ -103,31 +110,41 @@ function ExiWoW.Effect:add(stacks)
 		out.stacks = self.max_stacks
 	end
 
+	-- Handle ticking
+	local se = self;
+	if self.ticking > 0 and type(self.onTick) == "function" and (not exists or fLogin) then
+		out.timerTick = ExiWoW.Timer:set(function() 
+			se:onTick();
+			out.ticks = out.ticks+1;
+		end, self.ticking, math.huge);
+	end
+
+
+	-- onAdd function
+	if type(self.onAdd) == "function" and runOnAdd then
+		self:onAdd(out, fromLogin);
+	end
+
 	-- Runs on both since technically an add is a stack change
 	if type(self.onStackChange) == "function" then
-		self:onStackChange();
+		self:onStackChange(out, fromLogin);
 	end
 
 	-- Both newly added and stack added
 	if expires > 0 then
-		out.timerExpire = ExiWoW.Timer:set(function() ExiWoW.Effect:rem(ExiWoW.Effect.index) end, self.duration);
+		local dur = self.duration
+		-- Update timer
+		if fLogin then
+			dur = out.expires-GetTime()
+		end
+		out.timerExpire = ExiWoW.Timer:set(function() ExiWoW.Effect:rem(out.id) end, dur);
 	end
 
 	ExiWoW.Effect:UpdateAllBuffAnchors()
 	return exists
 end
 
-function ExiWoW.Effect:rem(index)
-	local effect = ExiWoW.Effect.applied[index];
-	local fx = effect.effect;
-	if type(fx.onRemove) == "function" then
-		fx:onRemove();
-	end
-	ExiWoW.Timer:clear(effect.timerExpire);
-	ExiWoW.Timer:clear(effect.timerTick);
-	ExiWoW.Effect.applied[index] = nil
-	ExiWoW.Effect:UpdateAllBuffAnchors()
-end
+
 
 function ExiWoW.Effect:getBuffAtIndex(index, detrimental)
 	local i = 0
@@ -161,7 +178,31 @@ function ExiWoW.Effect:refreshBuffs()
 end
 
 
+-- Static
+function ExiWoW.Effect:get(id)
+	for _,v in pairs(ExiWoW.Effect.Lib) do
+		if v.id == id then return v end
+	end
+	return false
+end
 
+function ExiWoW.Effect:run(id, stacks, fromLogin)
+	local effect = ExiWoW.Effect:get(id)
+	if not effect then print("Effect not found", id); return false end
+	effect:add(stacks, fromLogin)
+end
+
+function ExiWoW.Effect:rem(index)
+	local effect = ExiWoW.Effect.applied[index];
+	local fx = effect.effect;
+	if type(fx.onRemove) == "function" then
+		fx:onRemove();
+	end
+	ExiWoW.Timer:clear(effect.timerExpire);
+	ExiWoW.Timer:clear(effect.timerTick);
+	ExiWoW.Effect.applied[index] = nil
+	ExiWoW.Effect:UpdateAllBuffAnchors()
+end
 
 
 -- Visuals
@@ -217,10 +258,14 @@ function ExiWoW.Effect:AuraButtonUpdate(buttonName, index, filter, effect)
 		buff.exitTime = nil;
 		buff.ewID = effect.id;
 		buff:Show();
+
 		-- Set filter-specific attributes
 		if ( not helpful ) then
 			-- Anchor Debuffs
 			DebuffButton_UpdateAnchors(buttonName, index);
+
+			buff:RegisterForClicks("RightButtonUp");
+			buff:SetScript("OnClick", ExiWoW.Effect.onRightClick)
 
 			-- Set color of debuff border based on dispel class.
 			local debuffSlot = _G[buffName.."Border"];
@@ -354,6 +399,29 @@ function ExiWoW.Effect:UpdateAllBuffAnchors()
 	end
 end
 
+function ExiWoW.Effect:onRightClick()
+	if self.ewID then
+
+		local obj = ExiWoW.Effect.applied[self.ewID]
+		if not obj then return end
+
+		local allow = false
+		if type(obj.effect.onRightClick) == "function" then
+			local call = obj.effect:onRightClick(obj)
+			if call == false then 
+				-- Prevent right click of beneficial spell
+				return
+			elseif call == true then
+				-- Can be used to right click a detrimental spell
+				allow = true
+			end
+		end
+		if obj.effect.detrimental and not allow then return end
+		
+		ExiWoW.Effect:rem(self.ewID)
+	end 
+end
+
 
 function ExiWoW.Effect:ini()
 
@@ -363,13 +431,7 @@ function ExiWoW.Effect:ini()
 	end)
 
 	-- Right click an EWID
-	hooksecurefunc("BuffButton_OnClick", function(self)
-		if self.ewID then
-			local obj = ExiWoW.Effect.applied[self.ewID]
-			if not obj or obj.detrimental then return end
-			ExiWoW.Effect:rem(self.ewID)
-		end 
-	end)
+	hooksecurefunc("BuffButton_OnClick", ExiWoW.Effect.onRightClick)
 
 	-- Adding an effect example
 	--[[

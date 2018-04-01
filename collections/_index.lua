@@ -3,7 +3,6 @@ ExiWoW.LibAssets = {}
 local req = ExiWoW.RPText.Req;	-- RPText requirement constructor
 local ty = req.Types;			-- Local filter types
 
--- When used in rp texts, they need to be prefixed with SPELL_
 function ExiWoW.LibAssets.spellKitToRP(...)
 	local kits = {...}
 	local out = {}

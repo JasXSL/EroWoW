@@ -65,6 +65,14 @@ function ExiWoW.Underwear:buildLibrary()
 		description = "A tattered leather thong with rope straps, usually worn by furbolgs.",
 		tags = {},
 	}));
+
+	table.insert(lib, uw:new({
+		id = "FELCLOTH_PANTIES",
+		name = "Felcloth Panties",
+		icon = "6or_garrison_clothroof",
+		description = "Red panties made of felcloth, with black trimmings.",
+		tags = {},
+	}));
 	
 end
 

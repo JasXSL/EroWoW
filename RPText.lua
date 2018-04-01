@@ -23,6 +23,7 @@ local TAG_SUFFIXES = {
 	RACE = "race",
 	CLASS = "class",
 	UNDERWEAR = "undies",		-- Underwear name
+	BULGE = "bulge",			-- Bulge, package, junk etc
 	-- These are converted into somewhat applicable pronouns, him->her->their etc 
 	HIM = "him",
 	HIS = "his",
@@ -189,6 +190,12 @@ function ExiWoW.RPText:get(id, sender, receiver, spelldata, spellType)
 
 end
 
+-- Same as above but triggers as well
+function ExiWoW.RPText:trigger(id, sender, receiver, spelldata, spellType)
+	local text = ExiWoW.RPText:get(id, sender, receiver, spelldata, spellType)
+	if text then return text:convertAndReceive(sender, receiver, false) end
+end
+
 function ExiWoW.RPText:getSynonym(tag, target, spelldata)
 
 	local getSizeTag = function(size)
@@ -261,6 +268,8 @@ function ExiWoW.RPText:getSynonym(tag, target, spelldata)
 		return getSizeTag(target:getPenisSize())..getRandom("penis", "dick", "member", "cock", "manhood")
 	elseif tag == TAG_SUFFIXES.GROIN then
 		return getRandom("groin", "crotch")
+	elseif tag == TAG_SUFFIXES.BULGE then
+		return getRandom("bulge", "package", "junk")
 	elseif tag == TAG_SUFFIXES.VAGINA then
 		return getRandom("vagina", "pussy", "cunt")
 	elseif tag == TAG_SUFFIXES.BREASTS then

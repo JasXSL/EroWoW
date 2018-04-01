@@ -43,6 +43,7 @@ collections/loot.lua
 
 
 # Asset database
+assets/lib_Effect.lua
 assets/lib_RPText.lua
 assets/lib_Actions.lua
 assets/lib_SpellBindings.lua
