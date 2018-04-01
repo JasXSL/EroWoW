@@ -16,6 +16,7 @@ local sk = ExiWoW.LibAssets.spell_kits;
 	sk.shield_bash = {}
 	sk.slosh = {}										-- Sloshing things, like water bolt
 	sk.shards = {}										-- Small shards
+	sk.magicWhip = {}									-- Such as void whip, detached whips
 
 	-- Ice
 	sk.ice_common["Chilled"]=true;
@@ -26,16 +27,21 @@ local sk = ExiWoW.LibAssets.spell_kits;
 	sk.electric["%Lightning"] = true
 	sk.electric["Shock"] = true
 	sk.electric["Zap"] = true
+	sk.electric["Lizard Bolt"] = true
 	
 	
 
 	-- Basilisk freeze
 	sk.basilisk["Crystal Gaze"] = true
 	sk.basilisk["Petrifying Blast"] = true
+	sk.basilisk["Petrifying Stare"] = true
+	
 	
 	-- Insect swarms
 	sk.insects["Insect Swarm"] = true
 
+	-- Magic whips
+	sk.magicWhip["Void Whip"] = true
 
 
 	sk.spillable_add["Crimson Vial"] = true

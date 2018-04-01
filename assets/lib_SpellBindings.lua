@@ -131,6 +131,16 @@ function ExiWoW.SpellBinding:buildLibrary()
 		name = "Dancing Thorns",
 		proChance = 0.05
 	}))
+
+	table.insert(R, sb:new({
+		name = "Slitherstrike",
+		proChance = 0.25
+	}))
+
+	table.insert(R, sb:new({
+		name = spellKits.magicWhip,
+		proChance = 0.5
+	}))
 	
 
 end

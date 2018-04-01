@@ -20,7 +20,7 @@ local ty = req.Types;			-- Local filter types
 	-- Humanoid NPC attacker
 	rtc.attackerHumanoid = req:new({type = ty.RTYPE_TYPE,sender = true,data = {Humanoid = true}})
 	-- Includes other viable humanoid types like undeads
-	rtc.attackerHumanoidish = req:new({ type = ty.RTYPE_TYPE, sender = true, data = {Humanoid = true, Undead = true} })
+	rtc.attackerHumanoidish = req:new({ type = ty.RTYPE_TYPE, sender = true, data = {Humanoid = true, Undead = true, Demon=true} })
 
 	rtc.victimBreasts = req:new({type = ty.RTYPE_HAS_BREASTS})
 	rtc.victimPenis = req:new({type = ty.RTYPE_HAS_PENIS})
