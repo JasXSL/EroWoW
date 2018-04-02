@@ -67,6 +67,7 @@ local npcs = ExiWoW.LibAssets.npcs
 	local npc_ooze = {}
 	npcs.ooze = npc_ooze
 	npc_ooze["%Ooze"] = true
+	npc_ooze["Bloodvenom Slimeslave"] = true
 	
 	
 	-- Similar to tentacle fiends except the flowery kind with vines

@@ -63,6 +63,7 @@ function ExiWoW.Effect:add(stacks, fromLogin)
 	end
 
 	local exists = self:isApplied()
+	local existed = exists
 	local out = {}
 	local runOnAdd = false
 	local fLogin = type(fromLogin) == "table"
@@ -101,7 +102,7 @@ function ExiWoW.Effect:add(stacks, fromLogin)
 	-- Existing effect, but not if it was loaded from reload
 	elseif not fLogin then
 		out = ExiWoW.Effect.applied[exists]
-		ExiWoW.Timer:clear(effect.timerExpire);
+		ExiWoW.Timer:clear(out.timerExpire);
 		out.expires = expires
 		out.stacks = out.stacks + stacks
 	end
@@ -112,7 +113,7 @@ function ExiWoW.Effect:add(stacks, fromLogin)
 
 	-- Handle ticking
 	local se = self;
-	if self.ticking > 0 and type(self.onTick) == "function" and (not exists or fLogin) then
+	if self.ticking > 0 and type(self.onTick) == "function" and (not existed or fLogin) then
 		out.timerTick = ExiWoW.Timer:set(function() 
 			se:onTick();
 			out.ticks = out.ticks+1;
@@ -231,7 +232,6 @@ function ExiWoW.Effect:AuraButtonUpdate(buttonName, index, filter, effect)
 	local buffName = buttonName..index;
 	local buff = _G[buffName];
 	
-
 	if ( not name ) then
 		-- No buff so hide it if it exists
 		if ( buff ) then
@@ -300,7 +300,7 @@ function ExiWoW.Effect:AuraButtonUpdate(buttonName, index, filter, effect)
 				timeLeft = timeLeft / timeMod;
 			end
 
-			if ( not buff.timeLeft ) then
+			if ( buff.ewID ) then
 				buff.timeLeft = timeLeft;
 				buff:SetScript("OnUpdate", function(self)
 					AuraButton_OnUpdate(self);
@@ -308,10 +308,7 @@ function ExiWoW.Effect:AuraButtonUpdate(buttonName, index, filter, effect)
 						effect.effect:updateTooltip(self);
 					end
 				end)
-			else
-				buff.timeLeft = timeLeft;
 			end
-
 			buff.expirationTime = expirationTime;	
 		else
 			buff.duration:Hide();

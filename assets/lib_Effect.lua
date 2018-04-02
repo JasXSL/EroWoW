@@ -71,7 +71,7 @@ function ExiWoW.Effect:buildLibrary()
 			end
 		end,
 		onTick = function(self)
-			if math.random() < 0.25 then
+			if math.random() < 0.35 then
 				ExiWoW.RPText:trigger("FX_OozeInClothesTick", ExiWoW.ME, ExiWoW.ME)
 			end
 		end,
