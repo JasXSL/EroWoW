@@ -127,6 +127,26 @@ local f = ExiWoW.LibAssets.loot
 			}
 		}
 	})
+
+	table.insert(f, {
+		zone = "Felwood",
+		sub = "Whisperwind Grove",
+		name = "_FORAGE_",
+		points = {
+			{x = 45.06, y=29.37, rad=0.06},
+		},
+		items={
+			{
+				type = "Underwear", 
+				id = "LEAF_PANTIES", 
+				chance = 1,
+				sound = 911,
+				text = ExiWoW.RPText:new({
+					text_receiver = "You sneakily look through the drawer, finding a pair of leafy panties. These must belong to Innkeeper Wylaria. You hastily pocket them."
+				})
+			}
+		}
+	})
 	
 	table.insert(f, {
 		zone = zones.sandy,

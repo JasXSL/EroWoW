@@ -4,11 +4,10 @@ UIParentLoadAddOn("Blizzard_DebugTools")
 	/console scriptErrors 1
 
 	TODO:
+	- Make inventory not reset when a script error occurs before fully loading
 	- Add in more content
-	- Add pagination if you manage to fill up the whole first page
-	- Write VH Addon
-	- Alt click = create macro
-	- Settings export
+	- Add pagination if you manage to fill up the whole first page and/or underwear page
+	- Settings backup
 	 
 ]]
 

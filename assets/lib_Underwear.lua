@@ -73,6 +73,14 @@ function ExiWoW.Underwear:buildLibrary()
 		description = "Red panties made of felcloth, with black trimmings.",
 		tags = {},
 	}));
+
+	table.insert(lib, uw:new({
+		id = "LEAF_PANTIES",
+		name = "Leaf Panties",
+		icon = "ability_druid_flourish",
+		description = "Panties made of thick shiny green leaves. Super smooth to the touch.",
+		tags = {},
+	}));
 	
 end
 
