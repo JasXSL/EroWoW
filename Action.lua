@@ -573,6 +573,7 @@ function ExiWoW.Action:sendRPText(sender, target, suppressErrors)
 	local id = self.id;
 	if self.alias then id = self.alias end
 	local rptext = ExiWoW.RPText:get(id, ts, tt);
+
 	if not rptext then return false end
 	-- We only need a callback for this
 	return {

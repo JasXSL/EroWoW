@@ -18,10 +18,19 @@ local sk = ExiWoW.LibAssets.spell_kits;
 	sk.shards = {}										-- Small shards
 	sk.magicWhip = {}									-- Such as void whip, detached whips
 	sk.groundSpike = {}									-- Earth spike etc
+	sk.roots = {}
 
 	-- Ice
 	sk.ice_common["Chilled"]=true;
-	sk.ice["Frostbolt"]=true;
+	sk.ice["%Frostbolt"]=true;
+	sk.ice["Frost Shock"]=true;
+	sk.ice["Ice Blast"]=true;
+	sk.ice["Frost Breath"]=true;
+	
+	-- Roots
+	sk.roots["Entangling Roots"] = true
+	sk.roots["Strangling Roots"] = true
+	
  
 	-- Electric
 	sk.electric["Stormstrike"] = true
@@ -69,7 +78,11 @@ local sk = ExiWoW.LibAssets.spell_kits;
 	-- Ground spikes
 	sk.groundSpike["Earth Spike"] = true
 
-
+	-- Steam blast from below
+	local steam_below = {}
+	sk.steam_below = steam_below
+	steam_below["Steam Blast"] = true
+	
 
 
 

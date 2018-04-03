@@ -2,6 +2,7 @@ local appName, internal = ...
 UIParentLoadAddOn("Blizzard_DebugTools")
 --[[
 	/console scriptErrors 1
+	/run ExiWoW.Menu:drawLoot("Test", "inv_pants_leather_04")
 
 	TODO:
 	- Make inventory not reset when a script error occurs before fully loading
@@ -10,6 +11,8 @@ UIParentLoadAddOn("Blizzard_DebugTools")
 	- Settings backup
 	 
 ]]
+
+local _initialized = false
 
 ExiWoW = {};
 ExiWoW.APP_NAME = "ExiWoW"
@@ -119,6 +122,7 @@ function ExiWoW:ini()
 		ExiWoW.Effect:ini();
 	end, 1)
 	
+
 	
 	print("ExiWoW online!");
 end
@@ -184,13 +188,14 @@ function ExiWoW:loadFromStorage()
 	end
 
 	for k,v in pairs(ExiWoWLocalStorage.effects) do
-		if v.expires > GetTime() then
+		if v.expires == 0 or v.expires > GetTime() then
 			ExiWoW.Effect:run(v.id, v.stacks, v);
 		end
 	end
 
 	-- Redraw with cooldowns
 	ExiWoW.Menu:refreshAll()
+	_initialized = true
 	
 end
 
@@ -238,7 +243,7 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 
 	end
 
-	if event == "PLAYER_LOGOUT" then
+	if event == "PLAYER_LOGOUT" and _initialized then
 
 		-- Saving
 		local l = ExiWoWLocalStorage;

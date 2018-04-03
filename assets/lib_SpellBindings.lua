@@ -5,7 +5,7 @@ function ExiWoW.SpellBinding:buildLibrary()
 	local spellKits = ExiWoW.LibAssets.spell_kits;
 	-- Simple form uses RPText for everything
 	table.insert(R, sb:new({
-		name = "Entangling Roots",
+		name = spellKits.roots,
 		procChance = 1
 	}))
 	table.insert(R, sb:new({
@@ -147,4 +147,10 @@ function ExiWoW.SpellBinding:buildLibrary()
 		procChance = 0.5
 	}))
 
+	table.insert(R, sb:new({
+		name = spellKits.steam_below,
+		procChance = 0.25,
+	}))
+
+	
 end

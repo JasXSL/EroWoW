@@ -425,11 +425,21 @@ function ExiWoW.Character:rollLoot(npc)
 
 		if math.random() < v.chance then 
 			
-			local item = ExiWoW.ME:addItem(v.type, v.id, v.quant);
+			local quant = v.quant;
+			if not quant or quant < 1 then quant = 1 end
+			if type(v.quantRand) == "number" and v.quantRand > 0 then
+				quant = quant+math.random(v.quantRand+1)-1;
+			end
+			local item = ExiWoW.ME:addItem(v.type, v.id, quant);
 			if item then
 				if v.text then 
 					v.text.item = item.name;
-					v.text:convertAndReceive(ExiWoW.ME, ExiWoW.Character:buildNPC(u, npc));
+					v.text:convertAndReceive(ExiWoW.ME, ExiWoW.Character:buildNPC(u, npc), false, nil, function(text)
+						
+						text = string.gsub(text, "%%Qs", quant ~= 1 and "s" or "")
+						text = string.gsub(text, "%%Q", quant)
+						return text
+					end);
 				end
 				if v.sound then PlaySound(v.sound, "Dialog") end
 				return v;
@@ -583,6 +593,7 @@ function ExiWoW.Character:ownsUnderwear(id)
 end
 
 -- Items --
+-- /run ExiWoW.Menu:drawLoot("Test", "inv_pants_leather_04")
 function ExiWoW.Character:addItem(type, name, quant)
 
 	if not quant then quant = 1 end

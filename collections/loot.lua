@@ -16,10 +16,11 @@ local f = ExiWoW.LibAssets.loot
 				items={{
 					type = "Underwear" | "Charges",
 					id = assetID,
-					text = rpTextObject, (caster will be you, target will be the NPC on kill, otherwise you)
+					text = rpTextObject, (caster will be you, target will be the NPC on kill, otherwise you. For this you can use special tags %Q for nr items, and %Qs which returns "" if 1, otherwise "s")
 					chance = 0-1,
-					quant = 1,
-					sound = successSoundID
+					quant = 1,			-- Min quantity
+					quantRand = 0,		-- Quantity to randomize on top of quant
+					sound = successSoundID,
 				}...}}
 			...
 		}
@@ -143,6 +144,30 @@ local f = ExiWoW.LibAssets.loot
 				sound = 911,
 				text = ExiWoW.RPText:new({
 					text_receiver = "You sneakily look through the drawer, finding a pair of leafy panties. These must belong to Innkeeper Wylaria. You hastily pocket them."
+				})
+			}
+		}
+	})
+
+	table.insert(f, {
+		zone = "Winterspring",
+		sub = "Everlook",
+		name = "_FORAGE_",
+		points = {
+			{x = 59.21, y=50.16, rad=0.1},
+			{x = 59.01, y=50.19, rad=0.14},
+			{x = 60.18, y=50.54, rad=0.09},
+			{x = 60.59, y=50.16, rad=0.29},
+			
+		},
+		items={
+			{
+				type = "Underwear", 
+				id = "WOOLY_SHORTS", 
+				chance = 1,
+				sound = 1185,
+				text = ExiWoW.RPText:new({
+					text_receiver = "You found a crate of wooly shorts. Hopefully nobody will mind if a pair goes missing."
 				})
 			}
 		}

@@ -135,9 +135,11 @@ function ExiWoW.RPText:convert(text, sender, receiver, spelldata, item)
 end
 
 -- Converts and outputs text_receiver and audio, as well as triggering fn if applicable
-function ExiWoW.RPText:convertAndReceive(sender, receiver, noSound, spell)
+function ExiWoW.RPText:convertAndReceive(sender, receiver, noSound, spell, customFunction)
 
-	local text = ExiWoW.RPText:convert(self.text_receiver, sender, receiver, spell, self.item);
+	local text = self.text_receiver;
+	if customFunction then text = customFunction(text) end
+	local text = ExiWoW.RPText:convert(text, sender, receiver, spell, self.item);
 	ExiWoW.RPText:print(text)
 
 	if type(self.fn) == "function" then

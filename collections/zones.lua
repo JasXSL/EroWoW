@@ -19,6 +19,8 @@ f["sandy"]["Blade's Edge Mountains"] = true;
 f["sandy"]["Netherstorm"] = true;
 f["sandy"]["Shadowmoon Valley"] = true;
 
-
+-- Places where you can find mushrooms
+f["shrooms"] = {}
+f["shrooms"]["Zangarmarsh"] = true
 
 

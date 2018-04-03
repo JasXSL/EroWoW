@@ -228,7 +228,7 @@ function ExiWoW.Action:buildLibrary()
 		name = "Forage",
 		description = "Search your active area for items.",
 		texture = "icon_treasuremap",
-		cooldown = 6,
+		cooldown = 0,
 		self_only = true,
 		cast_sound_loop = 1104,
 		allow_caster_moving = false,

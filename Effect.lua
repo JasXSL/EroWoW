@@ -16,12 +16,17 @@ function ExiWoW.Effect:new(data)
 	self.texture = data.texture
 	self.name = data.name
 	self.description = data.description
-	
+	self.sound_loop = data.sound_loop
+
 	self.onAdd = data.onAdd							-- (obj)activeData, (bool)fromLogin
 	self.onRemove = data.onRemove
 	self.onTick = data.onTick
 	self.onStackChange = data.onStackChange			-- (obj)activeData, (bool)fromLogin
 	self.onRightClick = data.onRightClick			-- Right click binding
+
+
+	-- Automatic
+	self.loopPlaying = nil
 
 	return self
 end
@@ -120,6 +125,19 @@ function ExiWoW.Effect:add(stacks, fromLogin)
 		end, self.ticking, math.huge);
 	end
 
+	if self.sound_loop and (not existed or fLogin) then
+
+		local _, handle = PlaySound(self.sound_loop, "SFX", false, true);
+		self.loopPlaying = handle;
+		local se = self;
+		ExiWoW.Character:bind("SOUNDKIT_FINISHED", function(data)
+			if data[1] == se.loopPlaying then 
+				local _, handle = PlaySound(se.sound_loop, "SFX", false, true);
+				se.loopPlaying = handle;
+			end
+		end)
+
+	end
 
 	-- onAdd function
 	if type(self.onAdd) == "function" and runOnAdd then
@@ -165,7 +183,9 @@ function ExiWoW.Effect:refreshBuffs()
 	for i=1,BUFF_MAX_DISPLAY do
 		if UnitAura("player", i, "HELPFUL") == nil then
 			n = n+1
-			ExiWoW.Effect:AuraButtonUpdate("BuffButton", i, "HELPFUL", ExiWoW.Effect:getBuffAtIndex(n, false));
+			local effect = ExiWoW.Effect:getBuffAtIndex(n, false);
+			ExiWoW.Effect:AuraButtonUpdate("BuffButton", i, "HELPFUL", effect);
+			ExiWoW.Effect:rebindMouseover("BuffButton"..i, effect)
 		end
 	end
 
@@ -173,11 +193,28 @@ function ExiWoW.Effect:refreshBuffs()
 	for i=1,DEBUFF_MAX_DISPLAY do
 		if UnitAura("player", i, "HARMFUL") == nil then
 			n = n+1
-			ExiWoW.Effect:AuraButtonUpdate("DebuffButton", i, "HARMFUL", ExiWoW.Effect:getBuffAtIndex(n, true));
+			local effect = ExiWoW.Effect:getBuffAtIndex(n, true)
+			ExiWoW.Effect:AuraButtonUpdate("DebuffButton", i, "HARMFUL", effect);
+			ExiWoW.Effect:rebindMouseover("DebuffButton"..i, effect)
 		end
 	end
+
 end
 
+
+function ExiWoW.Effect:rebindMouseover(buffName, effect)
+	buff = _G[buffName]
+	if not buff then return end
+	buff:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT");
+		GameTooltip:SetFrameLevel(self:GetFrameLevel() + 2);
+		if effect then
+			effect.effect:updateTooltip(self);
+		else
+			GameTooltip:SetUnitAura(PlayerFrame.unit, self:GetID(), self.filter);
+		end
+	end)
+end
 
 -- Static
 function ExiWoW.Effect:get(id)
@@ -187,6 +224,7 @@ function ExiWoW.Effect:get(id)
 	return false
 end
 
+-- Runs an effect by ID
 function ExiWoW.Effect:run(id, stacks, fromLogin)
 	local effect = ExiWoW.Effect:get(id)
 	if not effect then print("Effect not found", id); return false end
@@ -198,6 +236,9 @@ function ExiWoW.Effect:rem(index)
 	local fx = effect.effect;
 	if type(fx.onRemove) == "function" then
 		fx:onRemove();
+	end
+	if fx.loopPlaying then
+		StopSound(fx.loopPlaying);
 	end
 	ExiWoW.Timer:clear(effect.timerExpire);
 	ExiWoW.Timer:clear(effect.timerTick);
@@ -228,14 +269,15 @@ function ExiWoW.Effect:AuraButtonUpdate(buttonName, index, filter, effect)
 		expirationTime = effect.expires
 		description = obj.description
 	end
-	
+
 	local buffName = buttonName..index;
 	local buff = _G[buffName];
-	
+
 	if ( not name ) then
 		-- No buff so hide it if it exists
 		if ( buff ) then
 			buff:Hide();
+			buff.ewID = nil
 			buff.duration:Hide();
 		end
 		return nil;
@@ -300,23 +342,24 @@ function ExiWoW.Effect:AuraButtonUpdate(buttonName, index, filter, effect)
 				timeLeft = timeLeft / timeMod;
 			end
 
-			if ( buff.ewID ) then
+			if ( not buff.timeLeft ) then
 				buff.timeLeft = timeLeft;
-				buff:SetScript("OnUpdate", function(self)
-					AuraButton_OnUpdate(self);
-					if ( GameTooltip:IsOwned(self) ) then
-						effect.effect:updateTooltip(self);
-					end
-				end)
+				buff:SetScript("OnUpdate", AuraButton_OnUpdate);
+			else
+				buff.timeLeft = timeLeft;
 			end
-			buff.expirationTime = expirationTime;	
+
+			buff.expirationTime = expirationTime;
 		else
 			buff.duration:Hide();
+			
 			if ( buff.timeLeft ) then
 				buff:SetScript("OnUpdate", nil);
 			end
 			buff.timeLeft = nil;
 		end
+
+		
 
 		-- Set Texture
 		local icon = _G[buffName.."Icon"];
@@ -430,6 +473,18 @@ function ExiWoW.Effect:ini()
 	-- Right click an EWID
 	hooksecurefunc("BuffButton_OnClick", ExiWoW.Effect.onRightClick)
 
+	hooksecurefunc("AuraButton_OnUpdate", function(self)
+		if self.ewID and ExiWoW.Effect.applied[self.ewID] then
+			if ( GameTooltip:IsOwned(self) ) then
+				ExiWoW.Effect.applied[self.ewID].effect:updateTooltip(self);
+			end
+		end
+	end)
+
+
+
+	
+	--DisplayTableInspectorWindow(BuffButton1)
 	-- Adding an effect example
 	--[[
 	local effect = ExiWoW.Effect:new({

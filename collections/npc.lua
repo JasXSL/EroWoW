@@ -35,6 +35,8 @@ local npcs = ExiWoW.LibAssets.npcs
 	npcs.furbolg = furbolg
 	furbolg["%Thistlefur"] = true
 	furbolg["%Deadwood"] = true
+	furbolg["%Winterfall"] = true
+	
 	
 
 	local satyr = {}
@@ -60,6 +62,8 @@ local npcs = ExiWoW.LibAssets.npcs
 	npc_lasher["Nether Maiden"] = true
 	npc_lasher["Salia"] = true
 	npc_lasher["Moora"] = true
+	npc_lasher["Corrupted Lasher"] = true
+	npc_lasher["Wintervine Lasher"] = true
 	
 	
 	
@@ -68,6 +72,7 @@ local npcs = ExiWoW.LibAssets.npcs
 	npcs.ooze = npc_ooze
 	npc_ooze["%Ooze"] = true
 	npc_ooze["Bloodvenom Slimeslave"] = true
+	npc_ooze["Boiling Springbubble"] = true
 	
 	
 	-- Similar to tentacle fiends except the flowery kind with vines
@@ -76,6 +81,8 @@ local npcs = ExiWoW.LibAssets.npcs
 	npc_vines["Juvenile Bloodpetal"] = true
 	npc_vines["%Bloodpetal"] = true
 	npc_lasher["Gloomshade Blossom"] = true
+	npc_lasher["Uprooted Lasher"] = true
+	npc_lasher["Corrupted Lasher"] = true
 	
 	
 	local npc_wasp = {}

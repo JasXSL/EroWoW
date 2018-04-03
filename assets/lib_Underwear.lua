@@ -81,6 +81,14 @@ function ExiWoW.Underwear:buildLibrary()
 		description = "Panties made of thick shiny green leaves. Super smooth to the touch.",
 		tags = {},
 	}));
+
+	table.insert(lib, uw:new({
+		id = "WOOLY_SHORTS",
+		name = "Wooly Shorts",
+		icon = "inv_pants_leather_31red",
+		description = "Brown wooly shorts. They're sure to keep you warm!",
+		tags = {},
+	}));
 	
 end
 
