@@ -113,7 +113,9 @@ function ExiWoW:ini()
 	-- Bind listener
 	RegisterAddonMessagePrefix(ExiWoW.APP_NAME.."a")		-- Sends an action	 {cb:cbToken, id:action_id, data:(var)data}
 	RegisterAddonMessagePrefix(ExiWoW.APP_NAME.."c")		-- Receive a callback {cb:cbToken, success:(bool)success, data:(var)data}
+	RegisterAddonMessagePrefix(ExiWoW.APP_NAME.."b")		-- Bystander text. {tx:(str)text}
 	
+
 	ExiWoW.Timer:set(function()
 		ExiWoW.loadFromStorage()
 		ExiWoW.loaded = true
@@ -341,6 +343,30 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 
 		end
 
+		if prefix == ExiWoW.APP_NAME.."b" then
+
+			local data, cb = getChunkedMessage(message)
+			if data == false then return end
+			--DebugBox.EditBox:SetText(data)
+			local sname = Ambiguate(sender, "all")
+			local response = ExiWoW.json.decode(data);
+
+			if not CheckInteractDistance(sname, 1) or not response or not response.tx then
+				return;
+			end
+
+			-- Add bystander text to combat log
+			for i = 1,10 do
+				if GetChatWindowInfo(i)=="Combat Log" then
+					_G['ChatFrame'..i]:AddMessage(response.tx, 1,0.8,1)
+				  	break
+				end
+			end
+			
+			
+			
+		end
+
 	end
 end
 
@@ -370,6 +396,16 @@ function ExiWoW:sendCallback(token, unit, success, data)
 
 end
 
+function ExiWoW:sendBystanderText(text)
+	local out = {
+		tx = text
+	}
+	local text = ExiWoW.json.encode(out);
+	local token = ExiWoW.Callbacks:generateToken();
+	--print("Sending bystander", text)
+	ExiWoW:sendChunks("b", token, ExiWoW.json.encode(out), nil)
+end
+
 function ExiWoW:sendChunks(suffix, token, text, unit)
 
 	-- Allowed chunk size
@@ -381,13 +417,19 @@ function ExiWoW:sendChunks(suffix, token, text, unit)
 		table.insert(chunks, chunk)
 	end
 	
+	local ctype = "WHISPER"
+	if unit == nil then 
+		ctype = "PARTY"
+	end
+	
 	--DebugBox.EditBox:SetText(ExiWoW.json.encode(out))
 	local total = #chunks
 	for i,ch in ipairs(chunks) do
-		SendAddonMessage(ExiWoW.APP_NAME..suffix, token.."§"..i.."§"..total.."§"..ch, "WHISPER", unit)
+		SendAddonMessage(ExiWoW.APP_NAME..suffix, token.."§"..i.."§"..total.."§"..ch, ctype, unit)
 	end	
 
 end
+
 
 
 	-- Tools --

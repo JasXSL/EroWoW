@@ -57,6 +57,7 @@ function ExiWoW.RPText:new(data)
 	self.id = data.id or "";			-- Generally matches an Action ID. Gets converted into a table with {id = true}
 	self.text_sender = data.text_sender or false; 		-- RP Text
 	self.text_receiver = data.text_receiver or ""; 		-- RP Text
+	self.text_bystander = data.text_bystander or false;	-- RP Text for bystanders
 	self.requirements = type(data.requirements) == "table" and data.requirements or {};
 	self.sound = data.sound;					-- Play this sound when sending or receiving this
 	self.fn = data.fn or nil;					-- Only supported for NPC/Spell events. Actions should use the action system instead
@@ -141,6 +142,12 @@ function ExiWoW.RPText:convertAndReceive(sender, receiver, noSound, spell, custo
 	if customFunction then text = customFunction(text) end
 	local text = ExiWoW.RPText:convert(text, sender, receiver, spell, self.item);
 	ExiWoW.RPText:print(text)
+
+	if self.text_bystander then
+		ExiWoW:sendBystanderText(
+			ExiWoW.RPText:convert(self.text_bystander, sender, receiver, spell, self.item)
+		)
+	end
 
 	if type(self.fn) == "function" then
 		self:fn(sender, receiver);

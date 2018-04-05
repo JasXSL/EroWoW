@@ -3,10 +3,7 @@ ExiWoW.Callbacks = {};
 ExiWoW.Callbacks.WAITING = {}; -- {id:str token, timer:int timer, callback:fn callback}
 -- Adds a callback listener and returns the callback token
 function ExiWoW.Callbacks:add(fn)
-	local token = string.gsub("xxxxxx", '[x]', function (c)
-		local out = string.format('%x', math.random(0, 0xf))
-		return out
-	end)
+	local token = ExiWoW.Callbacks:generateToken();
 	
 	-- Give it 1 sec
 	local timer = ExiWoW.Timer:set(function()
@@ -31,6 +28,14 @@ function ExiWoW.Callbacks:remove(token)
 			return;
 		end
 	end
+end
+
+function ExiWoW.Callbacks:generateToken()
+	local token = string.gsub("xxxxxx", '[x]', function (c)
+		local out = string.format('%x', math.random(0, 0xf))
+		return out
+	end)
+	return token;
 end
 
 function ExiWoW.Callbacks:trigger(token, success, args, sender)

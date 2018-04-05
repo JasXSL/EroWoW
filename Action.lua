@@ -401,8 +401,9 @@ function ExiWoW.Action:validate(unitCaster, unitTarget, suppressErrors, isSend, 
 
 end
 
-function ExiWoW.Action:checkRange(target)
-	for i,v in ipairs(self.max_distance) do
+function ExiWoW.Action:checkRange(target, item)
+	if not item then item = self.max_distance end
+	for i,v in ipairs(item) do
 		if IsItemInRange(v, target) then
 			return true;
 		end
@@ -583,6 +584,7 @@ function ExiWoW.Action:sendRPText(sender, target, suppressErrors)
 	}, 
 	function(se, success, data) 
 		if success then
+
 			if rptext.sound then
 				PlaySound(rptext.sound, "SFX");
 			end
@@ -591,8 +593,13 @@ function ExiWoW.Action:sendRPText(sender, target, suppressErrors)
 			if type(data) == "table" and data.receiver then 
 				tx = rptext.text_receiver 
 			end
+
 			if tx then 
 				ExiWoW.RPText:print(ExiWoW.RPText:convert(tx, ts, tt, nil, rptext.item))
+			end
+
+			if rptext.text_bystander then
+				ExiWoW:sendBystanderText(ExiWoW.RPText:convert(rptext.text_bystander, ts, tt, nil, rptext.item))
 			end
 		end
 	end

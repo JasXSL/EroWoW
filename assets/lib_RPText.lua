@@ -34,12 +34,14 @@ function ExiWoW.RPText:buildLibrary()
 	-- Tickle self
 	table.insert(R, ExiWoW.RPText:new({
 		id = "TICKLE",
+		text_bystander = "%T tickles %Thimself!",
 		text_receiver = "You tickle yourself!",
 		requirements = {},
 		--fn = ef.addExcitementMasochisticDefault
 	}))
 	table.insert(R, ExiWoW.RPText:new({
 		id = "TICKLE",
+		text_bystander = "%T tickles %Thimself with %This %item!",
 		text_receiver = "You use your %item to tickle yourself!",
 		requirements = {rtc.invFeathers},
 		--fn = ef.addExcitementMasochisticDefault
@@ -48,6 +50,7 @@ function ExiWoW.RPText:buildLibrary()
 	-- Wedgie
 	table.insert(R, ExiWoW.RPText:new({
 		id = "WEDGIE",
+		text_bystander = "%S grabs a hold of %T's %Tundies, giving %Thim a wedgie!",
 		text_sender = "You grab a hold of %T's %Tundies, giving %Thim a wedgie!",
 		text_receiver = "%S grabs a hold of your %Tundies, giving you a wedgie!",
 		sound = 25626,
@@ -57,6 +60,7 @@ function ExiWoW.RPText:buildLibrary()
 
 	table.insert(R, ExiWoW.RPText:new({
 		id = "WEDGIE",
+		text_bystander = "%T grabs a hold of %This %Tundies and gives %Thimself a wedgie!",
 		text_receiver = "You grab a hold of your %Tundies and give yourself a wedgie!",
 		sound = 25626,
 		requirements = {rtc.targetWearsUnderwear},
@@ -92,6 +96,7 @@ function ExiWoW.RPText:buildLibrary()
 
 	table.insert(R, ExiWoW.RPText:new({
 		id = "THROW_SAND",
+		text_bystander = "%T throws sand into the air, some of which falls back down on %Thim and into %This clothes!",
 		text_receiver = "You throw sand into the air, some of which falls back down on you and into your clothes!",
 		sound = 73172,
 		requirements = {}
@@ -99,6 +104,7 @@ function ExiWoW.RPText:buildLibrary()
 
 	table.insert(R, ExiWoW.RPText:new({
 		id = "THROW_SAND",
+		text_bystander = "%S throws a handful of sand at %T!",
 		text_sender = "You throw a handful of sand at %T!",
 		text_receiver = "%S throws a handful of sand at you!",
 		sound = 907,
@@ -107,6 +113,7 @@ function ExiWoW.RPText:buildLibrary()
 
 	table.insert(R, ExiWoW.RPText:new({
 		id = "CLAW_PINCH",
+		text_bystander = "%S pinches %T's side with a big claw!",
 		text_sender = "You pinch %T's side with your big claw!",
 		text_receiver = "%S pinches your side with %Shis big claw!",
 		sound = 36721,
@@ -114,6 +121,7 @@ function ExiWoW.RPText:buildLibrary()
 	}))
 	table.insert(R, ExiWoW.RPText:new({
 		id = "CLAW_PINCH",
+		text_bystander = "%T pinches %T's nose with a big claw!",
 		text_sender = "You pinch %T's nose with your big claw!",
 		text_receiver = "%S pinches your nose with %Shis big claw!",
 		sound = 36721,
@@ -121,6 +129,7 @@ function ExiWoW.RPText:buildLibrary()
 	}))
 	table.insert(R, ExiWoW.RPText:new({
 		id = "CLAW_PINCH",
+		text_bystander = "%T pinches %This own nose with a big claw!",
 		text_receiver = "You pinch your nose with your big claw!",
 		sound = 36721,
 		requirements = {}
