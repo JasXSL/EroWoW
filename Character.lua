@@ -63,7 +63,7 @@ function ExiWoW.Character:onEvent(event, ...)
 
 	-- Handle combat log
 	-- This needs to go first as it should only handle event bindings on the player
-	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
+	if event == "COMBAT_LOG_EVENT_UNFILTERED" and internal.checkHardlimits("player", "player", true) then
 
 		local timestamp, combatEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags =  ...; -- Those arguments appear for all combat event variants.
 		local eventPrefix, eventSuffix = combatEvent:match("^(.-)_?([^_]*)$");
@@ -140,7 +140,7 @@ function ExiWoW.Character:onEvent(event, ...)
 
 			end
 
-			if damage <= 0 or IsInInstance() then return end
+			if damage <= 0 then return end
 			local percentage = damage/UnitHealthMax("player");
 			ExiWoW.ME:addExcitement(percentage*0.1, false, true);
 			
