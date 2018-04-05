@@ -26,6 +26,8 @@ local sk = ExiWoW.LibAssets.spell_kits;
 	sk.ice["Frost Shock"]=true;
 	sk.ice["Ice Blast"]=true;
 	sk.ice["Frost Breath"]=true;
+	sk.ice["Frost Cleave"]=true;
+	
 	
 	-- Roots
 	sk.roots["Entangling Roots"] = true

@@ -89,6 +89,22 @@ function ExiWoW.Underwear:buildLibrary()
 		description = "Brown wooly shorts. They're sure to keep you warm!",
 		tags = {},
 	}));
+
+	table.insert(lib, uw:new({
+		id = "JEWELED_HARPY_THONG",
+		name = "Jeweled Harpy Thong",
+		icon = "inv_misc_necklace_beads10",
+		description = "A thong made of a bunch of woven together strings, with large jewels hanging off of it!",
+		tags = {},
+	}));
+
+	table.insert(lib, uw:new({
+		id = "SPIKED_LEATHER_JOCKSTRAP",
+		name = "Spiked Leather Jockstrap",
+		icon = "inv_misc_spikedbracer",
+		description = "A jockstrap made of thick leather with spikes protruding from the groin.",
+		tags = {},
+	}));
 	
 end
 

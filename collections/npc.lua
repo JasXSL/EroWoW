@@ -37,7 +37,10 @@ local npcs = ExiWoW.LibAssets.npcs
 	furbolg["%Deadwood"] = true
 	furbolg["%Winterfall"] = true
 	
-	
+
+	local harpy = {}
+	npcs.harpy = harpy
+	harpy["%Harpy"] = true
 
 	local satyr = {}
 	npcs.satyr = satyr
@@ -64,6 +67,7 @@ local npcs = ExiWoW.LibAssets.npcs
 	npc_lasher["Moora"] = true
 	npc_lasher["Corrupted Lasher"] = true
 	npc_lasher["Wintervine Lasher"] = true
+	npc_lasher["Sister of Grief"] = true
 	
 	
 	

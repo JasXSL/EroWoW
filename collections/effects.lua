@@ -110,9 +110,16 @@ local ef = ExiWoW.LibAssets.effects;
 	end
 	ef.addExcitementMasochisticCrit = function(self)
 		-- Swing pain sounds are handled by WoW
-		if type(self) ~= "table" or not (self.id.SWING and not self.id.SWING_CRIT) then
-			ef:critSound()
-		end
+
+		-- Trigger pain sound if
+		if 
+			type(self) ~= "table" or -- Self is not a table, not 100% sure about this
+			(	-- It is a table, but
+				not (self.id.SWING or self.id.SWING_CRIT) or -- It's not a melee swing
+				ExiWoWLocalStorage.tank_mode -- Or tank mode is on
+			) then 
+				ef:critSound() 
+			end
 		ExiWoW.Event:raise(ExiWoW.Event.Types.EXADD_M_CRIT)
 		ExiWoW.ME:addExcitement(0.3, false, true);
 	end

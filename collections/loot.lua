@@ -92,6 +92,21 @@ local f = ExiWoW.LibAssets.loot
 		}
 	})
 
+	table.insert(f, {
+		name = npc.harpy,
+		items = {
+			{
+				type = "Underwear",
+				id = "JEWELED_HARPY_THONG",
+				chance = 0.1,
+				sound = 1185,
+				text = ExiWoW.RPText:new({
+					text_receiver = "You found an extra piece of underwear on the harpy!"
+				})
+			}
+		}
+	})
+
 
 	-- Foraged loot
 	table.insert(f, {
@@ -106,6 +121,23 @@ local f = ExiWoW.LibAssets.loot
 				sound = 44577,
 				text = ExiWoW.RPText:new({
 					text_receiver = "You find some orcish briefs in a crate. They seem unused!"
+				})
+			}
+		}
+	})
+
+	table.insert(f, {
+		zone = "Feralas",
+		sub = "Woodpaw Den",
+		name = "_FORAGE_",
+		items={
+			{
+				type = "Underwear", 
+				id = "SPIKED_LEATHER_JOCKSTRAP", 
+				chance = 0.5,
+				sound = 44577,
+				text = ExiWoW.RPText:new({
+					text_receiver = "You find a discarded spiked leather jockstrap. These gnolls must be up to some weird stuff."
 				})
 			}
 		}
@@ -172,6 +204,8 @@ local f = ExiWoW.LibAssets.loot
 			}
 		}
 	})
+
+	
 	
 	table.insert(f, {
 		zone = zones.sandy,

@@ -229,7 +229,6 @@ function ExiWoW.Menu:ini()
 
 	PanelTemplates_SetNumTabs(f, 3);
 	PanelTemplates_SetTab(f, 1);
-	ExiWoW.Menu:toggle()
 	--ExiWoWSettingsFrame_page_settings:Show();
 	--ExiWoWSettingsFrame_page_actions:Hide();
 
