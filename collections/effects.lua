@@ -102,7 +102,7 @@ local ef = ExiWoW.LibAssets.effects;
 -- Reusable functions
 	ef.addExcitementMasochisticDefault = function(self, sender, receiver)
 		-- Swing pain sounds are handled by WoW
-		if type(self) ~= "table" or (not self.id.SWING and not self.id.SWING_CRIT) then
+		if type(self) ~= "table" or not self.id or (not self.id.SWING and not self.id.SWING_CRIT) then
 			ef:painSound()
 		end
 		ExiWoW.Event:raise(ExiWoW.Event.Types.EXADD_M_DEFAULT)
@@ -114,6 +114,7 @@ local ef = ExiWoW.LibAssets.effects;
 		-- Trigger pain sound if
 		if 
 			type(self) ~= "table" or -- Self is not a table, not 100% sure about this
+			not self.id or
 			(	-- It is a table, but
 				not (self.id.SWING or self.id.SWING_CRIT) or -- It's not a melee swing
 				ExiWoWLocalStorage.tank_mode -- Or tank mode is on

@@ -48,7 +48,7 @@ function ExiWoW.RPText:buildLibrary()
 	-- Wedgie
 	table.insert(R, ExiWoW.RPText:new({
 		id = "WEDGIE",
-		text_sender = "You grab a hold of %T's %Tundies a wedgie!",
+		text_sender = "You grab a hold of %T's %Tundies, giving %Thim a wedgie!",
 		text_receiver = "%S grabs a hold of your %Tundies, giving you a wedgie!",
 		sound = 25626,
 		requirements = {},

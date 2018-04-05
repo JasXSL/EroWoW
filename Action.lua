@@ -280,7 +280,6 @@ function ExiWoW.Action:validate(unitCaster, unitTarget, suppressErrors, isSend, 
 	
 	-- Make sure it's not on cooldown
 	if isSend and not isCastComplete and (self.on_cooldown or (self.global_cooldown and ExiWoW.Action.GCD)) then
-		print("isSend", isSend)
 		return ExiWoW:reportError("Can't do that yet", suppressErrors);
 	end
 
@@ -588,7 +587,7 @@ function ExiWoW.Action:sendRPText(sender, target, suppressErrors)
 				PlaySound(rptext.sound, "SFX");
 			end
 			local tx = rptext.text_sender
-
+			
 			if type(data) == "table" and data.receiver then 
 				tx = rptext.text_receiver 
 			end

@@ -33,7 +33,7 @@ function ExiWoW.Action:buildLibrary()
 		end,
 		-- Handle the receiving end here
 		fn_receive = function(self, sender, target, data)
-			return ExiWoW.ME:export(true)
+			return true, ExiWoW.ME:export(true)
 		end
 
 	}))
@@ -296,14 +296,13 @@ function ExiWoW.Action:buildLibrary()
 		charges = 0,
 		texture = "spell_sandexplosion",
 		cooldown = 0,
-		self_only = true,
 		cast_time = 0.5,
 		fn_send = function(self, sender, target, suppressErrors)
 			return self:sendRPText(sender, target, suppressErrors);
 		end,
 		fn_receive = function(self, sender, target, args)
 			self:receiveRPText(sender, target, args)
-			ef:addExcitementMasochisticDefault();
+			ef.addExcitementMasochisticDefault();
 			return true
 		end
 	}));
@@ -320,7 +319,7 @@ function ExiWoW.Action:buildLibrary()
 		end,
 		fn_receive = function(self, sender, target, args)
 			self:receiveRPText(sender, target, args)
-			ef:addExcitementMasochisticDefault();
+			ef.addExcitementMasochisticDefault();
 			return true
 		end
 	}));

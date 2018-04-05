@@ -260,6 +260,25 @@ local f = ExiWoW.LibAssets.loot
 	})
 
 	table.insert(f, {
+		zone = "Hellfire Peninsula",
+		name = "_FORAGE_",
+		points = {
+			{x = 22.13, y=68.27, rad=0.1},
+		},
+		items={
+			{
+				type = "Underwear", 
+				id = "NETHERWEAVE_PANTIES", 
+				chance = 1,
+				sound = 1185,
+				text = ExiWoW.RPText:new({
+					text_receiver = "You find a skimpy pair of netherweave panties that seem to have been left behind!"
+				})
+			}
+		}
+	})
+
+	table.insert(f, {
 		name = npc.pincer,
 		items={
 			{

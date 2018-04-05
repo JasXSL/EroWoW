@@ -105,6 +105,14 @@ function ExiWoW.Underwear:buildLibrary()
 		description = "A jockstrap made of thick leather with spikes protruding from the groin.",
 		tags = {},
 	}));
+
+	table.insert(lib, uw:new({
+		id = "NETHERWEAVE_PANTIES",
+		name = "Netherweave Panties",
+		icon = "inv_fabric_netherweave_bolt_imbued",
+		description = "Tiny panties in a pink to purple gradient color made from netherweave.",
+		tags = {},
+	}));
 	
 end
 
