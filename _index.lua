@@ -5,8 +5,6 @@ UIParentLoadAddOn("Blizzard_DebugTools")
 	/run ExiWoW.Menu:drawLoot("Test", "inv_pants_leather_04")
 
 	TODO:
-	- Abilities that trigger pain sounds should trigger the pain sound on the caster as well
-	- Mushroom effect seems to stop?
 	- Add pagination once you manage to fill up the whole first page and/or underwear page
 	- Character backup
 	 

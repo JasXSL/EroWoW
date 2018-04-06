@@ -219,7 +219,13 @@ function ExiWoW.Action:buildLibrary()
 		target_has_underwear = true,
 		party_restricted = false,
 		fn_send = function(self, sender, target, suppressErrors)
-			return self:sendRPText(sender, target, suppressErrors);
+			local race = UnitRace(target)
+			local gender = UnitSex(target)
+			return self:sendRPText(sender, target, suppressErrors, function(se, success)
+				if success and not UnitIsUnit(target, "player") then
+					ExiWoW.LibAssets.effects:painSound(race, gender)
+				end
+			end);
 		end,
 		fn_receive = function(self, sender, target, args)
 			DoEmote("GASP");
@@ -305,7 +311,13 @@ function ExiWoW.Action:buildLibrary()
 		cooldown = 0,
 		cast_time = 0.5,
 		fn_send = function(self, sender, target, suppressErrors)
-			return self:sendRPText(sender, target, suppressErrors);
+			local race = UnitRace(target)
+			local gender = UnitSex(target)
+			return self:sendRPText(sender, target, suppressErrors, function(se, success)
+				if success and not UnitIsUnit(target, "player") then
+					ExiWoW.LibAssets.effects:painSound(race, gender)
+				end
+			end);
 		end,
 		fn_receive = function(self, sender, target, args)
 			self:receiveRPText(sender, target, args)
@@ -314,6 +326,7 @@ function ExiWoW.Action:buildLibrary()
 		end
 	}));
 
+	-- Claw pinch
 	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
 		id = "CLAW_PINCH",
 		name = "Claw Pinch",
@@ -322,7 +335,13 @@ function ExiWoW.Action:buildLibrary()
 		texture = "inv_misc_claw_lobstrok_red",
 		cooldown = 0,
 		fn_send = function(self, sender, target, suppressErrors)
-			return self:sendRPText(sender, target, suppressErrors);
+			local race = UnitRace(target)
+			local gender = UnitSex(target)
+			return self:sendRPText(sender, target, suppressErrors, function(se, success)
+				if success and not UnitIsUnit(target, "player") then
+					ExiWoW.LibAssets.effects:painSound(race, gender)
+				end
+			end);
 		end,
 		fn_receive = function(self, sender, target, args)
 			self:receiveRPText(sender, target, args)

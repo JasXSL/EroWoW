@@ -564,7 +564,7 @@ end
 
 
 -- Template functions for callbacks and such --
-function ExiWoW.Action:sendRPText(sender, target, suppressErrors)
+function ExiWoW.Action:sendRPText(sender, target, suppressErrors, callback)
 
 	local ts = ExiWoW.ME;
 	local tt = ExiWoW.CAST_TARGET;
@@ -575,15 +575,20 @@ function ExiWoW.Action:sendRPText(sender, target, suppressErrors)
 	local rptext = ExiWoW.RPText:get(id, ts, tt);
 
 	if not rptext then return false end
-	-- We only need a callback for this
+	-- Send the text
 	return {
 		t=rptext.text_receiver,
 		se=ts:export(true),
 		so=rptext.sound,
 		i=rptext.item
 	}, 
+	-- Callback
 	function(se, success, data) 
 		if success then
+
+			if type(callback) == "function" then
+				callback(se, success, data);
+			end
 
 			if rptext.sound then
 				PlaySound(rptext.sound, "SFX");

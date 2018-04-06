@@ -6,7 +6,7 @@ local ef = ExiWoW.LibAssets.effects;
 
 -- Sound kits
 	-- /run ExiWoW.LibAssets.effects:painSound()
-	function ef:painSound()
+	function ef:painSound(race, sex)
 		local sounds = {
 			HumanM = 2942,
 			HumanF = 2938,
@@ -43,11 +43,11 @@ local ef = ExiWoW.LibAssets.effects;
 			NightborneM = 0,
 			NightborneF = 0,
 		}
-		ef:playCharSound(sounds);
+		ef:playCharSound(sounds, race, sex);
 	end
 
 	-- /run ExiWoW.LibAssets.effects:critSound()
-	function ef:critSound()
+	function ef:critSound(race, sex)
 		local sounds = {
 			HumanM = 2943,
 			HumanF = 2939,
@@ -84,12 +84,16 @@ local ef = ExiWoW.LibAssets.effects;
 			NightborneM = 0,
 			NightborneF = 0,
 		}
-		ef:playCharSound(sounds);
+		ef:playCharSound(sounds, race, sex);
 	end
 
-	function ef:playCharSound(library, offset)
-		local race = UnitRace("player");
-		local gender = UnitSex("player");
+	function ef:playCharSound(library, race, sex)
+		if not race then
+			race = UnitRace("player");
+		end
+		if not gender then
+			gender = UnitSex("player");
+		end
 		if gender == 2 then race = race.."M"
 		elseif gender == 3 then race = race.."F"
 		end
