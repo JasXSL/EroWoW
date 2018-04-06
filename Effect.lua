@@ -1,6 +1,6 @@
 ExiWoW.Effect = {}
 ExiWoW.Effect.__index = ExiWoW.Effect;
-ExiWoW.Effect.applied = {}					-- {index = {effect:ExiWoW.Effect:new(), expires:(float)GetTime()+duration}...}
+ExiWoW.Effect.applied = {}					-- {index = {effect:ExiWoW.Effect:new(), expires:(float)expires, ticks:(int)ticks, stacks:(int)stacks, id:(int)index}...}
 ExiWoW.Effect.index = 0
 ExiWoW.Effect.Lib = {}						-- Handled in extension
 
@@ -41,6 +41,7 @@ local function getNumBuffs(detrimental)
 	end
 	return out
 end
+
 
 -- Checks if an effect object is already affecting us
 function ExiWoW.Effect:isApplied()
@@ -223,6 +224,7 @@ function ExiWoW.Effect:get(id)
 	end
 	return false
 end
+
 
 -- Runs an effect by ID
 function ExiWoW.Effect:run(id, stacks, fromLogin)

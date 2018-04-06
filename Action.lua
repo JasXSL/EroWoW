@@ -654,25 +654,72 @@ function ExiWoW.Action:libSort()
 end
 
 -- Useful stuff for actions --
-function ExiWoW.Action:handleExcitementCallback(target, success, data)
+function ExiWoW.Action:handleInspectCallback(target, success, data)
 	-- Fail --
 	if not success then return false end
 
-	-- Output text --
-	local text = "looks extremely aroused!";
+	local char = ExiWoW.Character:new(data, target)
+	local out = "Inspecting "..Ambiguate(UnitName(target), "all").." you can tell that"
+	local muscle = char.muscle_tone
+	local fat = char.fat
+	local butt = char:getButtSize()
+	local breasts = char:getBreastSize()
+	local junk = char:getPenisSize()
 
-	if data[1] <= 0 then text = "does not look aroused.";
-	elseif data[1] < 0.25 then text = "looks a little aroused."
-	elseif data[1] < 0.5 then text = "looks somewhat aroused."
-	elseif data[1] < 0.75 then text = "looks aroused."
-	elseif data[1] < 1 then text = "looks heavily aroused.";
+	local texts = {}
+	if muscle < 3 then table.insert(texts, "frail")
+	elseif muscle < 5 then table.insert(texts, "weak")
+	elseif muscle > 7 then table.insert(texts, "brawny")
+	elseif muscle > 5 then table.insert(texts, "toned")
+	end
+	if fat < 2 then table.insert(texts, "emaciated")
+	elseif fat < 4 then table.insert(texts, "slender")
+	elseif fat > 7 then table.insert(texts, "corpulent")
+	elseif fat > 5 then table.insert(texts, "burly")
 	end
 
-	ExiWoW:reportNotice(Ambiguate(UnitName(target), "all").." "..text);
-end
+	if #texts > 0 then out = out.." they look "..table.concat(texts, ", and ")..". They have"
+	else out = out.." they have"
+	end
 
-function ExiWoW.Action:returnExcitement()
-	return true, {ExiWoW.ME.excitement};
+	texts = {}
+	if butt == 0 then table.insert(texts, "a flat butt")
+	elseif butt == 1 then table.insert(texts, "a small butt")
+	elseif butt == 2 then table.insert(texts, "an average butt")
+	elseif butt == 3 then table.insert(texts, "a large butt")
+	elseif butt == 4 then table.insert(texts, "a huge butt")
+	end
+	if breasts == false then table.insert(texts, "no breasts")
+	elseif breasts == 0 then table.insert(texts, "a mostly flat chest")
+	elseif breasts == 1 then table.insert(texts, "a small chest")
+	elseif breasts == 2 then table.insert(texts, "average sized breasts")
+	elseif breasts == 3 then table.insert(texts, "a large chest")
+	elseif breasts == 4 then table.insert(texts, "a huge chest")
+	end
+	if junk == 0 then table.insert(texts, "a barely visible pants bulge")
+	elseif junk == 1 then table.insert(texts, "a small pants bulge")
+	elseif junk == 2 then table.insert(texts, "an average pants bulge")
+	elseif junk == 3 then table.insert(texts, "a generous pants bulge")
+	elseif junk == 4 then table.insert(texts, "a massive pants bulge")
+	end
+	
+	if #texts > 0 then
+		out = out.." "..table.concat(texts, " and ")
+	end
+	out = out.."."
+
+	if char.excitement > 0 then
+		out = out.."\nThey "
+		if char.excitement < 0.25 then out = out.."seem a little flustered"
+		elseif char.excitement < 0.5 then out = out.."seem somewhat flustered"
+		elseif char.excitement < 0.75 then out = out.."seem pretty flustered"
+		elseif char.excitement < 1 then out = out.."seem very flustered"
+		else out = out.."are fidgeting, looking highly uncomfortable"
+		end
+		out = out.."."
+	end
+
+	ExiWoW.RPText:print(out);
 end
 
 

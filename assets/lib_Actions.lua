@@ -19,9 +19,12 @@ function ExiWoW.Action:buildLibrary()
 		-- Custom sending logic
 		fn_send = function(self, sender, target, suppressErrors)
 			ExiWoW.TARGET = nil
+
 			-- Return no data, but one callback
 			return nil, function(se, success, data, sender)
-				if success then
+				if not success then return end
+				sender = Ambiguate(sender, "all")
+				if success and UnitIsUnit(sender, "target") then
 					ExiWoW.TARGET = ExiWoW.Character:new(data, sender);
 					local offset = 0;
 					if ExiWoW.TARGET:isFemale() then offset = 0.25;
@@ -146,26 +149,28 @@ function ExiWoW.Action:buildLibrary()
 
 	-- Spot excitement (Public, melee range) --
 	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
-		id = "SPOT_EXCITEMENT",
-		name = "Spot Excitement",
+		id = "ASSESS",
+		name = "Assess",
 		important = true,
-		description = "Spot excitement of a nearby player.",
-		texture = "sha_ability_rogue_bloodyeye_nightborne",
+		description = "Take a good look at your target, revealing some information about them.",
+		texture = "inv_darkmoon_eye",
 		cooldown = 0,
 		max_distance = ExiWoW.Action.MELEE_RANGE,
 		party_restricted = false,
 		fn_send = function(self, sender, target, suppressErrors)
 			-- We only need a callback for this
-			return nil, function(se, success, data) ExiWoW.Action:handleExcitementCallback(target, success, data) end
+			return nil, function(se, success, data) ExiWoW.Action:handleInspectCallback(target, success, data) end
 		end,
-		fn_receive = ExiWoW.Action.returnExcitement
+		fn_receive = function()
+			return true, ExiWoW.ME:export(true)
+		end
 	}));
 
 	-- Sniff (Worgen) --
 	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
 		id = "SNIFF",
 		name = "Sniff",
-		description = "Sniff the excitement of a player.",
+		description = "Sniff out some information about your target from a distance.",
 		texture = "inv_wolfdraenormountshadow",
 		cooldown = 0,
 		max_distance = ExiWoW.Action.CASTER_RANGE,
@@ -174,9 +179,11 @@ function ExiWoW.Action:buildLibrary()
 		fn_send = function(self, sender, target, suppressErrors)
 			DoEmote("SNIFF", target);
 			-- Callback
-			return nil, function(se, success, data) ExiWoW.Action:handleExcitementCallback(target, success, data) end
+			return nil, function(se, success, data) ExiWoW.Action:handleInspectCallback(target, success, data) end
 		end,
-		fn_receive = ExiWoW.Action.returnExcitement
+		fn_receive = function()
+			return true, ExiWoW.ME:export(true)
+		end
 	}));
 
 	-- Tickle --

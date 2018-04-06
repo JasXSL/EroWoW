@@ -5,10 +5,10 @@ UIParentLoadAddOn("Blizzard_DebugTools")
 	/run ExiWoW.Menu:drawLoot("Test", "inv_pants_leather_04")
 
 	TODO:
-	- Make inventory not reset when a script error occurs before fully loading
-	- Add in more content
-	- Add pagination if you manage to fill up the whole first page and/or underwear page
-	- Settings backup
+	- Abilities that trigger pain sounds should trigger the pain sound on the caster as well
+	- Mushroom effect seems to stop?
+	- Add pagination once you manage to fill up the whole first page and/or underwear page
+	- Character backup
 	 
 ]]
 
@@ -373,7 +373,7 @@ end
 
 	-- Communications --
 function ExiWoW:sendAction(unit, actionID, data, callback)
-
+	if UnitFactionGroup(unit) ~= UnitFactionGroup("player") then return false end
 	local out = {
 		id = actionID,
 		da = data
