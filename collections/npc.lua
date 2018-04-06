@@ -27,6 +27,7 @@ local npcs = ExiWoW.LibAssets.npcs
 	npc_pincer["Skittering Doomstinger"] = true
 	npc_pincer["%Scorpashi"] = true
 	npc_pincer["%Drysnap"] = true
+	npc_pincer["%Bogstrok"] = true
 	
 	
 	

@@ -47,6 +47,10 @@ local ty = req.Types;			-- Local filter types
 	local knockdown = {};
 	table.insert(knockdown, {name="lash", caster="Bloodpetal Lasher"})
 	rtc.victimKnockedDown = req:new({type = ty.RTYPE_HAS_AURA, data=knockdown});
+	local paralysis = {};
+	table.insert(paralysis, {name="Paralysis"});
+	rtc.victimParalyzed = req:new({type = ty.RTYPE_HAS_AURA, data=paralysis});
+	
 
 	-- Inv items
 	local feathers = {};
@@ -56,4 +60,5 @@ local ty = req.Types;			-- Local filter types
 	-- Armor
 	rtc.chestPlate = req:new({type=ty.RTYPE_EQUIPMENT, data={slot=5, type="Plate"}})
 	rtc.crotchPlate = req:new({type=ty.RTYPE_EQUIPMENT, data={slot=7, type="Plate"}})
+
 	

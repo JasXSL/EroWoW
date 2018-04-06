@@ -12,11 +12,16 @@ function ExiWoW.Underwear:new(data)
 	self.id = data.id or "";							--
 	self.name = data.name or "???"
 	self.icon = data.icon or "Inv_misc_questionmark"
+	self.rarity = data.rarity or 1
 	self.description = data.description or "???"
 	self.tags = data.tags or {}
 	self.color = data.color or false
 	self.equip_sound = data.equip_sound or 1202
 	self.unequip_sound = data.equip_sound or 1185
+	self.flavor = data.flavor or false
+
+	-- Allows you to tie passive effects to underwear
+	self.effects = type(data.effects) == "table" and data.effects or {}
 
 	return self
 end
@@ -27,10 +32,15 @@ function ExiWoW.Underwear:onTooltip(frame)
 	if frame then
 
 		local v = self
+		local color = ITEM_QUALITY_COLORS[self.rarity]
+
 		GameTooltip:SetOwner(frame, "ANCHOR_CURSOR")
 		GameTooltip:ClearLines()
-		GameTooltip:AddLine(self.name, 1, 1, 1)
-		GameTooltip:AddLine(self.description, nil, nil, nil, true)
+		GameTooltip:AddLine(self.name, color.r, color.g, color.b)
+		GameTooltip:AddLine(self.description, 0.9, 0.9, 0.9, true)
+		if self.flavor then
+			GameTooltip:AddLine("\""..self.flavor.."\"", 1, 0.82, 0.043, true)
+		end
 		GameTooltip:Show()
 
 	else

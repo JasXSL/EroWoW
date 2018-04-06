@@ -1,6 +1,6 @@
 
 function ExiWoW.Underwear:buildLibrary()
-	local lib = ExiWoW.Underwear.Lib;
+	local lib = ExiWoW.R.underwear;
 	local uw = ExiWoW.Underwear;
 	table.insert(lib, uw:new({
 		id = "DEFAULT",
@@ -111,6 +111,14 @@ function ExiWoW.Underwear:buildLibrary()
 		name = "Netherweave Panties",
 		icon = "inv_fabric_netherweave_bolt_imbued",
 		description = "Tiny panties in a pink to purple gradient color made from netherweave.",
+		tags = {},
+	}));
+
+	table.insert(lib, uw:new({
+		id = "CRESCENT_THONG",
+		name = "Crescent Thong",
+		icon = "inv_fabric_moonshroud",
+		description = "A white-ish pink colored silk thong with a glowing crescent on the front.",
 		tags = {},
 	}));
 	

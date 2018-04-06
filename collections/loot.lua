@@ -279,6 +279,25 @@ local f = ExiWoW.LibAssets.loot
 	})
 
 	table.insert(f, {
+		zone = "Zangarmarsh",
+		name = "_FORAGE_",
+		points = {
+			{x = 23.41, y=66.33, rad=0.08},
+		},
+		items={
+			{
+				type = "Underwear", 
+				id = "CRESCENT_THONG", 
+				chance = 1,
+				sound = 1185,
+				text = ExiWoW.RPText:new({
+					text_receiver = "While Leesah'oh isn't watching, you snatch one of her panties from a crate in her tent!"
+				})
+			}
+		}
+	})
+
+	table.insert(f, {
 		name = npc.pincer,
 		items={
 			{

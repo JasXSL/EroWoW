@@ -29,6 +29,9 @@ function ExiWoW.Extension:new(data, isRoot)
 	-- Effects
 	self.effects = importTable(data.effects)
 
+	-- Underwear
+	self.underwear = importTable(data.underwear)
+
 	return self
 end
 
@@ -64,11 +67,14 @@ function ExiWoW.Extension:index()
 		ExiWoW.Action.LIB = TableConcat(ExiWoW.Action.LIB, v.actions);
 		ExiWoW.SpellBinding.Lib = TableConcat(ExiWoW.SpellBinding.Lib, v.spellBindings);
 		ExiWoW.Effect.Lib = TableConcat(ExiWoW.Effect.Lib, v.effects);
+		ExiWoW.Underwear.Lib = TableConcat(ExiWoW.Underwear.Lib, v.underwear);	
 	end
 
 	-- Update the HUD
 	ExiWoW.Action:libSort()
 	ExiWoW.Menu:refreshSpellsPage()
+	ExiWoW.Menu:refreshUnderwearPage()
+	
 
 end
 

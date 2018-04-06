@@ -101,11 +101,11 @@ function ExiWoW:ini()
 	ExiWoW.Action:ini()
 
 	-- Build libraries
-	ExiWoW.Underwear:buildLibrary()
 	ExiWoW.Effect:buildLibrary()
 	ExiWoW.RPText:buildLibrary()
 	ExiWoW.Action:buildLibrary()
 	ExiWoW.SpellBinding:buildLibrary()
+	ExiWoW.Underwear:buildLibrary()
 	ExiWoW.Extension:index() -- Update the built libraries
 
 	-- Bind listener

@@ -94,6 +94,7 @@ function ExiWoW.Menu:refreshSpellsPage()
 end
 
 function ExiWoW.Menu:getAbilityAt(index)
+	
 	local out = 0;
 	for k,v in pairs(ExiWoW.Action.LIB) do
 		-- Make sure it's acceptable
@@ -111,10 +112,16 @@ end
 
 -- Refresh Underwear --
 function ExiWoW.Menu:refreshUnderwearPage()
-
 	local i = 0;
 	local unlocked = ExiWoW.ME.underwear_ids
-	table.sort(unlocked, function(a, b)
+	local existing = {}
+	for k,v in pairs(unlocked) do
+		if ExiWoW.Underwear:get(v.id) then
+			table.insert(existing, v)
+		end
+	end
+
+	table.sort(existing, function(a, b)
 		if a.fav and not b.fav then return true
 		elseif not a.fav and b.fav then return false
 		end
@@ -124,7 +131,7 @@ function ExiWoW.Menu:refreshUnderwearPage()
 		return obja.name < objb.name;
 	end)
 
-	for k,v in pairs(unlocked) do
+	for k,v in pairs(existing) do
 
 		local item = v.id
 		local fav = v.fav
