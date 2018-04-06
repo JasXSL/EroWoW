@@ -98,6 +98,8 @@ local ef = ExiWoW.LibAssets.effects;
 		elseif gender == 3 then race = race.."F"
 		end
 
+		race = race:gsub("%s+", "")
+
 		if not library[race] then return end
 		PlaySound(library[race], "SFX")
 

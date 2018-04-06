@@ -341,7 +341,7 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 
 		end
 
-		if prefix == ExiWoW.APP_NAME.."b" then
+		if prefix == ExiWoW.APP_NAME.."b" and not UnitIsUnit(Ambiguate(sender, "all"), "player") then
 
 			local data, cb = getChunkedMessage(message)
 			if data == false then return end

@@ -382,13 +382,16 @@ function ExiWoW.Action:validate(unitCaster, unitTarget, suppressErrors, isSend, 
 	-- Underwear
 	if self.target_has_underwear ~= nil then
 		local pl = ExiWoW.TARGET;
+
 		if unitTarget == "player" then
 			pl = ExiWoW.ME;
 		end
-		local uw = pl:getUnderwear()
+		
 		if not pl then 
 			return ExiWoW:reportError("Target data missing. Try re-targeting!", suppressErrors);
-		elseif self.target_has_underwear == false and uw ~= false then
+		end
+		local uw = pl:getUnderwear()
+		if self.target_has_underwear == false and uw ~= false then
 			return ExiWoW:reportError("Target is wearing underwear!", suppressErrors);
 		elseif self.target_has_underwear == true and uw == false then
 			return ExiWoW:reportError("Target is not wearing underwear!", suppressErrors);

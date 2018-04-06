@@ -222,7 +222,7 @@ function ExiWoW.Action:buildLibrary()
 			local race = UnitRace(target)
 			local gender = UnitSex(target)
 			return self:sendRPText(sender, target, suppressErrors, function(se, success)
-				if success and not UnitIsUnit(target, "player") then
+					if success and not UnitIsUnit(target, "player") then
 					ExiWoW.LibAssets.effects:painSound(race, gender)
 				end
 			end);
@@ -230,7 +230,7 @@ function ExiWoW.Action:buildLibrary()
 		fn_receive = function(self, sender, target, args)
 			DoEmote("GASP");
 			ExiWoW.LibAssets.effects.addExcitementMasochisticDefault();
-			self:receiveRPText(sender, target, args)
+			self:receiveRPText(sender, target, args);
 			return true
 		end
 	}));
