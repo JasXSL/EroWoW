@@ -248,6 +248,12 @@ function ExiWoW.Effect:rem(index)
 	ExiWoW.Effect:UpdateAllBuffAnchors()
 end
 
+function ExiWoW.Effect:remByID(id)
+	for k,v in pairs(ExiWoW.Effect.applied) do
+		if v.effect.id == id then ExiWoW.Effect:rem(k) end
+	end
+end
+
 
 -- Visuals
 function ExiWoW.Effect:AuraButtonUpdate(buttonName, index, filter, effect)

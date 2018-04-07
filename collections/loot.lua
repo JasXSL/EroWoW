@@ -278,6 +278,7 @@ local f = ExiWoW.LibAssets.loot
 		}
 	})
 
+	-- Crescent thong
 	table.insert(f, {
 		zone = "Zangarmarsh",
 		name = "_FORAGE_",

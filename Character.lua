@@ -572,11 +572,15 @@ function ExiWoW.Character:useUnderwear(id)
 		if uw then 
 			PlaySound(uw.unequip_sound, "Dialog")
 			ExiWoW.RPText:print("You take off your "..uw.name)
+			uw:onUnequip();
 			ExiWoW.Event:raise(ACTION_UNDERWEAR_UNEQUIP, {id=id})
 		end
 	elseif self:ownsUnderwear(id) and uw then
+		local cur = ExiWoW.Underwear:get(self.underwear_worn)
+		if cur then cur:onUnequip(); end
 		self.underwear_worn = id
 		PlaySound(uw.equip_sound, "Dialog")
+		uw:onEquip();
 		ExiWoW.RPText:print("You put on your "..uw.name)
 		ExiWoW.Event:raise(ACTION_UNDERWEAR_EQUIP, {id=id})
 	else return false

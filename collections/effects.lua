@@ -105,6 +105,7 @@ local ef = ExiWoW.LibAssets.effects;
 
 	end
 
+	
 -- Reusable functions
 	ef.addExcitementMasochisticDefault = function(self, sender, receiver)
 		-- Swing pain sounds are handled by WoW

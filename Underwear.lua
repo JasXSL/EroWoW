@@ -21,9 +21,25 @@ function ExiWoW.Underwear:new(data)
 	self.flavor = data.flavor or false
 
 	-- Allows you to tie passive effects to underwear
+	-- Contains effect IDs
 	self.effects = type(data.effects) == "table" and data.effects or {}
 
 	return self
+end
+
+function ExiWoW.Underwear:onEquip()
+	for _,v in pairs(self.effects) do
+		local effect = ExiWoW.Effect:get(v)
+		if effect then
+			effect:add(1)
+		end
+	end
+end
+
+function ExiWoW.Underwear:onUnequip()
+	for _,v in pairs(self.effects) do
+		ExiWoW.Effect:remByID(v)
+	end
 end
 
 	-- TOOLTIP HANDLING --
