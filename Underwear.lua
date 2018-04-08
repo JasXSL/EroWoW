@@ -52,7 +52,9 @@ function ExiWoW.Underwear:onTooltip(frame)
 	if frame then
 
 		local v = self
-		local color = ITEM_QUALITY_COLORS[self.rarity]
+		local rarity = self.rarity-1
+		if rarity < 1 then rarity = 1 end
+		local color = ITEM_QUALITY_COLORS[rarity]
 
 		GameTooltip:SetOwner(frame, "ANCHOR_CURSOR")
 		GameTooltip:ClearLines()

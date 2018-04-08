@@ -7,6 +7,7 @@ local npcs = ExiWoW.LibAssets.npcs
 	npc_tentacleFiend["Fiendling Flesh Beast"] = true;
 	npc_tentacleFiend["Fleshfiend"] = true;
 	npc_tentacleFiend["Parasitic Fleshbeast"] = true;
+	npc_tentacleFiend["Nightmare Terror"] = true;
 	
 
 	-- NPCs that can pinch

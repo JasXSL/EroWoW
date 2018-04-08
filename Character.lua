@@ -596,6 +596,17 @@ function ExiWoW.Character:ownsUnderwear(id)
 	return false
 end
 
+function ExiWoW.Character:removeUnderwear(id)
+	for k,u in pairs(self.underwear_ids) do
+		if id == u.id then 
+			self.underwear_ids[k] = nil
+			print("Underwear removed")
+			return true
+		end
+	end
+	return false
+end
+
 -- Items --
 -- /run ExiWoW.Menu:drawLoot("Test", "inv_pants_leather_04")
 function ExiWoW.Character:addItem(type, name, quant)
