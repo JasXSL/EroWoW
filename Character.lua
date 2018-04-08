@@ -607,7 +607,7 @@ function ExiWoW.Character:addItem(type, name, quant)
 		if not exists then return false end
 		table.insert(self.underwear_ids, {id=name, fav=false})
 		ExiWoW.Menu:refreshUnderwearPage()
-		ExiWoW.Menu:drawLoot(exists.name, exists.icon)
+		ExiWoW.Menu:drawLoot(exists.name, exists.icon, exists.rarity)
 		ExiWoW.Event:raise(ExiWoW.Event.Types.INVADD, {type=type, name=name, quant=quant})
 		return exists;
 	elseif type == "Charges" then
@@ -616,7 +616,7 @@ function ExiWoW.Character:addItem(type, name, quant)
 		if action.charges >= action.max_charges or action.charges == math.huge then return false end
 		if not action:consumeCharges(-quant) then return false end
 		ExiWoW.Event:raise(ExiWoW.Event.Types.INVADD, {type=type, name=name, quant=quant})
-		ExiWoW.Menu:drawLoot(action.name, action.texture)
+		ExiWoW.Menu:drawLoot(action.name, action.texture, action.rarity)
 		return action
 	end
 

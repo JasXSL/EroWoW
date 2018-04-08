@@ -5,6 +5,8 @@ local npcs = ExiWoW.LibAssets.npcs
 	local npc_tentacleFiend = {}
 	npc_tentacleFiend["Writhing Terror"] = true;
 	npc_tentacleFiend["Fiendling Flesh Beast"] = true;
+	npc_tentacleFiend["Fleshfiend"] = true;
+	npc_tentacleFiend["Parasitic Fleshbeast"] = true;
 	
 
 	-- NPCs that can pinch
@@ -69,6 +71,7 @@ local npcs = ExiWoW.LibAssets.npcs
 	npc_lasher["Corrupted Lasher"] = true
 	npc_lasher["Wintervine Lasher"] = true
 	npc_lasher["Sister of Grief"] = true
+	npc_lasher["Farahlon Lasher"] = true
 	
 	
 	

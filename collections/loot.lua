@@ -60,6 +60,38 @@ local f = ExiWoW.LibAssets.loot
 		}
 	})
 
+	table.insert(f, {
+		zone = "Netherstorm",
+		name = "Spellreaver Marathelle",
+		items = {
+			{
+				type = "Underwear", 
+				id = "BLACK_LACE_PANTIES", 
+				chance = 1,
+				sound = 1185,
+				text = ExiWoW.RPText:new({
+					text_receiver = "You find some small black lace panties hidden in one of %T's pockets!"
+				})
+			}
+		}
+	})
+
+	table.insert(f, {
+		zone = "Netherstorm",
+		name = "Summoner Kanthin",
+		items = {
+			{
+				type = "Underwear", 
+				id = "BLACK_LACE_SHORTS", 
+				chance = 1,
+				sound = 1185,
+				text = ExiWoW.RPText:new({
+					text_receiver = "You find some small black lace shorts hidden in one of %T's pockets!"
+				})
+			}
+		}
+	})
+
 	-- Furbolg drops
 	table.insert(f, {
 		name = npc.furbolg,

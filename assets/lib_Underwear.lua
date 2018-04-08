@@ -7,6 +7,7 @@ function ExiWoW.Underwear:buildLibrary()
 		name = "Linen Underwear",
 		icon = "Inv_misc_desecrated_clothpants",
 		description = "A basic pair of linen underwear.",
+		rarity = 1,
 		tags = {},
 	}));
 
@@ -31,6 +32,7 @@ function ExiWoW.Underwear:buildLibrary()
 		name = "Kul Tiras Boxers",
 		icon = "inv_misc_anchor",
 		description = "White boxer shorts made of anchor-patterned cotton. Made with gold colored trimmings.",
+		rarity = 3,
 		tags = {},
 	}));
 
@@ -39,6 +41,7 @@ function ExiWoW.Underwear:buildLibrary()
 		name = "High Rising Bikini Thong",
 		icon = "inv_belt_cloth_draenei_c_01",
 		description = "A pink high rising bikini thong, made out of a stretchy material.",
+		rarity = 3,
 		tags = {},
 	}));
 
@@ -47,6 +50,7 @@ function ExiWoW.Underwear:buildLibrary()
 		name = "Skull Strap",
 		icon = "inv_helm_laughingskull_01",
 		description = "A hollowed out skull with straps attached to it, just about covers your crotch.",
+		rarity = 3,
 		tags = {},
 	}));
 
@@ -55,6 +59,7 @@ function ExiWoW.Underwear:buildLibrary()
 		name = "Razaani Soulthong",
 		icon = "inv_cloth_raidmage_p_01shoulder",
 		description = "A thong made of light pink silk wrappings with sparkling soulgems attached around the waist straps.",
+		rarity = 3,
 		tags = {},
 	}));
 
@@ -78,6 +83,7 @@ function ExiWoW.Underwear:buildLibrary()
 		id = "LEAF_PANTIES",
 		name = "Leaf Panties",
 		icon = "ability_druid_flourish",
+		rarity = 4,
 		description = "Panties made of thick shiny green leaves. Super smooth to the touch.",
 		tags = {},
 	}));
@@ -102,6 +108,7 @@ function ExiWoW.Underwear:buildLibrary()
 		id = "SPIKED_LEATHER_JOCKSTRAP",
 		name = "Spiked Leather Jockstrap",
 		icon = "inv_misc_spikedbracer",
+		rarity = 4,
 		description = "A jockstrap made of thick leather with spikes protruding from the groin.",
 		tags = {},
 	}));
@@ -110,6 +117,7 @@ function ExiWoW.Underwear:buildLibrary()
 		id = "NETHERWEAVE_PANTIES",
 		name = "Netherweave Panties",
 		icon = "inv_fabric_netherweave_bolt_imbued",
+		rarity = 3,
 		description = "Tiny panties in a pink to purple gradient color made from netherweave.",
 		tags = {},
 	}));
@@ -118,7 +126,26 @@ function ExiWoW.Underwear:buildLibrary()
 		id = "CRESCENT_THONG",
 		name = "Crescent Thong",
 		icon = "inv_fabric_moonshroud",
+		rarity = 3,
 		description = "A white-ish pink colored silk thong with a glowing crescent on the front.",
+		tags = {},
+	}));
+
+	table.insert(lib, uw:new({
+		id = "BLACK_LACE_PANTIES",
+		name = "Black Lace Panties",
+		icon = "inv_cape_cloth_raidpriest_r_01",
+		rarity = 3,
+		description = "Lace panties in a black satin material.",
+		tags = {},
+	}));
+
+	table.insert(lib, uw:new({
+		id = "BLACK_LACE_SHORTS",
+		name = "Black Lace Shorts",
+		icon = "inv_cloth_mageclass_d_01pants",
+		rarity = 3,
+		description = "Lace shorts in a black satin material.",
 		tags = {},
 	}));
 	

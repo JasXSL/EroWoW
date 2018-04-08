@@ -49,7 +49,10 @@ function ExiWoW.Action:new(data)
 	self.cast_sound_loop = data.cast_sound_loop or false		-- Cast loop sound
 	self.cast_sound_start = data.cast_sound_start or false		-- Start cast sound, played once
 	self.cast_sound_success = data.cast_sound_success or false	-- Cast success sound, played once
-	
+	self.rarity = type(data.rarity) == "number" and data.rarity or 2
+	if self.rarity < 1 then self.rarity = 1
+	elseif self.rarity > 7 then self.rarity = 7
+	end
 
 	self.suppress_all_errors = data.suppress_all_errors or false
 

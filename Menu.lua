@@ -56,6 +56,15 @@ function ExiWoW.Menu:refreshSpellsPage()
 				name:SetText("")
 			end
 
+			local rarity = v.rarity-1
+			if rarity < 1 then rarity = 1 end
+			if rarity >= LE_ITEM_QUALITY_COMMON and BAG_ITEM_QUALITY_COLORS[rarity] then
+				f.rarity:Show();
+				f.rarity:SetVertexColor(BAG_ITEM_QUALITY_COLORS[rarity].r, BAG_ITEM_QUALITY_COLORS[rarity].g, BAG_ITEM_QUALITY_COLORS[rarity].b);
+			else
+				f.rarity:Hide();
+			end
+
 			f:SetScript("OnMouseUp", function (self, button)
 				if IsShiftKeyDown() then
 					v.favorite = not v.favorite;
@@ -150,6 +159,16 @@ function ExiWoW.Menu:refreshUnderwearPage()
 				end
 				PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON);
 			end)
+
+
+			local rarity = obj.rarity-1
+			if rarity < 1 then rarity = 1 end
+			if rarity >= LE_ITEM_QUALITY_COMMON and BAG_ITEM_QUALITY_COLORS[rarity] then
+				f.rarity:Show();
+				f.rarity:SetVertexColor(BAG_ITEM_QUALITY_COLORS[rarity].r, BAG_ITEM_QUALITY_COLORS[rarity].g, BAG_ITEM_QUALITY_COLORS[rarity].b);
+			else
+				f.rarity:Hide();
+			end
 
 			f.icon:SetTexture("Interface/Icons/"..obj.icon);
 
@@ -255,6 +274,12 @@ function ExiWoW.Menu:ini()
 			ab:SetPoint("TOPLEFT", 23+col*50*BUTTON_MARG, -50-row*50*BUTTON_MARG);
 			ab:SetSize(50,50);
 			ab.cooldown:SetSwipeTexture('', 0, 0, 0, 0.75)
+
+			local rarity = ab:CreateTexture(nil, "OVERLAY");
+			ab.rarity = rarity
+			rarity:SetAllPoints()
+			rarity:SetTexture("Interface/Common/WhiteIconFrame")
+
 			ab:Hide();
 
 			ab.Name:SetPoint("TOPRIGHT", 8,-30)
@@ -293,7 +318,15 @@ function ExiWoW.Menu:ini()
 			ab:SetPoint("TOPLEFT", 23+col*50*BUTTON_MARG, -50-row*50*BUTTON_MARG);
 			ab:SetSize(50,50);
 			ab.cooldown:SetSwipeTexture('', 0, 0, 0, 0.75)
+
+			local rarity = ab:CreateTexture(nil, "OVERLAY");
+			ab.rarity = rarity
+			rarity:SetAllPoints()
+			rarity:SetTexture("Interface/Common/WhiteIconFrame")
+			
 			ab:Hide();
+
+
 
 			local s = CreateFrame("Frame", nil, ab);
 			ab.star = s;
@@ -518,12 +551,22 @@ function ExiWoW.Menu:ini()
 end
 
 
-hooksecurefunc(LootAlertSystem,"ShowAlert",function()
+hooksecurefunc(LootAlertSystem,"setUpFunction",function()
 	
 	if #ExiWoW.Menu.lootQueue == 0 then return end
+
+	local scans = {}
+	scans["Fanged Green Glaive"] = true
+	scans["Large Fang"] = true
+	scans["Weapon Enhancement Token"] = true
+	scans["Gloves of the Fang"] = true
+	scans["Fang of the Pit"] = true
+	scans["Golad, Twilight of Aspects"] = true
+
 	local lootAlertPool = LootAlertSystem.alertFramePool
 	for alertFrame in lootAlertPool:EnumerateActive() do
-		if alertFrame.ItemName:GetText() == "Weapon Enhancement Token" then
+
+		if scans[alertFrame.ItemName:GetText()] then
 			local item = ExiWoW.Menu.lootQueue[1]
 			local name = item.name
 			local icon = item.icon
@@ -534,14 +577,42 @@ hooksecurefunc(LootAlertSystem,"ShowAlert",function()
 			alertFrame:SetScript("Onleave", function() end);
 			alertFrame.Icon:SetTexture("Interface/Icons/"..icon);
 			table.remove(ExiWoW.Menu.lootQueue, 1)
+			if #ExiWoW.Menu.lootQueue == 0 then return end
 		end
-	end	
+	end
+	
+
 end)
 
-function ExiWoW.Menu:drawLoot(name, icon)
+-- /run ExiWoW.Menu:drawLoot("TestLoot", "ability_defend", 1)
+-- /run ExiWoW.Menu:drawLoot("TestLoot2", "ability_hunter_pet_bear", 2)
+-- Rarity starts at 1 which is grey
+function ExiWoW.Menu:drawLoot(name, icon, rarity)
+	if not rarity then rarity = 2 end
+
 	table.insert(ExiWoW.Menu.lootQueue, {name=name, icon=icon})
+	
+
+	local rarities = {
+		"|cff1eff00|Hitem:133963::::::::110:::::|h[w]|h|r",		-- Grey
+		"|cff1eff00|Hitem:5637::::::::110:::::|h[w]|h|r",		-- White
+		"|cff1eff00|Hitem:120302::::::::110:::::|h[w]|h|r",		-- Green
+		"|cff1eff00|Hitem:10413::::::::110:::::|h[w]|h|r",		-- Blue
+		"|cff1eff00|Hitem:124367::::::::110:::::|h[w]|h|r",		-- Purple
+		"|cff1eff00|Hitem:77949::::::::110:::::|h[w]|h|r"		-- Orange
+	}
 	PlaySound(50893, "Dialog")
-	LootAlertSystem.AddAlert(LootAlertSystem, "|cff1eff00|Hitem:120302::::::::110:::::|h[Weapon Enhancement Token]|h|r", 1, 0, 0, 0, false, false, nil, false, false, true, false);
+
+	local function checkItem()
+		if GetItemInfo(rarities[rarity]) == nil then
+			ExiWoW.Timer:set(checkItem, 0.1)
+		else
+			LootAlertSystem:AddAlert(rarities[rarity], 1, 0, 0, 0, false, false, nil, false, false, true, false);
+		end
+	end
+
+	checkItem();
+	
 end
 
 function ExiWoW.Menu.drawLocalSettings()

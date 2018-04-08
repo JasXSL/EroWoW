@@ -12,7 +12,11 @@ function ExiWoW.Underwear:new(data)
 	self.id = data.id or "";							--
 	self.name = data.name or "???"
 	self.icon = data.icon or "Inv_misc_questionmark"
-	self.rarity = data.rarity or 1
+	self.rarity = type(data.rarity) == "number" and data.rarity or 2
+	if self.rarity < 1 then self.rarity = 1
+	elseif self.rarity > 7 then self.rarity = 7
+	end
+
 	self.description = data.description or "???"
 	self.tags = data.tags or {}
 	self.color = data.color or false
