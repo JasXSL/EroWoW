@@ -25,6 +25,12 @@ local ty = req.Types;			-- Local filter types
 	rtc.victimBreasts = req:new({type = ty.RTYPE_HAS_BREASTS})
 	rtc.victimPenis = req:new({type = ty.RTYPE_HAS_PENIS})
 	rtc.victimVagina = req:new({type = ty.RTYPE_HAS_VAGINA})
+
+	rtc.largeBreasts = req:new({type = ty.RTYPE_BREASTS_GREATER, data={2}});
+	rtc.largePenis = req:new({type = ty.RTYPE_PENIS_GREATER, data={2}});
+	rtc.largeButt = req:new({type = ty.RTYPE_BUTT_GREATER, data={2}});
+	
+	
 	
 	rtc.spellAdd = req:new({type=ty.RTYPE_SPELL_ADD})
 	rtc.spellRem = req:new({type=ty.RTYPE_SPELL_REM})

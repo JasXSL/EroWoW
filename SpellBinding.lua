@@ -20,7 +20,8 @@ function ExiWoW.SpellBinding:new(data)
 	self.procChance = data.procChance or 0.5
 	self.alias = data.alias							-- Lets you convert a spell into another
 	self.allow_in_vehicle = data.allow_in_vehicle
-
+	self.always_run = data.always_run or false		-- This is always run when it matches
+	self.custom = data.custom or {}					-- Put custom parameters in here
 	self.detrimental_only = data.detrimental_only
 	self.beneficial_only = data.beneficial_only
 
@@ -54,18 +55,32 @@ end
 
 	-- Static --
 -- Runs code on all spell bindings that match the name --
-function ExiWoW.SpellBinding:runOnThese(name, callback)
+function ExiWoW.SpellBinding:runOnThese(name, callback, always_run)
 	if not internal.checkHardlimits(nil,nil,true) then return end
+
 	for k,v in pairs(ExiWoW.SpellBinding.Lib) do
 		if 
 			ExiWoW:multiSearch(name, v.name) and 
-			(self.allow_in_vehicle or not UnitInVehicle("player"))
+			(self.allow_in_vehicle or not UnitInVehicle("player")) and
+			(not ExiWoW.Character.takehitCD or always_run) and
+			(not v.always_run == not always_run) -- Boolean compare
 		then
 			if callback(v) == false then 
-				return 
+				return
 			end
 		end
 	end
+end
+
+-- Runs the always_run enabled procs
+function ExiWoW.SpellBinding:alwaysRun(fnName, data)
+	local name = data.name;
+	ExiWoW.SpellBinding:runOnThese(name, function(self)
+		if self[fnName] then
+			self[fnName](self, data);
+		end
+		return true;
+	end, true)
 end
 
 
@@ -74,6 +89,7 @@ end
 
 
 function ExiWoW.SpellBinding:onAdd(sender, data)
+	ExiWoW.SpellBinding:alwaysRun("fnOnAdd", data);
 	ExiWoW.SpellBinding:runOnThese(data.name, function(self)
 		local rpText = self:runRpText(sender, data, ExiWoW.RPText.Req.Types.RTYPE_SPELL_ADD);
 		if self.fnOnAdd then
@@ -86,6 +102,7 @@ function ExiWoW.SpellBinding:onAdd(sender, data)
 end
 
 function ExiWoW.SpellBinding:onTick(sender, data)
+	ExiWoW.SpellBinding:alwaysRun("fnOnTick", data);
 	ExiWoW.SpellBinding:runOnThese(data.name, function(self)
 		local rpText = self:runRpText(sender, data, ExiWoW.RPText.Req.Types.RTYPE_SPELL_TICK);
 		if self.fnOnTick then
@@ -98,6 +115,8 @@ function ExiWoW.SpellBinding:onTick(sender, data)
 end
 
 function ExiWoW.SpellBinding:onRemove(sender, data)
+
+	ExiWoW.SpellBinding:alwaysRun("fnOnRemove", data);
 	ExiWoW.SpellBinding:runOnThese(data.name, function(self)
 		local rpText = self:runRpText(sender, data, ExiWoW.RPText.Req.Types.RTYPE_SPELL_REM);
 		if self.fnOnRemove then

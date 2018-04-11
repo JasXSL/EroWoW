@@ -61,6 +61,7 @@ function ExiWoW.RPText:new(data)
 	self.requirements = type(data.requirements) == "table" and data.requirements or {};
 	self.sound = data.sound;					-- Play this sound when sending or receiving this
 	self.fn = data.fn or nil;					-- Only supported for NPC/Spell events. Actions should use the action system instead
+	self.is_chat = data.is_chat or false		-- Makes the RP text display with chat colors instead. 
 
 	-- Automatic
 	self.item = ""								-- Populated automatically when you use an item condition, contains the last valid item name
@@ -141,11 +142,16 @@ function ExiWoW.RPText:convertAndReceive(sender, receiver, noSound, spell, custo
 	local text = self.text_receiver;
 	if customFunction then text = customFunction(text) end
 	local text = ExiWoW.RPText:convert(text, sender, receiver, spell, self.item);
-	ExiWoW.RPText:print(text)
 
+	if not self.is_chat then
+		ExiWoW.RPText:print(text)
+	else
+		ExiWoW.RPText:npcSpeak(text);
+	end
 	if self.text_bystander then
 		ExiWoW:sendBystanderText(
-			ExiWoW.RPText:convert(self.text_bystander, sender, receiver, spell, self.item)
+			ExiWoW.RPText:convert(self.text_bystander, sender, receiver, spell, self.item),
+			self.is_chat
 		)
 	end
 
@@ -202,7 +208,10 @@ end
 -- Same as above but triggers as well
 function ExiWoW.RPText:trigger(id, sender, receiver, spelldata, spellType)
 	local text = ExiWoW.RPText:get(id, sender, receiver, spelldata, spellType)
-	if text then return text:convertAndReceive(sender, receiver, false) end
+	if text then 
+		text:convertAndReceive(sender, receiver, false) 
+		return text
+	end
 end
 
 function ExiWoW.RPText:getSynonym(tag, target, spelldata)
@@ -308,7 +317,7 @@ function ExiWoW.RPText:getSynonym(tag, target, spelldata)
 		end
 	elseif tag == TAG_SUFFIXES.UNDERWEAR then
 		local und = target:getUnderwear();
-		local out = ""
+		if not und then return "underwear" end
 		if und then
 			if math.random() < 0.5 and und.color then out = out..und.color.." "; end
 			out = out..string.lower(und.name);
@@ -326,10 +335,19 @@ function ExiWoW.RPText:getSynonym(tag, target, spelldata)
 end
 
 function ExiWoW.RPText:print(text)
-	ChatFrame1:AddMessage(text, 1,0.8,1);
+	ChatFrame1:AddMessage(text, 0.95686274509,0.49019607843,0.25490196078);
+	--f47d41
 	UIErrorsFrame:AddMessage(text, 1, 0.8, 1, 53, 6);
 end
 
+-- You can either do (sender,text) or (text)
+function ExiWoW.RPText:npcSpeak(sender, text)
+	if text then
+		sender = sender.." says: "..text;
+	end
+	ChatFrame1:AddMessage(sender, 0.95294117647, 0.94901960784, 0.59607843137);
+	UIErrorsFrame:AddMessage(sender, 0.95294117647, 0.94901960784, 0.59607843137, 53, 6);
+end
 
 
 -- Req CLASS --

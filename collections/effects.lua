@@ -143,6 +143,10 @@ local ef = ExiWoW.LibAssets.effects;
 		ExiWoW.ME:addExcitement(0.2);
 	end
 
+	ef.addExcitement = ef.addExcitementDefault;
+	ef.addExcitementMasochistic = ef.addExcitementMasochisticDefault;
+	
+
 	ef.toggleVibHubProgram = function(self, program, duration)
 		if not ExiWoW.VH then return end
 		if not ExiWoW.VH.programs[program] then return end

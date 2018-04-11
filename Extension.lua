@@ -95,7 +95,7 @@ function ExiWoW.Extension:import(data, isRoot)
 		ExiWoW.Extension.LIB[ex.id] = ex
 		ExiWoW.Extension:index()
 		if ex.id ~= "ROOT" then
-			print("-- Using: ", ex.id)
+			print("-- Using: ", ex.id, "["..#ex.spellBindings.." bindings]")
 		end
 		if ExiWoW.loaded then ExiWoW.Menu:refreshAll(); end
 		return ex

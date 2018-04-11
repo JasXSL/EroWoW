@@ -148,6 +148,33 @@ function ExiWoW.Underwear:buildLibrary()
 		description = "Lace shorts in a black satin material.",
 		tags = {},
 	}));
+
+	table.insert(lib, uw:new({
+		id = "TWILIGHT_BRIEFS",
+		name = "Twilight Briefs",
+		icon = "Inv_pant_cloth_raidwarlock_r_01",
+		rarity = 2,
+		description = "Black briefs in a soft material with red trimmings.",
+		tags = {},
+	}));
+
+	table.insert(lib, uw:new({
+		id = "MANA_GEM_THONG",
+		name = "Mana Gem Thong",
+		icon = "spell_misc_conjuremanajewel",
+		rarity = 3,
+		description = "A bright white silken thong with sparkling pink trimmings radiating mana.",
+		tags = {},
+	}));
+
+	table.insert(lib, uw:new({
+		id = "ARCHMAGE_BRIEFS",
+		name = "Archmage Briefs",
+		icon = "inv_legion_faction_kirintor",
+		rarity = 3,
+		description = "Purple silken briefs with the kirin tor symbol on the front and silvery trimmings.",
+		tags = {},
+	}));
 	
 end
 

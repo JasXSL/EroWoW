@@ -159,6 +159,67 @@ local f = ExiWoW.LibAssets.loot
 	})
 
 	table.insert(f, {
+		zone = "Mount Hyjal",
+		sub = "The Forge of Supplication",
+		name = "_FORAGE_",
+		items={
+			{
+				type = "Underwear", 
+				id = "TWILIGHT_BRIEFS", 
+				chance = 0.5,
+				sound = 44577,
+				text = ExiWoW.RPText:new({
+					text_receiver = "You found a box of surplus twilight briefs."
+				})
+			}
+		}
+	})
+
+	table.insert(f, {
+		zone = "Azsuna",
+		sub = "Runas's Hovel",
+		points = {
+			{x = 42.84, y=17.36, rad=0.1},
+		},
+		name = "_FORAGE_",
+		items={
+			{
+				type = "Underwear", 
+				id = "MANA_GEM_THONG", 
+				chance = 1,
+				sound = 44577,
+				text = ExiWoW.RPText:new({
+					text_receiver = "You found a sparkling thong emanating mana. Embroidered into the waist is the word \"Elisande\". Maybe that has something to do with Runas' exile."
+				})
+			}
+		}
+	})
+
+	table.insert(f, {
+		zone = "Azsuna",
+		sub = "Lair of the Deposed",
+		points = {
+			{x = 49.49, y=8.1, rad=0.11},
+		},
+		name = "_FORAGE_",
+		items={
+			{
+				type = "Underwear", 
+				id = "ARCHMAGE_BRIEFS", 
+				chance = 1,
+				sound = 44577,
+				text = ExiWoW.RPText:new({
+					text_receiver = "You found a pair of underwear that look like they may have belonged to a Kirin Tor archmage. 'Deposed' indeed."
+				})
+			}
+		}
+	})
+
+
+	
+	
+
+	table.insert(f, {
 		zone = "Feralas",
 		sub = "Woodpaw Den",
 		name = "_FORAGE_",

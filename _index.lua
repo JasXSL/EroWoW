@@ -111,7 +111,7 @@ function ExiWoW:ini()
 	-- Bind listener
 	RegisterAddonMessagePrefix(ExiWoW.APP_NAME.."a")		-- Sends an action	 {cb:cbToken, id:action_id, data:(var)data}
 	RegisterAddonMessagePrefix(ExiWoW.APP_NAME.."c")		-- Receive a callback {cb:cbToken, success:(bool)success, data:(var)data}
-	RegisterAddonMessagePrefix(ExiWoW.APP_NAME.."b")		-- Bystander text. {tx:(str)text}
+	RegisterAddonMessagePrefix(ExiWoW.APP_NAME.."b")		-- Bystander text. {tx:(str)text,ch:(bool)is_chat}
 	
 
 	ExiWoW.Timer:set(function()
@@ -353,14 +353,18 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 				return;
 			end
 
+			-- Add to chat log
+			if response.ch then
+				ExiWoW.RPText:npcSpeak(response.tx);
 			-- Add bystander text to combat log
-			for i = 1,10 do
-				if GetChatWindowInfo(i)=="Combat Log" then
-					_G['ChatFrame'..i]:AddMessage(response.tx, 1,0.8,1)
-				  	break
+			else
+				for i = 1,10 do
+					if GetChatWindowInfo(i)=="Combat Log" then
+						_G['ChatFrame'..i]:AddMessage(response.tx, 1,0.8,1)
+						break
+					end
 				end
 			end
-			
 			
 			
 		end
@@ -394,9 +398,10 @@ function ExiWoW:sendCallback(token, unit, success, data)
 
 end
 
-function ExiWoW:sendBystanderText(text)
+function ExiWoW:sendBystanderText(text, isChat)
 	local out = {
-		tx = text
+		tx = text,
+		ch = isChat
 	}
 	local text = ExiWoW.json.encode(out);
 	local token = ExiWoW.Callbacks:generateToken();

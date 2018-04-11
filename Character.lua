@@ -204,7 +204,7 @@ function ExiWoW.Character:onEvent(event, ...)
 			--spellId, name, harmful, unitCaster, count, crit, char
 			local aura = buildSpellTrigger(spellId, name, harmful, unitCaster, count, false, char)
 			table.insert(active, aura)
-			if not auraExists(ExiWoW.Character.AURAS, aura) and not ExiWoW.Character.takehitCD then
+			if not auraExists(ExiWoW.Character.AURAS, aura) then
 				ExiWoW.SpellBinding:onAdd(char, aura)
 			end
 
@@ -227,7 +227,7 @@ function ExiWoW.Character:onEvent(event, ...)
 
 		-- See what auras were removed
 		for i,a in pairs(ExiWoW.Character.AURAS) do
-			if not auraExists(active, a) and ExiWoW.Character.takehitCD then
+			if not auraExists(active, a) then
 				ExiWoW.SpellBinding:onRemove(a.char, a)
 			end
 		end
