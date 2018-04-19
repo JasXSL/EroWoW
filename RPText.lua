@@ -318,10 +318,9 @@ function ExiWoW.RPText:getSynonym(tag, target, spelldata)
 	elseif tag == TAG_SUFFIXES.UNDERWEAR then
 		local und = target:getUnderwear();
 		if not und then return "underwear" end
-		if und then
-			if math.random() < 0.5 and und.color then out = out..und.color.." "; end
-			out = out..string.lower(und.name);
-		end
+		local out = ""
+		if math.random() < 0.5 and und.color then out = out..und.color.." "; end
+		out = out..string.lower(und.name);
 		return out
 	elseif tag == TAG_SUFFIXES.HE then
 		if target:isMale() then return "he" 
@@ -335,7 +334,8 @@ function ExiWoW.RPText:getSynonym(tag, target, spelldata)
 end
 
 function ExiWoW.RPText:print(text)
-	ChatFrame1:AddMessage(text, 0.95686274509,0.49019607843,0.25490196078);
+	-- 0.95686274509,0.49019607843,0.25490196078
+	ChatFrame1:AddMessage(text, 0.737, 0.6, 0.980);
 	--f47d41
 	UIErrorsFrame:AddMessage(text, 1, 0.8, 1, 53, 6);
 end

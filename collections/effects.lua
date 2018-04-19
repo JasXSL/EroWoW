@@ -107,15 +107,15 @@ local ef = ExiWoW.LibAssets.effects;
 
 	
 -- Reusable functions
-	ef.addExcitementMasochisticDefault = function(self, sender, receiver)
+	ef.addExcitementMasochisticDefault = function(self, ignoreVhProgram)
 		-- Swing pain sounds are handled by WoW
 		if type(self) ~= "table" or not self.id or (not self.id.SWING and not self.id.SWING_CRIT) then
 			ef:painSound()
 		end
-		ExiWoW.Event:raise(ExiWoW.Event.Types.EXADD_M_DEFAULT)
+		ExiWoW.Event:raise(ExiWoW.Event.Types.EXADD_M_DEFAULT, {vh = not ignoreVhProgram})
 		ExiWoW.ME:addExcitement(0.15, false, true);
 	end
-	ef.addExcitementMasochisticCrit = function(self)
+	ef.addExcitementMasochisticCrit = function(self, ignoreVhProgram)
 		-- Swing pain sounds are handled by WoW
 
 		-- Trigger pain sound if
@@ -128,18 +128,18 @@ local ef = ExiWoW.LibAssets.effects;
 			) then 
 				ef:critSound() 
 			end
-		ExiWoW.Event:raise(ExiWoW.Event.Types.EXADD_M_CRIT)
+		ExiWoW.Event:raise(ExiWoW.Event.Types.EXADD_M_CRIT, {vh = not ignoreVhProgram})
 		ExiWoW.ME:addExcitement(0.3, false, true);
 	end
-	ef.addExcitementDefault = function(self)
-		ExiWoW.Event:raise(ExiWoW.Event.Types.EXADD_DEFAULT)
+	ef.addExcitementDefault = function(self, ignoreVhProgram)
+		ExiWoW.Event:raise(ExiWoW.Event.Types.EXADD_DEFAULT, {vh = not ignoreVhProgram})
 		ExiWoW.ME:addExcitement(0.1);
 	end
-	ef.addExcitementCrit = function(self)
+	ef.addExcitementCrit = function(self, ignoreVhProgram)
 		if type(self) ~= "table" or not (self.id.SWING and not self.id.SWING_CRIT) then
 			ef:painSound()
 		end
-		ExiWoW.Event:raise(ExiWoW.Event.Types.EXADD_CRIT)
+		ExiWoW.Event:raise(ExiWoW.Event.Types.EXADD_CRIT, {vh = not ignoreVhProgram})
 		ExiWoW.ME:addExcitement(0.2);
 	end
 

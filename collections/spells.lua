@@ -48,6 +48,7 @@ local sk = ExiWoW.LibAssets.spell_kits;
 	sk.basilisk["Crystal Gaze"] = true
 	sk.basilisk["Petrifying Blast"] = true
 	sk.basilisk["Petrifying Stare"] = true
+	sk.basilisk["Death Glare"] = true
 	
 	
 	-- Insect swarms
@@ -61,6 +62,8 @@ local sk = ExiWoW.LibAssets.spell_kits;
 	sk.spillable["Bottle of Grog"] = true
 	
 	sk.sand["Sand Breath"] = true
+	sk.sand["Sand Bolt"] = true
+	
 	
 	sk.dirt["Throw Dirt"] = true
 	
@@ -74,10 +77,13 @@ local sk = ExiWoW.LibAssets.spell_kits;
 	sk.slosh["Water Bolt"] = true
 	sk.slosh["Slime Spray"] = true
 	sk.slosh["Water Spout"] = true
+	sk.slosh["Water Blast"] = true
 	
+
 	-- Small shards
 	sk.shards["Crystal Shards"] = true
-
+	sk.shards["Crystal Shard"] = true
+	
 	-- Ground spikes
 	sk.groundSpike["Earth Spike"] = true
 

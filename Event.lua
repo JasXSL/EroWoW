@@ -5,10 +5,10 @@ ExiWoW.Event.bindings = {}		-- {id={event:(str)event, callback:(str)callback}...
 ExiWoW.Event.Types = {
 	LOADED = "LOADED",									-- ExiWoW loaded
 	EXADD = "EXADD",									-- {amount=amount, set=set, multiplyMasochism=multiplyMasochism} Excitement has been added or subtracted
-	EXADD_DEFAULT = "EXADD_DEFAULT",					-- Excitement add default
-	EXADD_CRIT = "EXADD_CRIT",							-- Excitement add crit
-	EXADD_M_DEFAULT = "EXADD_M_DEFAULT",				-- Excitement add masochistic default
-	EXADD_M_CRIT = "EXADD_M_CRIT",						-- Excitement add masochistic crit
+	EXADD_DEFAULT = "EXADD_DEFAULT",					-- {vh=triggerVhProgram} Excitement add default
+	EXADD_CRIT = "EXADD_CRIT",							-- {vh=triggerVhProgram} Excitement add crit
+	EXADD_M_DEFAULT = "EXADD_M_DEFAULT",				-- {vh=triggerVhProgram} Excitement add masochistic default
+	EXADD_M_CRIT = "EXADD_M_CRIT",						-- {vh=triggerVhProgram} Excitement add masochistic crit
 	
 	INVADD = "INVADD",									-- {type=type, name=name, quant=quant} - Inventory has been added
 	
