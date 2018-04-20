@@ -1,7 +1,9 @@
+local appName, internal = ...
+local require = internal.require;
 
-function ExiWoW.Underwear:buildLibrary()
+function internal.build.underwear()
 	local lib = ExiWoW.R.underwear;
-	local uw = ExiWoW.Underwear;
+	local uw = require("Underwear");
 	table.insert(lib, uw:new({
 		id = "DEFAULT",
 		name = "Linen Underwear",

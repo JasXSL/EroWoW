@@ -1,4 +1,9 @@
-	-- LOOT TABLES --
+local appName, internal = ...;
+local require = internal.require;
+
+local RPText = require("RPText")
+
+-- LOOT TABLES --
 local zones = ExiWoW.LibAssets.zones
 local npc = ExiWoW.LibAssets.npcs
 
@@ -37,7 +42,7 @@ local f = ExiWoW.LibAssets.loot
 				id = "KULTIRAS_BOXERS", 
 				chance = 1,
 				sound = 1185,
-				text = ExiWoW.RPText:new({
+				text = RPText:new({
 					text_receiver = "You found a folded pair of %item that %T was carrying!"
 				})
 			}
@@ -53,7 +58,7 @@ local f = ExiWoW.LibAssets.loot
 				id = "RAZAANI_SOULTHONG", 
 				chance = 0.1,
 				sound = 1185,
-				text = ExiWoW.RPText:new({
+				text = RPText:new({
 					text_receiver = "%T was holding a small gem studded garment, you decide to hold on to it!"
 				})
 			}
@@ -69,7 +74,7 @@ local f = ExiWoW.LibAssets.loot
 				id = "BLACK_LACE_PANTIES", 
 				chance = 1,
 				sound = 1185,
-				text = ExiWoW.RPText:new({
+				text = RPText:new({
 					text_receiver = "You find some small black lace panties hidden in one of %T's pockets!"
 				})
 			}
@@ -85,7 +90,7 @@ local f = ExiWoW.LibAssets.loot
 				id = "BLACK_LACE_SHORTS", 
 				chance = 1,
 				sound = 1185,
-				text = ExiWoW.RPText:new({
+				text = RPText:new({
 					text_receiver = "You find some small black lace shorts hidden in one of %T's pockets!"
 				})
 			}
@@ -101,7 +106,7 @@ local f = ExiWoW.LibAssets.loot
 				id = "FURBOLG_LOINCLOTH", 
 				chance = 0.1,
 				sound = 1185,
-				text = ExiWoW.RPText:new({
+				text = RPText:new({
 					text_receiver = "You found a spare loincloth on the defeated furbolg!"
 				})
 			}
@@ -117,7 +122,7 @@ local f = ExiWoW.LibAssets.loot
 				id = "FELCLOTH_PANTIES",
 				chance = 0.1,
 				sound = 1185,
-				text = ExiWoW.RPText:new({
+				text = RPText:new({
 					text_receiver = "The satyr was holding onto a small pair of felcloth panties!"
 				})
 			}
@@ -132,7 +137,7 @@ local f = ExiWoW.LibAssets.loot
 				id = "JEWELED_HARPY_THONG",
 				chance = 0.1,
 				sound = 1185,
-				text = ExiWoW.RPText:new({
+				text = RPText:new({
 					text_receiver = "You found an extra piece of underwear on the harpy!"
 				})
 			}
@@ -151,7 +156,7 @@ local f = ExiWoW.LibAssets.loot
 				id = "ORCISH_BRIEFS", 
 				chance = 1,
 				sound = 44577,
-				text = ExiWoW.RPText:new({
+				text = RPText:new({
 					text_receiver = "You find some orcish briefs in a crate. They seem unused!"
 				})
 			}
@@ -168,7 +173,7 @@ local f = ExiWoW.LibAssets.loot
 				id = "TWILIGHT_BRIEFS", 
 				chance = 0.5,
 				sound = 44577,
-				text = ExiWoW.RPText:new({
+				text = RPText:new({
 					text_receiver = "You found a box of surplus twilight briefs."
 				})
 			}
@@ -188,7 +193,7 @@ local f = ExiWoW.LibAssets.loot
 				id = "MANA_GEM_THONG", 
 				chance = 1,
 				sound = 44577,
-				text = ExiWoW.RPText:new({
+				text = RPText:new({
 					text_receiver = "You found a sparkling thong emanating mana. Embroidered into the waist is the word \"Elisande\". Maybe that has something to do with Runas' exile."
 				})
 			}
@@ -208,7 +213,7 @@ local f = ExiWoW.LibAssets.loot
 				id = "ARCHMAGE_BRIEFS", 
 				chance = 1,
 				sound = 44577,
-				text = ExiWoW.RPText:new({
+				text = RPText:new({
 					text_receiver = "You found a pair of underwear that look like they may have belonged to a Kirin Tor archmage. 'Deposed' indeed."
 				})
 			}
@@ -229,7 +234,7 @@ local f = ExiWoW.LibAssets.loot
 				id = "SPIKED_LEATHER_JOCKSTRAP", 
 				chance = 0.5,
 				sound = 44577,
-				text = ExiWoW.RPText:new({
+				text = RPText:new({
 					text_receiver = "You find a discarded spiked leather jockstrap. These gnolls must be up to some weird stuff."
 				})
 			}
@@ -247,7 +252,7 @@ local f = ExiWoW.LibAssets.loot
 				id = "SKULL_STRAP", 
 				chance = 0.5,
 				sound = 1199,
-				text = ExiWoW.RPText:new({
+				text = RPText:new({
 					text_receiver = "You find a skull with waist straps tucked away under some mushrooms"
 				})
 			}
@@ -267,7 +272,7 @@ local f = ExiWoW.LibAssets.loot
 				id = "LEAF_PANTIES", 
 				chance = 1,
 				sound = 911,
-				text = ExiWoW.RPText:new({
+				text = RPText:new({
 					text_receiver = "You sneakily look through the drawer, finding a pair of leafy panties. These must belong to Innkeeper Wylaria. You hastily pocket them."
 				})
 			}
@@ -291,7 +296,7 @@ local f = ExiWoW.LibAssets.loot
 				id = "WOOLY_SHORTS", 
 				chance = 1,
 				sound = 1185,
-				text = ExiWoW.RPText:new({
+				text = RPText:new({
 					text_receiver = "You found a crate of wooly shorts. Hopefully nobody will mind if a pair goes missing."
 				})
 			}
@@ -309,7 +314,7 @@ local f = ExiWoW.LibAssets.loot
 				id = "THROW_SAND", 
 				chance = 0.8,
 				sound = 73172,
-				text = ExiWoW.RPText:new({
+				text = RPText:new({
 					text_receiver = "You found a handful of sand!"
 				})
 			}
@@ -324,7 +329,7 @@ local f = ExiWoW.LibAssets.loot
 				id = "THROW_SAND", 
 				chance = 0.8,
 				sound = 73172,
-				text = ExiWoW.RPText:new({
+				text = RPText:new({
 					text_receiver = "You found a handful of sand!"
 				})
 			}
@@ -345,7 +350,7 @@ local f = ExiWoW.LibAssets.loot
 				id = "HIGH_RISING_BIKINI_THONG_PINK", 
 				chance = 1,
 				sound = 1185,
-				text = ExiWoW.RPText:new({
+				text = RPText:new({
 					text_receiver = "You find a crate of pink bikini thongs, hopefully nobody will notice if one goes missing!"
 				})
 			}
@@ -364,7 +369,7 @@ local f = ExiWoW.LibAssets.loot
 				id = "NETHERWEAVE_PANTIES", 
 				chance = 1,
 				sound = 1185,
-				text = ExiWoW.RPText:new({
+				text = RPText:new({
 					text_receiver = "You find a skimpy pair of netherweave panties that seem to have been left behind!"
 				})
 			}
@@ -384,7 +389,7 @@ local f = ExiWoW.LibAssets.loot
 				id = "CRESCENT_THONG", 
 				chance = 1,
 				sound = 1185,
-				text = ExiWoW.RPText:new({
+				text = RPText:new({
 					text_receiver = "While Leesah'oh isn't watching, you snatch one of her panties from a crate in her tent!"
 				})
 			}
@@ -399,7 +404,7 @@ local f = ExiWoW.LibAssets.loot
 				id = "CLAW_PINCH", 
 				chance = 0.05,
 				quant = math.huge,
-				text = ExiWoW.RPText:new({
+				text = RPText:new({
 					text_receiver = "This big claw is pristine! I'll polish it and take it with me!"
 				})
 			}

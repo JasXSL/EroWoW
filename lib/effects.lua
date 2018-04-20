@@ -1,7 +1,9 @@
+local appName, internal = ...;
+local require = internal.require;
+
 -- Effect templates, such as adding arousal
 ExiWoW.LibAssets.effects = {}
 local ef = ExiWoW.LibAssets.effects;
-
 
 
 -- Sound kits
@@ -108,14 +110,16 @@ local ef = ExiWoW.LibAssets.effects;
 	
 -- Reusable functions
 	ef.addExcitementMasochisticDefault = function(self, ignoreVhProgram)
+		local Event = require("Event");
 		-- Swing pain sounds are handled by WoW
 		if type(self) ~= "table" or not self.id or (not self.id.SWING and not self.id.SWING_CRIT) then
 			ef:painSound()
 		end
-		ExiWoW.Event:raise(ExiWoW.Event.Types.EXADD_M_DEFAULT, {vh = not ignoreVhProgram})
+		Event.raise(Event.Types.EXADD_M_DEFAULT, {vh = not ignoreVhProgram})
 		ExiWoW.ME:addExcitement(0.15, false, true);
 	end
 	ef.addExcitementMasochisticCrit = function(self, ignoreVhProgram)
+		local Event = require("Event");
 		-- Swing pain sounds are handled by WoW
 
 		-- Trigger pain sound if
@@ -124,22 +128,24 @@ local ef = ExiWoW.LibAssets.effects;
 			not self.id or
 			(	-- It is a table, but
 				not (self.id.SWING or self.id.SWING_CRIT) or -- It's not a melee swing
-				ExiWoWLocalStorage.tank_mode -- Or tank mode is on
+				localStorage.tank_mode -- Or tank mode is on
 			) then 
 				ef:critSound() 
 			end
-		ExiWoW.Event:raise(ExiWoW.Event.Types.EXADD_M_CRIT, {vh = not ignoreVhProgram})
+		Event.raise(Event.Types.EXADD_M_CRIT, {vh = not ignoreVhProgram})
 		ExiWoW.ME:addExcitement(0.3, false, true);
 	end
 	ef.addExcitementDefault = function(self, ignoreVhProgram)
-		ExiWoW.Event:raise(ExiWoW.Event.Types.EXADD_DEFAULT, {vh = not ignoreVhProgram})
+		local Event = require("Event");
+		Event.raise(Event.Types.EXADD_DEFAULT, {vh = not ignoreVhProgram})
 		ExiWoW.ME:addExcitement(0.1);
 	end
 	ef.addExcitementCrit = function(self, ignoreVhProgram)
+		local Event = require("Event");
 		if type(self) ~= "table" or not (self.id.SWING and not self.id.SWING_CRIT) then
 			ef:painSound()
 		end
-		ExiWoW.Event:raise(ExiWoW.Event.Types.EXADD_CRIT, {vh = not ignoreVhProgram})
+		Event.raise(Event.Types.EXADD_CRIT, {vh = not ignoreVhProgram})
 		ExiWoW.ME:addExcitement(0.2);
 	end
 
@@ -154,7 +160,5 @@ local ef = ExiWoW.LibAssets.effects;
 	end
 
 	
-
-
 
 
