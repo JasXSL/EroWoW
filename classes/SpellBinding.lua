@@ -2,7 +2,7 @@ local appName, internal = ...
 local export = internal.Module.export;
 local require = internal.require;
 
-local Index, Database, Tools, Character;
+local Index, Database, Tools, Character, Condition, RPText;
 
 -- SpellBindings are spells that trigger RPTexts when received or ticking
 -- Spellbindings will search for RPTexts with the spell name prefixed with SPELL_
@@ -17,6 +17,8 @@ SpellBinding.__index = SpellBinding;
 		Database = require("Database");
 		Tools = require("Tools");
 		Character = require("Character");
+		Condition = require("Condition");
+		RPText = require("RPText");
 	end
 
 	function SpellBinding:new(data)
@@ -53,8 +55,8 @@ SpellBinding.__index = SpellBinding;
 		if self.alias then name = self.alias end
 		local rpText = SpellBinding.getRpText(sender, data, t, name)
 		if rpText then
-			RPText:convertAndReceive(sender, ExiWoW.ME, false, data)
-			Character:setTakehitTimer();
+			rpText:convertAndReceive(sender, ExiWoW.ME, false, data)
+			Character.setTakehitTimer();
 			return rpText
 		end
 	end
@@ -74,7 +76,7 @@ SpellBinding.__index = SpellBinding;
 			if 
 				Tools.multiSearch(name, v.name) and 
 				(self.allow_in_vehicle or not UnitInVehicle("player")) and
-				(not Character.takehitCD or always_run) and
+				(not Character.getTakehitCD() or always_run) and
 				(not v.always_run == not always_run) -- Boolean compare
 			then
 				if callback(v) == false then 

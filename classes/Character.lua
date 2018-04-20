@@ -2,7 +2,7 @@ local appName, internal = ...
 local export = internal.Module.export;
 local require = internal.require;
 
-local UI, Timer, Event, Action, Underwear, Index, SpellBinding, Tools, RPText;
+local UI, Timer, Event, Action, Underwear, Index, SpellBinding, Tools, RPText, Condition;
 
 -- Contains info about a character, 
 local Character = {}
@@ -22,7 +22,8 @@ local Character = {}
 	Character.EXCITEMENT_FADE_IDLE = 0.001;
 	Character.AURAS = {}
 
-
+	function Character.getTakehitCD() return Character.takehitCD end
+	function Character.getWhisperCD() return Character.whisperCD end
 
 	-- Static
 	function Character.ini()
@@ -36,6 +37,7 @@ local Character = {}
 		SpellBinding = require("SpellBinding");
 		Tools = require("Tools");
 		RPText = require("RPText");
+		Condition = require("Condition");
 
 		Character.evtFrame:SetScript("OnEvent", Character.onEvent)
 		Character.evtFrame:RegisterEvent("PLAYER_STARTED_MOVING")
@@ -165,7 +167,7 @@ local Character = {}
 
 					local rp = RPText.get(eventPrefix..crit, npc, ExiWoW.ME)
 					if rp then
-						Character:setTakehitTimer();
+						Character.setTakehitTimer();
 						rp:convertAndReceive(npc, ExiWoW.ME)
 					end
 
@@ -320,7 +322,7 @@ local Character = {}
 	end
 
 
-	function Character:setTakehitTimer()
+	function Character.setTakehitTimer()
 		local rate = globalStorage.takehit_rp_rate;
 		Timer.clear(Character.takehitCD);
 		Character.takehitCD = Timer.set(function()
@@ -833,6 +835,9 @@ local Character = {}
 export(
 	"Character", 
 	Character,
-	{},
+	{
+		getTakehitCD = Character.getTakehitCD,
+		getWhisperCD = Character.getWhisperCD
+	},
 	Character
 )

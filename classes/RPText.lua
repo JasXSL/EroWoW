@@ -147,7 +147,9 @@ RPText.DEBUG = false
 	function RPText:convertAndReceive(sender, receiver, noSound, spell, customFunction)
 
 		local text = self.text_receiver;
-		if customFunction then text = customFunction(text) end
+		if customFunction then 
+			text = customFunction(text) 
+		end
 		local text = RPText.convert(text, sender, receiver, spell, self.item);
 
 		local bystander = self.text_bystander

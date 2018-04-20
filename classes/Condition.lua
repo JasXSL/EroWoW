@@ -2,7 +2,7 @@ local appName, internal = ...
 local export = internal.Module.export;
 local require = internal.require;
 
-local RPText, Character;
+local RPText, Character, Tools;
 
 local Condition = {};
 Condition.__index = Condition;
@@ -43,6 +43,7 @@ Condition.__index = Condition;
 	function Condition.ini()
 		RPText = require("RPText");
 		Character = require("Character");
+		Tools = require("Tools");
 	end
 
 	function Condition:new(data)
