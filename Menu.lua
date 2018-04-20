@@ -519,11 +519,18 @@ function ExiWoW.Menu:ini()
 	createCheckbutton("enable_in_dungeons", panel, "TOPLEFT", gPadding,-gPadding-gBottom*n, "Enable in Dungeons", "Some actions may still be disabled in dungeons due to API restrictions");
 	n = n+1;
 	createCheckbutton("enable_public", panel, "TOPLEFT", gPadding,-gPadding-gBottom*n, "Enable Public", "Allows ANYONE to use actions on you.\n(Some functionality may still be restricted by the API)");
+	n = n+1;
+	createCheckbutton("taunt_female", panel, "TOPLEFT", gPadding,-gPadding-gBottom*n, "Enable Female Actions", "Turn off to prevent certain actions by females to be used against you.");
+	n = n+1;
+	createCheckbutton("taunt_male", panel, "TOPLEFT", gPadding,-gPadding-gBottom*n, "Enable Male Actions", "Turn off to prevent certain actions by males to be used against you.");
+	n = n+1;
+	createCheckbutton("taunt_other", panel, "TOPLEFT", gPadding,-gPadding-gBottom*n, "Enable Other Actions", "Turn off to prevent certain actions by other genders to be used against you.");
+	
 
 	local prefix = appName.."_globalConf_";
 	n = 0
 	createSlider(prefix.."takehit_rp_rate", panel, "TOPRIGHT", -gPadding,-gPadding-gBottom*n, "1", "60", "Hit Text Limit", 1, 60, 1, "Sets minimum time in seconds between RP texts received from being affected by an attack or spell.", function(self, val)
-		setValueInTitle(self, " ("..val..")");
+		setValueInTitle(self, " ("..val.." sec)");
 	end);
 	n = n+1
 	createSlider(prefix.."spell_text_freq", panel, "TOPRIGHT", -gPadding,-gPadding-gBottom*n, "0%", "400%", "Spell RP Text Chance", 0, 4, 0.1, "Sets the chance of a viable spell triggering an RP text.\nThis is multiplied by the spell's internal chance, so even at 100% it's not a guarantee. Default = 100%", function(self, val)
@@ -532,6 +539,14 @@ function ExiWoW.Menu:ini()
 	n = n+1
 	createSlider(prefix.."swing_text_freq", panel, "TOPRIGHT", -gPadding,-gPadding-gBottom*n, "0%", "100%", "Melee Text Chance", 0, 1, 0.05, "Chance of a text triggering on a melee hit. Crits are 4x this value. Default = 15%", function(self, val)
 		setValueInTitle(self, " ("..math.floor(val*100).."%)");
+	end);
+	n = n+1
+	createSlider(prefix.."taunt_freq", panel, "TOPRIGHT", -gPadding,-gPadding-gBottom*n, "0%", "100%", "NPC whisper chance", 0, 1, 0.05, "Chance of NPCs whispering you. 0 turns it off.", function(self, val)
+		setValueInTitle(self, " ("..math.floor(val*100).."%)");
+	end);
+	n = n+1
+	createSlider(prefix.."taunt_rp_rate", panel, "TOPRIGHT", -gPadding,-gPadding-gBottom*n, "0", "300", "NPC Whisper Limit", 0, 300, 1, "Minimum time between receiving NPC whispers in combat. Default is 30.", function(self, val)
+		setValueInTitle(self, " ("..val.." sec)");
 	end);
 	
 			
@@ -542,9 +557,15 @@ function ExiWoW.Menu:ini()
 		gs.takehit_rp_rate = getglobal(prefix.."takehit_rp_rate"):GetValue();
 		gs.spell_text_freq = getglobal(prefix.."spell_text_freq"):GetValue();
 		gs.swing_text_freq = getglobal(prefix.."swing_text_freq"):GetValue();
+		gs.taunt_freq = getglobal(prefix.."taunt_freq"):GetValue();
+		gs.taunt_rp_rate = getglobal(prefix.."taunt_rp_rate"):GetValue();
+		
 		
 		gs.enable_in_dungeons = getglobal(prefix.."enable_in_dungeons"):GetChecked();
 		gs.enable_public = getglobal(prefix.."enable_public"):GetChecked();
+		gs.taunt_female = getglobal(prefix.."taunt_female"):GetChecked();
+		gs.taunt_male = getglobal(prefix.."taunt_male"):GetChecked();
+		gs.taunt_other = getglobal(prefix.."taunt_other"):GetChecked();
 
 	end;
     panel.cancel = function (self)  ExiWoW.Menu.drawGlobalSettings(); end;
@@ -657,9 +678,15 @@ function ExiWoW.Menu.drawGlobalSettings()
 	getglobal(prefix.."takehit_rp_rate"):SetValue(gs.takehit_rp_rate);
 	getglobal(prefix.."spell_text_freq"):SetValue(gs.spell_text_freq);
 	getglobal(prefix.."swing_text_freq"):SetValue(gs.swing_text_freq);
+	getglobal(prefix.."taunt_freq"):SetValue(gs.taunt_freq);
+	getglobal(prefix.."taunt_rp_rate"):SetValue(gs.taunt_rp_rate);
+	
 	
 	getglobal(prefix.."enable_in_dungeons"):SetChecked(gs.enable_in_dungeons);
 	getglobal(prefix.."enable_public"):SetChecked(gs.enable_public);
+	getglobal(prefix.."taunt_female"):SetChecked(gs.taunt_female);
+	getglobal(prefix.."taunt_male"):SetChecked(gs.taunt_male);
+	getglobal(prefix.."taunt_other"):SetChecked(gs.taunt_other);
 	
 	
 

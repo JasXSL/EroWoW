@@ -38,7 +38,12 @@ local npcs = ExiWoW.LibAssets.npcs
 	npc_pincer["%Bogstrok"] = true
 	
 	
-	
+	npcs.feltotemMale = {
+		["Feltotem Warmonger"]=true, 
+		["Feltotem Bloodsinger"]=true,
+		["Torok Bloodtotem"]=true,
+	}
+
 
 	local furbolg = {}
 	npcs.furbolg = furbolg

@@ -61,8 +61,8 @@ function ExiWoW.RPText:new(data)
 	self.requirements = type(data.requirements) == "table" and data.requirements or {};
 	self.sound = data.sound;					-- Play this sound when sending or receiving this
 	self.fn = data.fn or nil;					-- Only supported for NPC/Spell events. Actions should use the action system instead
-	self.is_chat = data.is_chat or false		-- Makes the RP text display with chat colors instead. 
-
+	self.is_chat = data.is_chat or false		-- Makes the RP text display with chat colors instead. Set text_bystander to any non-false value to make it a say. Otherwise it's a whisper
+	
 	-- Automatic
 	self.item = ""								-- Populated automatically when you use an item condition, contains the last valid item name
 
@@ -143,14 +143,20 @@ function ExiWoW.RPText:convertAndReceive(sender, receiver, noSound, spell, custo
 	if customFunction then text = customFunction(text) end
 	local text = ExiWoW.RPText:convert(text, sender, receiver, spell, self.item);
 
+	local bystander = self.text_bystander
 	if not self.is_chat then
 		ExiWoW.RPText:print(text)
 	else
-		ExiWoW.RPText:npcSpeak(text);
+		ExiWoW.RPText:npcSpeak(text, nil, self.text_bystander == false);
+		if self.text_bystander ~= false then
+			bystander = self.text_receiver
+		end
 	end
-	if self.text_bystander then
+
+	
+	if bystander then
 		ExiWoW:sendBystanderText(
-			ExiWoW.RPText:convert(self.text_bystander, sender, receiver, spell, self.item),
+			ExiWoW.RPText:convert(bystander, sender, receiver, spell, self.item),
 			self.is_chat
 		)
 	end
@@ -212,7 +218,10 @@ function ExiWoW.RPText:trigger(id, sender, receiver, spelldata, spellType)
 		text:convertAndReceive(sender, receiver, false) 
 		return text
 	end
+	return false
 end
+
+
 
 function ExiWoW.RPText:getSynonym(tag, target, spelldata)
 
@@ -341,39 +350,49 @@ function ExiWoW.RPText:print(text)
 end
 
 -- You can either do (sender,text) or (text)
-function ExiWoW.RPText:npcSpeak(sender, text)
+function ExiWoW.RPText:npcSpeak(sender, text, isWhisper)
 	if text then
 		sender = sender.." says: "..text;
+	end	
+	local color = {0.95294117647, 0.94901960784, 0.59607843137}
+	if isWhisper then
+		color = {1.0,0.49,1.0}
 	end
-	ChatFrame1:AddMessage(sender, 0.95294117647, 0.94901960784, 0.59607843137);
-	UIErrorsFrame:AddMessage(sender, 0.95294117647, 0.94901960784, 0.59607843137, 53, 6);
+	ChatFrame1:AddMessage(sender, color[1], color[2], color[3]);
+	UIErrorsFrame:AddMessage(sender, color[1], color[2], color[3], 53, 6);
 end
 
 
 -- Req CLASS --
 -- Ranges are usually 0 = tiny, 1 = small, 2 = average, 3 = large, 4 = huge
 ExiWoW.RPText.Req.Types = {
-RTYPE_HAS_PENIS = "has_penis",				-- These explain themselves
-RTYPE_HAS_VAGINA = "has_vagina",
-RTYPE_HAS_BREASTS = "has_breasts",
-RTYPE_PENIS_GREATER = "penis_greater",		-- (int)size :: Penis greater than size.
-RTYPE_BREASTS_GREATER = "breasts_greater",	-- (int)size :: Breasts greater than size.
-RTYPE_BUTT_GREATER = "butt_greater",			-- (int)size :: Butt greater than size.
-RTYPE_RACE = "race",							-- {raceEN=true, raceEn=true...} Table of races that are accepted. Example: {Gnome=true, HighmountainTauren=true}
-RTYPE_CLASS = "class",							-- {englishClass=true, englishClass=true...} Table of classes that are accepted. Example: {DEATHKNIGHT=true, MONK=true}
-RTYPE_TYPE = "type",							-- {typeOne=true, typeTwo=true...} For players this is always "player", otherwise refer to the type of NPC, such as "Humanoid"
-RTYPE_NAME = "name",							-- {nameOne=true, nameTwo=true...} Primairly useful for NPCs
-RTYPE_RANDOM = "rand",							-- {chance=0-1} 1 = 100%
-RTYPE_HAS_AURA = "aura",						-- {{name=name, caster=casterName}...} Player has one or more of these auras
-RTYPE_HAS_INVENTORY = "inv",					-- {{name=name, quant=min_quant}}
-RTYPE_UNDIES = "undies",						-- false = none, true = req, {name=true, name2=true...} = limit by name
--- The following will only validate from spells received --
-RTYPE_CRIT = "crit",						-- Spell was a critical hit
-RTYPE_DETRIMENTAL = "detrimental",			-- Spell was detrimental
-RTYPE_SPELL_ADD = "spell_add",				-- Spell was just added
-RTYPE_SPELL_REM = "spell_rem",				-- Spell was just removed
-RTYPE_SPELL_TICK = "spell_tick",			-- Spell was ticking
-RTYPE_EQUIPMENT = "equipment",				-- {slot=(int)equipmentSlot(http://wowwiki.wikia.com/wiki/InventorySlotId), type="Plate/Mail/Leather/Cloth"}
+	RTYPE_HAS_PENIS = "has_penis",				-- These explain themselves
+	RTYPE_HAS_VAGINA = "has_vagina",
+	RTYPE_HAS_BREASTS = "has_breasts",
+	RTYPE_PENIS_GREATER = "penis_greater",		-- (int)size :: Penis greater than size.
+	RTYPE_BREASTS_GREATER = "breasts_greater",	-- (int)size :: Breasts greater than size.
+	RTYPE_BUTT_GREATER = "butt_greater",			-- (int)size :: Butt greater than size.
+	RTYPE_RACE = "race",							-- {raceEN=true, raceEn=true...} Table of races that are accepted. Example: {Gnome=true, HighmountainTauren=true}
+	RTYPE_CLASS = "class",							-- {englishClass=true, englishClass=true...} Table of classes that are accepted. Example: {DEATHKNIGHT=true, MONK=true}
+	RTYPE_TYPE = "type",							-- {typeOne=true, typeTwo=true...} For players this is always "player", otherwise refer to the type of NPC, such as "Humanoid"
+	RTYPE_NAME = "name",							-- {nameOne=true, nameTwo=true...} Primairly useful for NPCs
+	RTYPE_RANDOM = "rand",							-- {chance=0-1} 1 = 100%
+	RTYPE_HAS_AURA = "aura",						-- {{name=name, caster=casterName}...} Player has one or more of these auras
+	RTYPE_HAS_INVENTORY = "inv",					-- {{name=name, quant=min_quant}}
+	RTYPE_UNDIES = "undies",						-- false = none, true = req, {name=true, name2=true...} = limit by name
+	-- The following will only validate from spells received --
+	RTYPE_CRIT = "crit",						-- Spell was a critical hit
+	RTYPE_DETRIMENTAL = "detrimental",			-- Spell was detrimental
+	RTYPE_SPELL_ADD = "spell_add",				-- Spell was just added
+	RTYPE_SPELL_REM = "spell_rem",				-- Spell was just removed
+	RTYPE_SPELL_TICK = "spell_tick",			-- Spell was ticking
+	RTYPE_EQUIPMENT = "equipment",				-- {slot=(int)equipmentSlot(http://wowwiki.wikia.com/wiki/InventorySlotId), type="Plate/Mail/Leather/Cloth"}
+	RTYPE_MELEE = "swing",						-- "Spell" was a melee swing
+
+	-- These are primarily used for whisper texts
+	RTYPE_REQUIRE_MALE = "req_male",			-- Allow male must be checked in settings
+	RTYPE_REQUIRE_FEMALE = "req_female",		-- Allow female must be checked in settings
+	RTYPE_REQUIRE_OTHER = "req_other"			-- Allow other must be checked in settings
 }
 
 
@@ -429,6 +448,8 @@ function ExiWoW.RPText.Req:validate(sender, receiver, spelldata, spelltype)
 		out = type(spelldata) == "table" and spelldata.crit;
 	elseif t == ty.RTYPE_DETRIMENTAL then
 		out = type(spelldata) == "table" and spelldata.harmful;
+	elseif t == ty.RTYPE_MELEE then
+		out = spelltype == ty.RTYPE_MELEE
 	elseif t == ty.RTYPE_SPELL_ADD then
 		out = spelltype == ty.RTYPE_SPELL_ADD;
 	elseif t == ty.RTYPE_SPELL_REM then
@@ -441,6 +462,12 @@ function ExiWoW.RPText.Req:validate(sender, receiver, spelldata, spelltype)
 		out = ExiWoW.Character:hasAura(data);
 	elseif t == ty.RTYPE_HAS_INVENTORY then
 		out = ExiWoW.Character:hasInventory(data);
+	elseif t == ty.RTYPE_REQUIRE_MALE then
+		out = ExiWoWGlobalStorage.taunt_male == true
+	elseif t == ty.RTYPE_REQUIRE_FEMALE then
+		out = ExiWoWGlobalStorage.taunt_female == true
+	elseif t == ty.RTYPE_REQUIRE_OTHER then
+		out = ExiWoWGlobalStorage.taunt_other == true
 	elseif t == ty.RTYPE_EQUIPMENT then
 		local unit = false
 		if targ == ExiWoW.ME then unit = "player" 

@@ -38,7 +38,12 @@ local gDefaults = {
 	takehit_rp_rate = 6,			-- RP texts from being hit by spells and abilities can only trigger this often
 	enable_in_dungeons = false,
 	enable_public = false,
-	tank_mode = false			-- Tank mode grants a chance for normal texts to trigger a critical, since tanks can't be critically hit
+	tank_mode = false,			-- Tank mode grants a chance for normal texts to trigger a critical, since tanks can't be critically hit
+	taunt_freq = 0.1,			-- Chance of a horny npc taunt when they damage you.
+	taunt_rp_rate = 30,			-- Time between horny npc taunts
+	taunt_female = true,		-- I want to be hit on by females 
+	taunt_male = true,			-- I want to be hit on by males
+	taunt_other = true,			-- I want to be hit on by other
 };
 -- LocalStorage defaults
 local lDefaults = {

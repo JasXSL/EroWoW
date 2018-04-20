@@ -8,6 +8,7 @@ ExiWoW.Character.eventBindings = {};		-- {id:(int)id, evt:(str)evt, fn:(func)fun
 ExiWoW.Character.eventBindingIndex = 0;	
 
 ExiWoW.Character.takehitCD = nil			-- Cooldown for takehit texts
+ExiWoW.Character.whisperCD = nil
 
 local myGUID = UnitGUID("player")
 
@@ -56,10 +57,24 @@ function ExiWoW.Character:onEvent(event, ...)
 
 	local arguments = {...}
 
+	-- Local functions
 	local function buildSpellTrigger(spellId, name, harmful, unitCaster, count, crit, char)
 		return { spellId = spellId, name=name, harmful=harmful, unitCaster=unitCaster, count=count, crit=crit, char=char}
 	end
 
+	local function triggerWhisper(sender, spelldata, spellType)
+		if math.random() > ExiWoWGlobalStorage.taunt_freq then return end 
+		if ExiWoW.Character.whisperCD then return end
+
+		if ExiWoW.RPText:trigger("_WHISPER_", sender, ExiWoW.ME, spelldata, spellType) then
+			if ExiWoWGlobalStorage.taunt_rp_rate > 0 then
+				ExiWoW.Character.whisperCD = ExiWoW.Timer:set(function()
+					ExiWoW.Character.whisperCD = nil
+				end, ExiWoWGlobalStorage.taunt_rp_rate);
+			end
+		end
+		
+	end
 
 	-- Handle combat log
 	-- This needs to go first as it should only handle event bindings on the player
@@ -86,7 +101,7 @@ function ExiWoW.Character:onEvent(event, ...)
 		end
 
 		-- Only player themselves after this point
-		if bit.band(destFlags, COMBATLOG_OBJECT_TYPE_PLAYER) == 0 then return end 
+		if bit.band(destFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == 0 then return end 
 
 		
 		-- These only work for healing or damage
@@ -114,6 +129,9 @@ function ExiWoW.Character:onEvent(event, ...)
 				npc
 			)
 			ExiWoW.SpellBinding:onTick(npc, trig)
+			if harmful and eventPrefix ~= "SPELL_PERIODIC" then
+				triggerWhisper(npc, trig, ExiWoW.RPText.Req.Types.RTYPE_SPELL_TICK)
+			end
 
 		elseif eventSuffix == "DAMAGE" and eventPrefix == "SWING" then
 
@@ -127,11 +145,10 @@ function ExiWoW.Character:onEvent(event, ...)
 			local chance = ExiWoWGlobalStorage.swing_text_freq;
 			if crit ~= "" then chance = chance*4 end -- Crits have 3x chance for swing text
 
-
+			local npc = ExiWoW.Character:buildNPC(u, sourceName)
 			local rand = math.random()
 			if not ExiWoW.Character.takehitCD and rand < chance and u and not UnitIsPlayer(u) then
 
-				local npc = ExiWoW.Character:buildNPC(u, sourceName)
 				local rp = ExiWoW.RPText:get(eventPrefix..crit, npc, ExiWoW.ME)
 				if rp then
 					ExiWoW.Character:setTakehitTimer();
@@ -143,6 +160,12 @@ function ExiWoW.Character:onEvent(event, ...)
 			if damage <= 0 then return end
 			local percentage = damage/UnitHealthMax("player");
 			ExiWoW.ME:addExcitement(percentage*0.1, false, true);
+
+			triggerWhisper(
+				npc, 
+				buildSpellTrigger("ATTACK", "ATTACK", true, sourceName, 1, crit, npc), 
+				ExiWoW.RPText.Req.Types.RTYPE_MELEE
+			)
 			
 
 	   end

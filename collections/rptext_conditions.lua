@@ -26,6 +26,10 @@ local ty = req.Types;			-- Local filter types
 	rtc.victimPenis = req:new({type = ty.RTYPE_HAS_PENIS})
 	rtc.victimVagina = req:new({type = ty.RTYPE_HAS_VAGINA})
 
+	rtc.attackerBreasts = req:new({type = ty.RTYPE_HAS_BREASTS, sender=true})
+	rtc.attackerPenis = req:new({type = ty.RTYPE_HAS_PENIS, sender=true})
+	rtc.attackerVagina = req:new({type = ty.RTYPE_HAS_VAGINA, sender=true})
+
 	rtc.largeBreasts = req:new({type = ty.RTYPE_BREASTS_GREATER, data={2}});
 	rtc.largePenis = req:new({type = ty.RTYPE_PENIS_GREATER, data={2}});
 	rtc.largeButt = req:new({type = ty.RTYPE_BUTT_GREATER, data={2}});
@@ -44,6 +48,12 @@ local ty = req.Types;			-- Local filter types
 	rtc.attackerIsLasher = req:new({type=ty.RTYPE_NAME, data=npc.lasher, sender=true})
 	rtc.attackerIsVines = req:new({type=ty.RTYPE_NAME, data=npc.vines, sender=true})
 	rtc.attackerIsOoze = req:new({type=ty.RTYPE_NAME, data=npc.ooze, sender=true});
+	rtc.attackerIsFeltotemMale = req:new({type=ty.RTYPE_NAME, data=npc.feltotemMale, sender=true});
+
+	rtc.maleWhispers = req:new({type=ty.RTYPE_REQUIRE_MALE})
+	rtc.femaleWhispers = req:new({type=ty.RTYPE_REQUIRE_FEMALE})
+	rtc.otherWhispers = req:new({type=ty.RTYPE_REQUIRE_OTHER})
+	
 
 	
 	-- Underwear
