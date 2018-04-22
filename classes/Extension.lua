@@ -10,12 +10,13 @@ local RPText, Action, SpellBinding, Effect, Underwear, Database;
 
 
 	function Extension:ini()
-		Database = require("Database")
-		RPText = require("RPText")
-		Action = require("Action")
-		SpellBinding = require("SpellBinding")
-		Effect = require("Effect")
-		Underwear = require("Underwear")
+		Database = require("Database");
+		RPText = require("RPText");
+		Action = require("Action");
+		SpellBinding = require("SpellBinding");
+		Effect = require("Effect");
+		Underwear = require("Underwear");
+		Condition = require("Condition");
 	end
 
 	function Extension:new(data, isRoot)
@@ -48,6 +49,25 @@ local RPText, Action, SpellBinding, Effect, Underwear, Database;
 		-- Underwear
 		self.underwear = importTable(data.underwear)
 
+		-- Conditions
+		self.conditions = importTable(data.conditions);
+
+		-- Loot
+		self.loot = importTable(data.loot);
+
+		-- NPCs
+		self.npcs = importTable(data.npcs);
+
+		-- Zones
+		self.zones = importTable(data.zones);
+
+		-- Spells
+		self.spells = importTable(data.spells);
+
+		-- Functions
+		self.functions = importTable(data.functions);
+
+
 		return self
 	end
 
@@ -76,7 +96,10 @@ local RPText, Action, SpellBinding, Effect, Underwear, Database;
 	function Extension:addUnderwear(data)
 		table.insert(self.underwear, Underwear:new(data))
 	end
-	
+	function Extension:addCondition(data)
+		table.insert(self.conditions, Condition:new(data))
+	end
+		
 
 
 	-- STATIC --
@@ -84,8 +107,8 @@ local RPText, Action, SpellBinding, Effect, Underwear, Database;
 	-- Updates asset indexes --
 	function Extension.index()
 
-		-- Reset libraries
-		Database.clearTables("RPText", "Action", "SpellBinding", "Effect", "Underwear")
+		-- Reset libraries	
+		Database.clearTables("RPText", "Action", "SpellBinding", "Effect", "Underwear", "Condition")
 
 		for k,v in pairs(Extension.LIB) do
 			
@@ -94,7 +117,7 @@ local RPText, Action, SpellBinding, Effect, Underwear, Database;
 			Database.add("SpellBinding", v.spellBindings);
 			Database.add("Effect", v.effects);
 			Database.add("Underwear", v.underwear);
-
+			Database.add("Condition", v.conditions);
 		end
 		
 
@@ -124,7 +147,7 @@ local RPText, Action, SpellBinding, Effect, Underwear, Database;
 		local ex = Extension:new(data, isRoot);
 		if ex then
 			Extension.LIB[ex.id] = ex
-			Extension:index()
+			Extension.index()
 			if ex.id ~= "ROOT" then
 				print("-- Using: ", ex.id, "["..#ex.spellBindings.." bindings]")
 			end

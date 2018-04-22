@@ -48,14 +48,14 @@ SpellBinding.__index = SpellBinding;
 	end
 
 	-- Runs (and returns if found) an RP text bound to a this spellbinding
-	function SpellBinding:runRpText(sender, data, t)
+	function SpellBinding:runRpText(senderUnit, senderObj, data, t)
 		if not self:rollProc() then return end
 
 		local name = data.name;
 		if self.alias then name = self.alias end
-		local rpText = SpellBinding.getRpText(sender, data, t, name)
+		local rpText = SpellBinding.getRpText(senderUnit, senderObj, data, t, name)
 		if rpText then
-			rpText:convertAndReceive(sender, ExiWoW.ME, false, data)
+			rpText:convertAndReceive(senderObj, ExiWoW.ME, false, data)
 			RPText.setTakehitTimer();
 			return rpText
 		end
@@ -102,10 +102,10 @@ SpellBinding.__index = SpellBinding;
 
 
 
-	function SpellBinding:onAdd(sender, data)
+	function SpellBinding.onAdd(senderUnit, senderObj, data)
 		SpellBinding:alwaysRun("fnOnAdd", data);
 		SpellBinding:runOnThese(data.name, function(self)
-			local rpText = self:runRpText(sender, data, Condition.Types.RTYPE_SPELL_ADD);
+			local rpText = self:runRpText(senderUnit, senderObj, data, Condition.Types.RTYPE_SPELL_ADD);
 			if self.fnOnAdd then
 				self:fnOnAdd(rpText, data);
 			end
@@ -115,10 +115,10 @@ SpellBinding.__index = SpellBinding;
 		end);
 	end
 
-	function SpellBinding:onTick(sender, data)
+	function SpellBinding.onTick(senderUnit, senderObj, data)
 		SpellBinding:alwaysRun("fnOnTick", data);
 		SpellBinding:runOnThese(data.name, function(self)
-			local rpText = self:runRpText(sender, data, Condition.Types.RTYPE_SPELL_TICK);
+			local rpText = self:runRpText(senderUnit, senderObj, data, Condition.Types.RTYPE_SPELL_TICK);
 			if self.fnOnTick then
 				self:fnOnTick(rpText, data);
 			end
@@ -128,11 +128,11 @@ SpellBinding.__index = SpellBinding;
 		end);
 	end
 
-	function SpellBinding:onRemove(sender, data)
+	function SpellBinding.onRemove(senderUnit, senderObj, data)
 
 		SpellBinding:alwaysRun("fnOnRemove", data);
 		SpellBinding:runOnThese(data.name, function(self)
-			local rpText = self:runRpText(sender, data, Condition.Types.RTYPE_SPELL_REM);
+			local rpText = self:runRpText(senderUnit, senderObj, data, Condition.Types.RTYPE_SPELL_REM);
 			if self.fnOnRemove then
 				self:fnOnRemove(rpText, data);
 			end
@@ -141,8 +141,9 @@ SpellBinding.__index = SpellBinding;
 	end
 
 	-- Returns an RP text object
-	function SpellBinding.getRpText(sender, data, type, name)
-		return RPText.get(name, sender, ExiWoW.ME, data, type)
+	-- id, senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action
+	function SpellBinding.getRpText(senderUnit, senderObj, data, type, name)
+		return RPText.get(name, senderUnit, "player", senderOBJ, ExiWoW.ME, data, type);
 	end
 
 

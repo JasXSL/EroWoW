@@ -2,12 +2,14 @@ local appName, internal = ...
 local require = internal.require;
 local export = internal.Module.export;
 internal.build = {}							-- Collection of libraries to build
+internal.ext = nil							-- Root extension
 local Tools = require("Tools")
 local Action, Extension, Character, UI, Effect, Timer, Event, Callback, Database;
 
+
 UIParentLoadAddOn("Blizzard_DebugTools")
 
-
+-- Create base tables that can be accessed immediately without needing to use an extension
 --[[
 	/console scriptErrors 1
 	/run ExiWoW.UI.drawLoot("Test", "inv_pants_leather_04")
@@ -20,7 +22,7 @@ UIParentLoadAddOn("Blizzard_DebugTools")
 	- Make all RP text fetching and outputting run in the RPText module
 	- Move UI code from Character module
 	- Keep improving so static calls always use . instead of :
-	- ExiWoW.R should be local to ExiWoW
+	- internal.ext should be local to ExiWoW
 
 	- Maybe make bundles of rptexts instead of spellbindings?
 	- Add pagination once you manage to fill up the whole first page and/or underwear page
@@ -30,14 +32,14 @@ UIParentLoadAddOn("Blizzard_DebugTools")
 ExiWoW = {};
 ExiWoW.require = internal.Module.require;
 ExiWoW.initialized = false
-ExiWoW.R = nil					-- Root extension
 ExiWoW.LibAssets = {}			-- Reusable thingie library
 
 -- Targets
 ExiWoW.ME = nil					-- My character
 ExiWoW.TARGET = nil				-- Target character, do not use in actions
 ExiWoW.CAST_TARGET = nil		-- Cast target character, use this in actions
-ExiWoW.loaded = false
+ExiWoW.loaded = false;
+
 
 -- Globalstorage and localstorage are persistent variables
 globalStorage = nil
@@ -137,7 +139,7 @@ local Index = {}
 			if localStorage[k] == nil then localStorage[k] = v end
 		end
 
-		ExiWoW.R = Extension.import({id="ROOT"}, true);	-- Build the main extension for assets
+		internal.ext = Extension.import({id="ROOT"}, true);	-- Build the main extension for assets
 
 		-- Bind slash commands
 		SLASH_EWACT1 = '/ewact'
@@ -149,6 +151,11 @@ local Index = {}
 		Action.ini();
 
 		-- Build libraries
+		-- Conditions first since they're required
+		internal.build.conditions();
+		internal.build.conditions = nil;
+		Extension.index();
+		print("Extension re-indexed")
 		for k,fn in pairs(internal.build) do
 			fn();
 		end
@@ -460,10 +467,11 @@ export(
 		sendCallback = Index.sendCallback,
 		sendBystanderText = Index.sendBystanderText,
 		sendChunks = Index.sendChunks,
-		onPlayerLogout = Index.onPlayerLogout
+		onPlayerLogout = Index.onPlayerLogout,
+		checkHardLimits = Index.checkHardlimits,
 	}, 
 	{
-		checkHardLimits = Index.checkHardlimits,
+		
 	}
 )
 

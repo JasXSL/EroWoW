@@ -3,7 +3,7 @@ local export = internal.Module.export;
 local require = internal.require;
 local evtFrame = CreateFrame("Frame");
 
-local RPText, Character, SpellBinding, Index;
+local RPText, Character, SpellBinding, Index, Action;
 
 local Event = {}
 	Event.index = 0
@@ -37,6 +37,8 @@ local Event = {}
 		Character = require("Character");
 		SpellBinding = require("SpellBinding");
 		Index = require("Index");
+		Action = require("Action");
+		
 
 		evtFrame:SetScript("OnEvent", Event.onEvent)
 		evtFrame:RegisterEvent("PLAYER_STARTED_MOVING")
@@ -134,7 +136,7 @@ local Event = {}
 					crit, -- Crit
 					npc
 				)
-				SpellBinding:onTick(npc, trig)
+				SpellBinding.onTick(u, npc, trig)
 				if harmful and eventPrefix ~= "SPELL_PERIODIC" then
 					triggerWhisper(npc, trig, Condition.Types.RTYPE_SPELL_TICK)
 				end
@@ -155,7 +157,8 @@ local Event = {}
 				local rand = math.random()
 				if not RPText.takehitCD and rand < chance and u and not UnitIsPlayer(u) then
 
-					local rp = RPText.get(eventPrefix..crit, npc, ExiWoW.ME)
+					-- id, senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action
+					local rp = RPText.get(eventPrefix..crit, u, "player", npc, ExiWoW.ME);
 					if rp then
 						RPText.setTakehitTimer();
 						rp:convertAndReceive(npc, ExiWoW.ME)
@@ -254,7 +257,7 @@ local Event = {}
 				local aura = buildSpellTrigger(spellId, name, harmful, unitCaster, count, false, char)
 				table.insert(active, aura)
 				if not auraExists(Event.AURAS, aura) then
-					SpellBinding:onAdd(char, aura)
+					SpellBinding.onAdd(unitCaster, char, aura);
 				end
 
 			end
@@ -277,7 +280,7 @@ local Event = {}
 			-- See what auras were removed
 			for i,a in pairs(Event.AURAS) do
 				if not auraExists(active, a) then
-					SpellBinding:onRemove(a.char, a)
+					SpellBinding.onRemove(nil, a.char, a);
 				end
 			end
 

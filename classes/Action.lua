@@ -1,7 +1,7 @@
 local appName, internal = ...
 local export = internal.Module.export;
 local require = internal.require;
-local UI, Database, Tools, Timer, RPText, Character, Event, Index;	-- These are setup in ini
+local UI, Database, Tools, Timer, RPText, Character, Event, Index, Condition;	-- These are setup in ini
 
 local Action = {}
 Action.__index = Action;
@@ -37,6 +37,7 @@ Action.__index = Action;
 		Character = require("Character");
 		Event = require("Event");
 		Index = require("Index");
+		Condition = require("Condition");
 
 		Action.FRAME_CASTBAR = CreateFrame("StatusBar", "ExiWoWCastBar", UIParent, "CastingBarFrameTemplate");
 		local sb = Action.FRAME_CASTBAR;
@@ -81,47 +82,53 @@ Action.__index = Action;
 
 		self.suppress_all_errors = data.suppress_all_errors or false
 
+		self.conditions = type(data.conditions) == "table" and data.conditions or {};
+		self.filters = type(data.filters) == "table" and data.filters or {};		-- Same as above, but will hide the ability and not generate errors
+
+		
+
+		-- Handle default conditions
+		local defaults = {
+			-- The batched ones need to be separated into single ones on add
+			party_restricted = {
+				Condition.get("sender_party_restricted"),
+				Condition.get("victim_party_restricted"),
+			},
+			not_stunned = Condition.get("not_stunned"),
+			not_in_instance = Condition.get("not_in_instance"),
+			sender_alive = Condition.get("sender_alive"),
+			victim_alive = Condition.get("victim_alive"),
+			not_in_vehicle = {
+				Condition.get("sender_not_in_vehicle"),
+				Condition.get("victim_not_in_vehicle"),
+			},
+		};
+		if type(data.not_defaults) == "table" then
+			for _,v in pairs(data.not_defaults) do
+				if not defaults[v] then print("Unknown default action condition", v)
+				else
+					defaults[v] = nil;
+				end
+			end
+		end
+
+		for k,v in pairs(defaults) do
+			if v[1] == nil then v = {v}; end
+			for _, cond in pairs(v) do
+				table.insert(self.conditions, cond);
+			end
+		end
 		-- Functions
 		self.fn_send = data.fn_send									-- Function to execute on the sender when sending
 		self.fn_receive = data.fn_receive							-- Function to execute on the receiver when receiving
 		self.fn_cast = data.fn_cast									-- Function to execute on the sender when starting a cast
 		self.fn_done = data.fn_done									-- Function sent on both success and interrupt
 
-		-- Conditions
-		self.self_only = data.self_only or false;					-- Auto targets self
-		self.require_stealth = data.require_stealth or false;		-- Require the caster to be in stealth (only caster can be checked)
-		self.require_party = getVar(data.require_party, false)		-- Require caster and target to be in the same party. This ignores if  party_restricted is false. You should use it for tasks where the API itself restricts to party.
-		self.party_restricted = getVar(data.party_restricted, true)	-- Same as above, but can be turned off in settings
-		self.allow_caster_combat = getVar(data.allow_caster_combat, true)	-- Caster can use this in combat
-		self.allow_targ_combat = getVar(data.allow_targ_combat, true)		-- Target can receive this in combat
-
-		self.max_distance = data.max_distance or 0;					-- Sets a max spell distance, this value is actually an item ID
-		self.allow_self = getVar(data.allow_self, true)				-- Allow self cast
-		self.allow_stunned = data.allow_stunned or false; 				-- Allow to be used when caster is stunned
-		self.allow_targ_moving = getVar(data.allow_targ_moving, true)			-- Can't use this on a moving target
-		self.allow_caster_moving = getVar(data.allow_caster_moving, true)		-- Can't use this while you're moving
-		self.allow_instance = data.allow_instance or false;				-- Allow in instances
-		self.allow_caster_dead = data.allow_caster_dead or false;		-- Allow if caster is dead
-		self.allow_targ_dead = data.allow_targ_dead or false;			-- Allow if target is dead
-		self.max_charges = type(data.max_charges) == "number" and data.max_charges or math.huge;
-
-		self.allow_in_vehicle = data.allow_in_vehicle or false;			-- Allow if either player is in a vehicle
-
-		-- These CASTER conditions are used in filtering
-		self.allowed_classes = data.allowed_classes or false;			-- Allowable classes, use classIndex: http://wowwiki.wikia.com/wiki/API_UnitClass
-		self.allowed_races = data.allowed_races or false;				-- Allowable races, use raceEn: http://wowwiki.wikia.com/wiki/API_UnitRace
-		self.disallowed_classes = data.disallowed_classes or false;		-- Nonallowed classes, use classIndex: http://wowwiki.wikia.com/wiki/API_UnitClass
-		self.disallowed_races = data.disallowed_races or false;			-- Nonallowed races, use raceEn: http://wowwiki.wikia.com/wiki/API_UnitRace
 		
 		self.charges = data.charges or math.huge;						-- Charges tied to this spell. Charges can be added by loot?
+		self.max_charges = type(data.max_charges) == "number" and data.max_charges or math.huge;
 
-		self.target_has_underwear = data.target_has_underwear;			-- Nil = either, false = no underwear, true = has underwear, table = {name=true, name2=true...}
-
-		-- Convert to sets
-		if self.allowed_classes ~= false then self.allowed_classes = Tools.createSet(self.allowed_classes); end
-		if self.allowed_races ~= false then self.allowed_races = Tools.createSet(self.allowed_races); end
 		
-
 
 		-- Custom
 		self.hidden = data.hidden or false;								-- Hides action from action window
@@ -264,22 +271,10 @@ Action.__index = Action;
 		local _, _, cls = UnitClass(caster);
 		local _, rname = UnitRace(caster);
 
-		if self.allowed_classes ~= false and not self.allowed_classes[cls] then
-			return Tools.reportError("Invalid class.", suppressErrors)
+		local success, cond = Condition.all(self.filters, caster, nil, ExiWoW.ME);
+		if not success then
+			return cond:reportError(suppressErrors);
 		end
-
-		if self.allowed_races ~= false and not self.allowed_races[rname] then
-			return Tools.reportError("Invalid race.", suppressErrors)
-		end
-		
-		if self.disallowed_classes ~= false and self.disallowed_classes[cls] then
-			return Tools.reportError("Invalid class.", suppressErrors)
-		end
-
-		if self.disallowed_races ~= false and self.disallowed_races[rname] then
-			return Tools.reportError("Invalid race.", suppressErrors)
-		end
-		
 
 		-- Send validation
 		if caster == "player" then
@@ -304,17 +299,17 @@ Action.__index = Action;
 	-- Returns boolean true on success
 	function Action:validate(unitCaster, unitTarget, suppressErrors, isSend, isCastComplete)
 
-		if self.suppress_all_errors then suppressErrors = true end -- Allow actions to suppress errors - 
+		if self.suppress_all_errors then 
+			suppressErrors = true;
+		end -- Allow actions to suppress errors
 		
 		-- Make sure it's not on cooldown
 		if isSend and not isCastComplete and (self.on_cooldown or (self.global_cooldown and Action.GCD)) then
 			return Tools.reportError("Can't do that yet", suppressErrors);
 		end
 
-		local inInstance = IsInInstance()
-		if inInstance and not self.allow_instance then
-			return Tools.reportError("Can't be used in instances.", suppressErrors)
-		end
+		-- Validate filtering. Filtering is also used in if a spell should show up whatsoever
+		if not self:validateFiltering(unitCaster, suppressErrors) then return false end
 
 		-- Make sure target and caster are actual units
 		unitCaster = Ambiguate(unitCaster, "all")
@@ -330,101 +325,21 @@ Action.__index = Action;
 			return Tools.reportError("Target is not a player", suppressErrors);
 		end
 
-		if not self.allow_in_vehicle and (UnitInVehicle(unitCaster) or UnitInVehicle(unitTarget)) then
-			return Tools.reportError("Target is in a vehicle", suppressErrors);
-		end
-
-		if not Index.checkHardLimits(unitCaster, unitSender, suppressErrors) then
+		if not Index.checkHardLimits(unitCaster, unitTarget, suppressErrors) then 
 			return false;
 		end
 
-		-- Validate filtering. Filtering is also used in if a spell should show up whatsoever
-		if not self:validateFiltering(unitCaster, suppressErrors) then return false end
-
-
-		-- Check self cast
-		local isSelf =
-			(unitCaster == "player" and UnitIsUnit(unitTarget, "player")) or
-			(unitTarget == "player" and UnitIsUnit(unitCaster, "player"));
-		if not self.allow_self and isSelf then
-			return Tools.reportError("Action can not target self", suppressErrors);
+		local tChar = ExiWoW.TARGET;
+		if unitTarget == "player" then
+			tChar = ExiWoW.ME;
 		end
 
-		-- Unit must be in a party or raid
-		local inParty = UnitInRaid(unitCaster) or UnitInParty(unitCaster) or UnitInRaid(unitTarget) or UnitInRaid(unitTarget) or isSelf
-		if not inParty and self.require_party then
-			return Tools.reportError("Target is not in your party or raid", suppressErrors);
-		end
-
-		-- Check dead
-		if UnitIsDeadOrGhost(unitCaster) and not self.allow_caster_dead then
-			return Tools.reportError("You are dead.", suppressErrors);
-		end
-		if UnitIsDeadOrGhost(unitTarget) and not self.allow_targ_dead then
-			return Tools.reportError("Your target is dead", suppressErrors);
-		end
-
-		
-
-		-- Unit in range
-		if self.max_distance ~= 0 and (not self:checkRange(unitTarget) or not self:checkRange(unitCaster)) then
-			return Tools.reportError("Too far away!", suppressErrors);
-		end
-
-		-- Check combat
-		if not self.allow_targ_combat and UnitAffectingCombat(unitTarget) then
-			return Tools.reportError("Target is in combat", suppressErrors);
-		end
-		if not self.allow_targ_combat and UnitAffectingCombat(unitTarget) then
-			return Tools.reportError("You are in combat", suppressErrors);
-		end
-
-
-
-		-- Validations only when SENDING (these are limited to caster) --
-		if unitCaster == "player" then
-
-			-- Make sure we're not stunned
-			local pl = ExiWoW.ME;
-			if not HasFullControl() and not self.allow_stunned then
-				return Tools.reportError("Can't use actions right now", suppressErrors);
-			end
-
-			-- Stealth
-			if not IsStealthed() and self.require_stealth then
-				return Tools.reportError("You must be in stealth to use this action!", suppressErrors);
-			end
-
-			-- Unit movement --
-			if not self.allow_caster_moving and GetUnitSpeed(unitCaster) > 0 then
-				return Tools.reportError("Can't use while moving", suppressErrors);
-			end
-			if not self.allow_targ_moving and GetUnitSpeed(unitTarget) > 0 then
-				return Tools.reportError("Can't use on a moving target", suppressErrors);
-			end
-
-		-- Validate when RECEIVING --
-		else
-		end
-
-		-- Underwear
-		if self.target_has_underwear ~= nil then
-			local pl = ExiWoW.TARGET;
-
-			if unitTarget == "player" then
-				pl = ExiWoW.ME;
-			end
-			
-			if not pl then 
-				return Tools.reportError("Target data missing. Try re-targeting!", suppressErrors);
-			end
-			local uw = pl:getUnderwear()
-			if self.target_has_underwear == false and uw ~= false then
-				return Tools.reportError("Target is wearing underwear!", suppressErrors);
-			elseif self.target_has_underwear == true and uw == false then
-				return Tools.reportError("Target is not wearing underwear!", suppressErrors);
-			elseif type(self.target_has_underwear) == "table" and (not uw or not self.target_has_underwear[uw.id]) then
-				return Tools.reportError("Target is not wearing the required underwear!", suppressErrors);
+		-- Validate the conditions
+		if #self.conditions > 0 then
+			local success, failedCondition = Condition.all(self.conditions, unitCaster, unitTarget, ExiWoW.ME, tChar, nil, nil, self);
+			if not success then
+				failedCondition:reportError();
+				return false;
 			end
 		end
 
@@ -432,15 +347,7 @@ Action.__index = Action;
 
 	end
 
-	function Action:checkRange(target, item)
-		if not item then item = self.max_distance end
-		for i,v in ipairs(item) do
-			if IsItemInRange(v, target) then
-				return true;
-			end
-		end
-		return false;
-	end
+	
 
 
 		-- TOOLTIP HANDLING --
@@ -594,7 +501,8 @@ Action.__index = Action;
 	end
 
 
-	-- Template functions for callbacks and such --
+	-- Template functions for callbacks and such
+	
 	function Action:sendRPText(sender, target, suppressErrors, callback)
 
 		local ts = ExiWoW.ME;
@@ -603,7 +511,8 @@ Action.__index = Action;
 
 		local id = self.id;
 		if self.alias then id = self.alias end
-		local rptext = RPText.get(id, ts, tt);
+		-- id, senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action
+		local rptext = RPText.get(id, sender, target, ts, tt, nil, nil, self);
 
 		if not rptext then return false end
 		-- Send the text
@@ -654,7 +563,14 @@ Action.__index = Action;
 		end
 	end
 
-
+	function Action:allowCasterMoving()
+		for _,a in pairs(self.conditions) do
+			if a.type == Condition.Types.RTYPE_MOVING and a.inverse then
+				return false
+			end
+		end
+		return true
+	end
 
 
 -- STATIC --
@@ -748,6 +664,17 @@ Action.__index = Action;
 		end
 		return false
 
+	end
+
+	-- Check range
+	function Action.checkRange(target, item)
+		if not item then item = self.max_distance end
+		for i,v in ipairs(item) do
+			if IsItemInRange(v, target) then
+				return true;
+			end
+		end
+		return false;
 	end
 
 	-- Send an action, id can also be an action
@@ -847,6 +774,7 @@ Action.__index = Action;
 		return ((x2 - x1) ^ 2 + (y2 - y1) ^ 2 + (z2-z1) ^ 2) ^ 0.5
 	end
 
+
 	function Action.beginSpellCast(action, target)
 
 		Action:endSpellCast(false);
@@ -888,7 +816,7 @@ Action.__index = Action;
 		end
 
 		-- Move interrupt
-		if not action.allow_caster_moving then
+		if not action:allowCasterMoving() then
 			Action.CASTING_MOVEMENT_BINDING = Event.on("PLAYER_STARTED_MOVING", interrupt)
 		end
 

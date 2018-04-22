@@ -10,9 +10,10 @@ function internal.build.actions()
 	local UI = require("UI");
 	local RPText = require("RPText");
 	local Event = require("Event");
+	local Condition = require("Condition");
 
 	local ef = ExiWoW.LibAssets.effects
-	local extension = ExiWoW.R;
+	local extension = internal.ext;
 	
 
 			-- LIBRARY --
@@ -22,12 +23,16 @@ function internal.build.actions()
 		id = "A",
 		global_cooldown = false,
 		suppress_all_errors = true,
-		party_restricted = false,
-		allow_stunned = true,
-		allow_instance = true,
-		allow_caster_dead = true,
-		allow_targ_dead = true,
 		hidden = true,
+		conditions = {},
+		not_defaults = {
+			"party_restricted",
+			"not_stunned",
+			"not_in_instance",
+			"sender_alive",
+			"victim_alive",
+			"not_in_vehicle"
+		},
 		-- Custom sending logic
 		fn_send = function(self, sender, target, suppressErrors)
 			ExiWoW.TARGET = nil
@@ -61,13 +66,18 @@ function internal.build.actions()
 		texture = "ability_rogue_plunderarmor",
 		--cooldown = 120,
 		cooldown = 10,
-		require_stealth = true,
-		allow_targ_combat = false,
-		party_restricted = true,
 		cast_time = 2,
-		allow_caster_moving = false,
 		cast_sound_loop = 6425,				-- Tailoring, see http://www.wowhead.com/sound=6425/tailoring
-		max_distance = Action.MELEE_RANGE,
+		conditions = {
+			Condition.get("require_stealth"),
+			Condition.get("victim_no_combat"),
+			Condition.get("sender_no_combat"),
+			Condition.get("require_party"),
+			Condition.get("sender_not_moving"),
+			Condition.get("melee_range"),
+		},
+		not_defaults = {},
+
 		-- allow_self = false,
 		fn_cast = function(self, sender, target, suppressErrors)
 			DoEmote("KNEEL", target);
@@ -131,14 +141,17 @@ function internal.build.actions()
 	-- meditate --
 	extension:addAction({
 		id = "MEDITATE",
-		self_only = true,
 		name = "Meditate",
 		description = "Meditate for a while, allowing your excitement to fade at a greatly increased rate.",
 		texture = "monk_ability_transcendence",
 		cooldown = 0,
-		allow_caster_moving = false,
-		allow_targ_combat = false,
 		important = true,
+		conditions = {
+			Condition.get("sender_no_combat"),
+			Condition.get("sender_not_moving"),
+			Condition.get("only_selfcast"),
+		},
+		not_defaults = {},
 		-- Handle the receiving end here
 		fn_receive = function(self, sender, target, suppressErrors)
 
@@ -167,8 +180,12 @@ function internal.build.actions()
 		description = "Take a good look at your target, revealing some information about them.",
 		texture = "inv_darkmoon_eye",
 		cooldown = 0,
-		max_distance = Action.MELEE_RANGE,
-		party_restricted = false,
+		conditions = {
+			Condition.get("melee_range"),
+		},
+		not_defaults = {
+			"party_restricted"
+		},
 		fn_send = function(self, sender, target, suppressErrors)
 			-- We only need a callback for this
 			return nil, function(se, success, data) Action.handleInspectCallback(target, success, data) end
@@ -185,9 +202,15 @@ function internal.build.actions()
 		description = "Sniff out some information about your target from a distance.",
 		texture = "inv_wolfdraenormountshadow",
 		cooldown = 0,
-		max_distance = Action.CASTER_RANGE,
-		party_restricted = false,
-		allowed_races = {"Worgen"},
+		conditions = {
+			Condition.get("caster_range"),
+		},
+		filters = {
+			Condition:new({type=Condition.Types.RTYPE_RACE, data={Worgen=true}, sender=true})
+		},
+		not_defaults = {
+			"party_restricted",
+		},
 		fn_send = function(self, sender, target, suppressErrors)
 			DoEmote("SNIFF", target);
 			-- Callback
@@ -205,8 +228,10 @@ function internal.build.actions()
 		description = "Tickle a player.",
 		texture = "Spell_shadow_fingerofdeath",
 		cooldown = 6,
-		max_distance = Action.MELEE_RANGE,
-		party_restricted = false,
+		conditions = {
+			Condition.get("melee_range"),
+		},
+		not_defaults = {},
 		fn_send = function(self, sender, target, suppressErrors)
 			if not UnitIsUnit(target, "player") then 
 				DoEmote("TICKLE", target);
@@ -227,9 +252,13 @@ function internal.build.actions()
 		description = "Give a player a wedgie, provided they're wearing underwear.",
 		texture = "Spell_holy_fistofjustice",
 		cooldown = 6,
-		max_distance = Action.MELEE_RANGE,
-		target_has_underwear = true,
-		party_restricted = false,
+		conditions = {
+			Condition.get("targetWearsUnderwear"),
+			Condition.get("melee_range"),
+		},
+		no_defaults = {
+			"party_restricted"
+		},
 		fn_send = function(self, sender, target, suppressErrors)
 			local race = UnitRace(target)
 			local gender = UnitSex(target)
@@ -254,10 +283,13 @@ function internal.build.actions()
 		description = "Search your active area for items.",
 		texture = "icon_treasuremap",
 		cooldown = 0,
-		self_only = true,
 		cast_sound_loop = 1104,
-		allow_caster_moving = false,
 		cast_time = 3,
+		conditions = {
+			Condition.get("only_selfcast"),
+			Condition.get("sender_not_moving"),
+		},
+		not_defaults = {},
 		fn_cast = function(self, sender, target, suppressErrors)
 			DoEmote("KNEEL", target);
 		end,
@@ -277,7 +309,10 @@ function internal.build.actions()
 		description = "First use: Stake a starting point. Second use: Get the distance from the starting point, measured in map coordinates.",
 		texture = "ability_tracking",
 		cooldown = 0,
-		self_only = true,
+		conditions = {
+			Condition.get("only_selfcast"),
+		},
+		not_defaults = {},
 		fn_send = function(self, sender, target, suppressErrors)
 			return nil;
 		end,

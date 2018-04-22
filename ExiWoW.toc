@@ -40,11 +40,11 @@ lib/_index.lua
 lib/zones.lua
 lib/effects.lua
 lib/npc.lua
-lib/rptext_conditions.lua
 lib/spells.lua
 lib/loot.lua
 
 # Asset database
+db/conditions.lua
 db/effects.lua
 db/rptexts.lua
 db/actions.lua

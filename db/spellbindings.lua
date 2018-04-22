@@ -4,7 +4,7 @@ local require = internal.require;
 function internal.build.spellBindings()
 	
 	local sb = require("SpellBinding");
-	local R = ExiWoW.R;
+	local R = internal.ext;
 	local spellKits = ExiWoW.LibAssets.spell_kits;
 
 	R:addSpellBinding({

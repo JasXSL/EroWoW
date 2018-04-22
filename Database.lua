@@ -6,6 +6,7 @@ local Database = {
 	tables = {}
 };
 
+
 function Database.add(tble, value)
 	if type(value) ~= "table" then
 		value = {value};
@@ -34,6 +35,29 @@ function Database.clearTables(...)
 	end
 end
 
+function Database.getID(tbl, id)
+	local all = Database.filter(tbl);
+	for _,v in pairs(all) do
+		if v.id == id then
+			return v;
+		end
+	end
+end
+
+function Database.getIDs(tbl, ids)
+	if type(ids) ~= "table" then
+		ids = {ids=true};
+	end
+	local all = Database.filter(tbl);
+	local out = {};
+	for _,v in pairs(all) do
+		if ids[v.id] then
+			table.insert(out, v);
+		end
+	end
+	return out;
+end
+
 -- Lets you supply one or many filter functions
 -- Returns false if none are found
 function Database.filter(tble, filters)
@@ -58,9 +82,14 @@ function Database.filter(tble, filters)
 	return out;
 end
 
-export("Database", Database, {}, {
-	add = Database.add,
-	sort = Database.sort,
+export("Database", Database, {
 	filter = Database.filter,
-	clearTables = Database.clearTables
+	sort = Database.sort,
+	getIDs = Database.getIDs,
+	getID = Database.getID
+}, 
+{
+	add = Database.add,
+	clearTables = Database.clearTables,
+	tables = Database.tables
 })

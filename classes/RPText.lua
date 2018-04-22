@@ -87,7 +87,8 @@ RPText.whisperCD = nil
 		return self
 	end
 
-	function RPText:validate(sender, receiver, spelldata, spellType)
+	-- senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action
+	function RPText:validate(senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action)
 
 		local se = self;
 		function validateThese(input, noOr)
@@ -99,7 +100,7 @@ RPText.whisperCD = nil
 				if v[1] ~= nil then 
 					success = validateThese(v)	-- We must go deeper
 				else
-					success = v:validate(sender, receiver, spelldata, spellType) -- This entry was a condition
+					success = v:validate(senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action) -- This entry was a condition
 					if v.type == Condition.Types.RTYPE_HAS_INVENTORY and success then
 						se.item = success;
 					end
@@ -189,17 +190,17 @@ RPText.whisperCD = nil
 
 	-- STATIC
 	-- Returns an RPText object
-	function RPText.get(id, sender, receiver, spelldata, spellType)
+	function RPText.get(id, senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action)
 
 		local viable = {};
-		local isSelfCast = UnitIsUnit(sender:getName(), receiver:getName())
+		local isSelfCast = UnitIsUnit(senderChar:getName(), receiverChar:getName())
 		
 		local lib = Database.filter("RPText");
 		for k,v in pairs(lib) do
 
 			if Tools.multiSearch(id, v.id) then
 
-				local valid = v:validate(sender, receiver, spelldata, spellType);
+				local valid = v:validate(senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action);
 				if 
 					valid and 
 					(
@@ -226,6 +227,7 @@ RPText.whisperCD = nil
 	end
 
 	-- Same as above but triggers as well
+	--senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action
 	function RPText.trigger(id, sender, receiver, spelldata, spellType)
 		local text = RPText.get(id, sender, receiver, spelldata, spellType)
 		if text then 
