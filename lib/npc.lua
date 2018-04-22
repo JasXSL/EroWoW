@@ -29,13 +29,13 @@ local npcs = ExiWoW.LibAssets.npcs
 	npc_pincer["%Makrura"] = true
 	npc_pincer["%Mak'Rana"] = true
 	npc_pincer["King Azureback"] = true
-	
-	
 	npc_pincer["Moonshell Crawler"] = true
 	npc_pincer["Skittering Doomstinger"] = true
 	npc_pincer["%Scorpashi"] = true
 	npc_pincer["%Drysnap"] = true
 	npc_pincer["%Bogstrok"] = true
+	npc_pincer["Deepwater Spikeback"] = true
+	npc_pincer["Coastal Spikeback"] = true
 	
 	
 	npcs.feltotemMale = {
@@ -56,6 +56,13 @@ local npcs = ExiWoW.LibAssets.npcs
 	npcs.harpy = harpy
 	harpy["%Harpy"] = true
 	harpy["Witchwood Hag"] = true
+	harpy["%Crawliac"] = true
+	harpy["Ragi the Hexxer"] = true
+	harpy["Agara Deathsong"] = true
+	harpy["Ugla the Hag"] = true
+	harpy["Screeching Hag-Sister"] = true
+	harpy["Screeching Harridan"] = true
+	
 	
 
 	local satyr = {}

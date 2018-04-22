@@ -21,6 +21,7 @@ local Character = {}
 	Character.EXCITEMENT_MAX = 1.25;				-- You can overshoot max excitement and have to wait longer
 	Character.EXCITEMENT_FADE_IDLE = 0.001;
 	Character.AURAS = {}
+	Character.lootContainer = nil					-- Loot container name when looting a container through the "Open" spell
 
 	function Character.getTakehitCD() return Character.takehitCD end
 	function Character.getWhisperCD() return Character.whisperCD end
@@ -49,7 +50,15 @@ local Character = {}
 		Character.evtFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 		Character.evtFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
 		Character.evtFrame:RegisterUnitEvent("UNIT_AURA", "player")
-		Character.evtFrame:RegisterEvent("PLAYER_DEAD");
+		Character.evtFrame:RegisterEvent("UNIT_AURA", "player")
+		Character.evtFrame:RegisterEvent("UNIT_SPELLCAST_SENT");
+		Character.evtFrame:RegisterUnitEvent("UNIT_SPELLCAST_FAILED", "player")
+		Character.evtFrame:RegisterUnitEvent("UNIT_SPELLCAST_FAILED_QUIET", "player")
+
+		Character.evtFrame:RegisterEvent("LOOT_OPENED");
+		Character.evtFrame:RegisterEvent("LOOT_SLOT_CLEARED");
+		Character.evtFrame:RegisterEvent("LOOT_CLOSED");
+		
 
 		-- Main timer, ticking once per second
 		Timer.set(function()
@@ -184,7 +193,7 @@ local Character = {}
 				)
 				
 
-		end
+			end
 		end
 
 		for k,v in pairs(Character.eventBindings) do
@@ -207,6 +216,26 @@ local Character = {}
 			end
 		end
 
+		if event == "UNIT_SPELLCAST_SENT" then
+			
+			local lootableSpells = {
+				Fishing = true,
+				Mining = true,
+				Opening = true,
+				["Herb Gathering"] = true,
+				Archaeology = true,
+				Skinning = true,
+				Mining = true,
+				Disenchanting = true
+			}
+			if lootableSpells[arguments[2]] then
+				Character.lootSpell = arguments[2];
+				Character.lootContainer = arguments[4];
+			end
+			--print(event, ...)
+		end
+
+
 		if event == "PLAYER_TARGET_CHANGED" then
 			UI.portrait.targetHasExiWoWFrame:Hide();
 			if UnitExists("target") then
@@ -219,6 +248,24 @@ local Character = {}
 			ExiWoW.ME:addExcitement(0, true);
 		end
 		
+		if event == "LOOT_OPENED" or event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_FAILED_QUIET" then
+			if Character.lootContainer then 
+				print("LootContainer = ", Character.lootContainer);
+			
+				print("Nr items", GetNumLootItems())
+				print("Autoloot", arguments[1])
+				for i=1, GetNumLootItems() do
+					print("Item", i, GetLootSlotInfo(i))
+				end
+			end
+
+		end
+
+		if event == "LOOT_CLOSED" then
+			print("Clearing container")
+			Character.lootContainer = nil
+		end
+
 		if event == "UNIT_AURA" then
 
 			local unit = ...;
@@ -439,7 +486,8 @@ local Character = {}
 			then add = false end
 
 			if add and type(item.points) == "table" then
-				add = isCloseToPoints(item.points)
+				add = isCloseToPoints(item.points);
+				print("B", item.items[1].id, add);
 			end
 
 			if add then

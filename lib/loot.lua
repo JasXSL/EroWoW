@@ -220,7 +220,43 @@ local f = ExiWoW.LibAssets.loot
 		}
 	})
 
+	table.insert(f, {
+		zone = "Suramar",
+		sub = "Estate of the First Arcanist",
+		points = {
+			{x = 65.75, y=62.89, rad=0.26},
+		},
+		name = "_FORAGE_",
+		items={
+			{
+				type = "Underwear", 
+				id = "BRIGHT_WHITE_BIKINI_BOTTOMS", 
+				chance = 1,
+				sound = 44577,
+				text = RPText:new({
+					text_receiver = "You find some bright-white bikini bottoms in a drawer. If Thalyssra asks, you could say Elisande's forces stole them."
+				})
+			}
+		}
+	})
 
+	-- FEL_LEATHER_BRIEFS
+	table.insert(f, {
+		zone = "Felsoul Hold",
+		sub = "Den of the Demented",
+		name = "_FORAGE_",
+		items={
+			{
+				type = "Underwear", 
+				id = "FEL_LEATHER_BRIEFS", 
+				chance = 0.25,
+				sound = 44577,
+				text = RPText:new({
+					text_receiver = "You find a pair of black leather briefs inscribed with runes glowing with fel energy."
+				})
+			}
+		}
+	})
 	
 	
 

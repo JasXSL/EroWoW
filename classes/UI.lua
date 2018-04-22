@@ -417,7 +417,7 @@ UI = {}
 				f:SetScript("OnMouseUp", function (self, button)
 					if IsShiftKeyDown() then
 						v.favorite = not v.favorite;
-						Action:libSort();
+						Action.sort();
 						UI.actionPage.update()
 					else
 						Action.useOnTarget(v.id, "target")

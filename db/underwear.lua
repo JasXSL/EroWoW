@@ -177,6 +177,24 @@ function internal.build.underwear()
 		description = "Purple silken briefs with the kirin tor symbol on the front and silvery trimmings.",
 		tags = {},
 	}));
+
+	table.insert(lib, uw:new({
+		id = "BRIGHT_WHITE_BIKINI_BOTTOMS",
+		name = "Bright-white Bikini Bottoms",
+		icon = "Inv_misc_embercloth",
+		rarity = 3,
+		description = "A bright-white Shal'dorei silk thong with small snaps on the sides adorned with ancient mana crystals.",
+		tags = {},
+	}));
+
+	table.insert(lib, uw:new({
+		id = "FEL_LEATHER_BRIEFS",
+		name = "Fel Leather Briefs",
+		icon = "Inv_helm_leather_raidmonkmythic_p_01",
+		rarity = 3,
+		description = "Black leather briefs inscribed with green glowing fel runes. Wear at your own risk.",
+		tags = {},
+	}));
 	
 end
 

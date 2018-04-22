@@ -14,7 +14,14 @@ UIParentLoadAddOn("Blizzard_DebugTools")
 
 	TODO:
 	- Make condition a standalone asset type
-	- Make everything run off of conditions
+	- Make actions and everything run off of conditions
+	- Improve the NPC generator
+	- Move events into its own module
+	- Make all RP text fetching and outputting run in the RPText module
+	- Move UI code from Character module
+	- Keep improving so static calls always use . instead of :
+	- ExiWoW.R should be local to ExiWoW
+
 	- Maybe make bundles of rptexts instead of spellbindings?
 	- Add pagination once you manage to fill up the whole first page and/or underwear page
 	- Character backup
