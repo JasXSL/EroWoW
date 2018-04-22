@@ -1,7 +1,7 @@
 local appName, internal = ...
 local export = internal.Module.export;
 local require = internal.require;
-local Condition, Database, Tools, Index;
+local Condition, Database, Tools, Index, Timer;
 
 local RPText = {};
 RPText.__index = RPText;
@@ -14,6 +14,7 @@ RPText.whisperCD = nil
 		Database = require("Database");
 		Tools = require("Tools");
 		Index = require("Index");
+		Timer = require("Timer");
 	end
 
 	function RPText.getTakehitCD() return RPText.takehitCD end
@@ -205,7 +206,7 @@ RPText.whisperCD = nil
 					valid and 
 					(
 						(not v.text_sender and isSelfCast) or
-						((v.text_sender or sender.type ~= "player") and not isSelfCast) -- NPC spells don't have text_sender, so they need to be put here
+						((v.text_sender or senderUnit.type ~= "player") and not isSelfCast) -- NPC spells don't have text_sender, so they need to be put here
 					)
 				then
 					table.insert(viable, v)

@@ -70,11 +70,11 @@ local Event = {}
 			return { spellId = spellId, name=name, harmful=harmful, unitCaster=unitCaster, count=count, crit=crit, char=char}
 		end
 
-		local function triggerWhisper(sender, spelldata, spellType)
+		local function triggerWhisper(senderUnit, sender, spelldata, spellType)
 			if math.random() > globalStorage.taunt_freq then return end 
 			if RPText.whisperCD then return end
 
-			if RPText.trigger("_WHISPER_", sender, ExiWoW.ME, spelldata, spellType) then
+			if RPText.trigger("_WHISPER_", senderUnit, "player", sender, ExiWoW.ME, spelldata, spellType) then
 				if globalStorage.taunt_rp_rate > 0 then
 					RPText.whisperCD = Timer.set(function()
 						RPText.whisperCD = nil
@@ -92,7 +92,7 @@ local Event = {}
 			local eventPrefix, eventSuffix = combatEvent:match("^(.-)_?([^_]*)$");
 
 			-- See if a viable unit exists
-			local u = false
+			local u = "none"
 			if sourceGUID == UnitGUID("target") then u = "target"
 			elseif sourceGUID == UnitGUID("focus") then u = "focus"
 			elseif sourceGUID == UnitGUID("mouseover") then u = "mouseover"
@@ -138,7 +138,7 @@ local Event = {}
 				)
 				SpellBinding.onTick(u, npc, trig)
 				if harmful and eventPrefix ~= "SPELL_PERIODIC" then
-					triggerWhisper(npc, trig, Condition.Types.RTYPE_SPELL_TICK)
+					triggerWhisper(u, npc, trig, Condition.Types.RTYPE_SPELL_TICK)
 				end
 
 			elseif eventSuffix == "DAMAGE" and eventPrefix == "SWING" then
@@ -171,6 +171,7 @@ local Event = {}
 				ExiWoW.ME:addExcitement(percentage*0.1, false, true);
 
 				triggerWhisper(
+					u,
 					npc, 
 					buildSpellTrigger("ATTACK", "ATTACK", true, sourceName, 1, crit, npc), 
 					Condition.Types.RTYPE_MELEE
@@ -228,7 +229,6 @@ local Event = {}
 		end
 
 		if event == "LOOT_CLOSED" then
-			print("Clearing container")
 			Event.lootContainer = nil
 		end
 
@@ -335,7 +335,8 @@ export(
 	{
 		on = Event.on,
 		off = Event.off,
-		Types = Event.Types
+		Types = Event.Types,
+		hasAura = Event.hasAura
 	},
 	{
 		raise = Event.raise
