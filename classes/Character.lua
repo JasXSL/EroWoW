@@ -3,28 +3,19 @@ local export = internal.Module.export;
 local require = internal.require;
 
 local UI, Timer, Event, Action, Underwear, Index, SpellBinding, Tools, RPText, Condition;
+local myGUID = UnitGUID("player")
 
 -- Contains info about a character, 
 local Character = {}
-	Character.__index = Character;
-	Character.evtFrame = CreateFrame("Frame");
-	Character.eventBindings = {};		-- {id:(int)id, evt:(str)evt, fn:(func)function, numTriggers:(int)numTriggers=inf}
-	Character.eventBindingIndex = 0;	
-
-	Character.takehitCD = nil			-- Cooldown for takehit texts
-	Character.whisperCD = nil
-
-	local myGUID = UnitGUID("player")
+Character.__index = Character;
 
 	-- Consts
 	Character.EXCITEMENT_FADE_PER_SEC = 0.05;
 	Character.EXCITEMENT_MAX = 1.25;				-- You can overshoot max excitement and have to wait longer
 	Character.EXCITEMENT_FADE_IDLE = 0.001;
-	Character.AURAS = {}
-	Character.lootContainer = nil					-- Loot container name when looting a container through the "Open" spell
+	
 
-	function Character.getTakehitCD() return Character.takehitCD end
-	function Character.getWhisperCD() return Character.whisperCD end
+
 
 	-- Static
 	function Character.ini()
@@ -40,29 +31,8 @@ local Character = {}
 		RPText = require("RPText");
 		Condition = require("Condition");
 
-		Character.evtFrame:SetScript("OnEvent", Character.onEvent)
-		Character.evtFrame:RegisterEvent("PLAYER_STARTED_MOVING")
-		Character.evtFrame:RegisterEvent("PLAYER_STOPPED_MOVING")
-		Character.evtFrame:RegisterUnitEvent("UNIT_SPELLCAST_START", "player");
-		Character.evtFrame:RegisterUnitEvent("UNIT_SPELLCAST_SUCCESS", "player");
-		
-		Character.evtFrame:RegisterEvent("SOUNDKIT_FINISHED");
-		Character.evtFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-		Character.evtFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
-		Character.evtFrame:RegisterUnitEvent("UNIT_AURA", "player")
-		Character.evtFrame:RegisterEvent("UNIT_AURA", "player")
-		Character.evtFrame:RegisterEvent("UNIT_SPELLCAST_SENT");
-		Character.evtFrame:RegisterUnitEvent("UNIT_SPELLCAST_FAILED", "player")
-		Character.evtFrame:RegisterUnitEvent("UNIT_SPELLCAST_FAILED_QUIET", "player")
-
-		Character.evtFrame:RegisterEvent("LOOT_OPENED");
-		Character.evtFrame:RegisterEvent("LOOT_SLOT_CLEARED");
-		Character.evtFrame:RegisterEvent("LOOT_CLOSED");
-		
-
-		-- Main timer, ticking once per second
+		-- Main character timer, ticking once per second
 		Timer.set(function()
-			
 			-- Owner meditation
 			local me = ExiWoW.ME;
 			local fade = 0;
@@ -72,280 +42,7 @@ local Character = {}
 				fade = Character.EXCITEMENT_FADE_IDLE;
 			end
 			me:addExcitement(-fade);
-
-
 		end, 1, math.huge)
-
-	end
-
-	function Character.onEvent(self, event, ...)
-
-		local arguments = {...}
-
-		-- Local functions
-		local function buildSpellTrigger(spellId, name, harmful, unitCaster, count, crit, char)
-			return { spellId = spellId, name=name, harmful=harmful, unitCaster=unitCaster, count=count, crit=crit, char=char}
-		end
-
-		local function triggerWhisper(sender, spelldata, spellType)
-			if math.random() > globalStorage.taunt_freq then return end 
-			if Character.whisperCD then return end
-
-			if RPText.trigger("_WHISPER_", sender, ExiWoW.ME, spelldata, spellType) then
-				if globalStorage.taunt_rp_rate > 0 then
-					Character.whisperCD = Timer.set(function()
-						Character.whisperCD = nil
-					end, globalStorage.taunt_rp_rate);
-				end
-			end
-			
-		end
-
-		-- Handle combat log
-		-- This needs to go first as it should only handle event bindings on the player
-		if event == "COMBAT_LOG_EVENT_UNFILTERED" and Index.checkHardLimits("player", "player", true) then
-
-			local timestamp, combatEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags =  ...; -- Those arguments appear for all combat event variants.
-			local eventPrefix, eventSuffix = combatEvent:match("^(.-)_?([^_]*)$");
-
-			-- See if a viable unit exists
-			local u = false
-			if sourceGUID == UnitGUID("target") then u = "target"
-			elseif sourceGUID == UnitGUID("focus") then u = "focus"
-			elseif sourceGUID == UnitGUID("mouseover") then u = "mouseover"
-			elseif sourceGUID == UnitGUID("player") then u = "player"
-			end
-
-			if combatEvent == "UNIT_DIED" then
-				if 
-					bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) == 0 and
-					bit.band(destFlags, COMBATLOG_OBJECT_CONTROL_NPC) > 0
-				then
-					Character.rollLoot(destName);
-				end
-			end
-
-			-- Only player themselves after this point
-			if bit.band(destFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == 0 then return end 
-
-			
-			-- These only work for healing or damage
-			if not Character.takehitCD and (eventPrefix == "SPELL" or eventPrefix == "SPELL_PERIODIC") and (eventSuffix == "DAMAGE" or eventSuffix=="HEAL") then
-				
-				local npc = Character:new({}, sourceName);
-				if u then npc = Character.buildNPC(u, sourceName) end
-
-				local crit = arguments[21]
-				if localStorage.tank_mode then crit = math.random() < globalStorage.tank_mode_perc end
-
-				-- Todo: Add spell triggers
-				damage = arguments[15]
-				local harmful = true
-				if eventSuffix ~= "DAMAGE" then harmful = false end
-
-				--spellId, name, harmful, unitCaster, count, crit, char
-				local trig = buildSpellTrigger(
-					arguments[12], -- Spell ID
-					arguments[13], --Spell Name
-					harmful, 
-					sourceName, 
-					1,
-					crit, -- Crit
-					npc
-				)
-				SpellBinding:onTick(npc, trig)
-				if harmful and eventPrefix ~= "SPELL_PERIODIC" then
-					triggerWhisper(npc, trig, Condition.Types.RTYPE_SPELL_TICK)
-				end
-
-			elseif eventSuffix == "DAMAGE" and eventPrefix == "SWING" then
-
-				local crit = ""
-				if arguments[18] or (localStorage.tank_mode and math.random() < globalStorage.tank_mode_perc) then crit = "_CRIT" end
-
-				local damage = 0	
-				damage = arguments[12]
-
-				
-				local chance = globalStorage.swing_text_freq;
-				if crit ~= "" then chance = chance*4 end -- Crits have 3x chance for swing text
-
-				local npc = Character.buildNPC(u, sourceName)
-				local rand = math.random()
-				if not Character.takehitCD and rand < chance and u and not UnitIsPlayer(u) then
-
-					local rp = RPText.get(eventPrefix..crit, npc, ExiWoW.ME)
-					if rp then
-						Character.setTakehitTimer();
-						rp:convertAndReceive(npc, ExiWoW.ME)
-					end
-
-				end
-
-				if damage <= 0 then return end
-				local percentage = damage/UnitHealthMax("player");
-				ExiWoW.ME:addExcitement(percentage*0.1, false, true);
-
-				triggerWhisper(
-					npc, 
-					buildSpellTrigger("ATTACK", "ATTACK", true, sourceName, 1, crit, npc), 
-					Condition.Types.RTYPE_MELEE
-				)
-				
-
-			end
-		end
-
-		for k,v in pairs(Character.eventBindings) do
-
-			if v.evt == event then
-
-				local trigs = v.numTriggers -1;
-
-				-- Remove if out of triggers
-				if trigs < 1 then
-					Character.eventBindings[k] = nil;
-				else
-					Character.eventBindings[k].numTriggers = trigs;
-				end
-
-				if type(v.fn) == "function" then
-					v:fn(arguments);
-				end
-
-			end
-		end
-
-		if event == "UNIT_SPELLCAST_SENT" then
-			
-			local lootableSpells = {
-				Fishing = true,
-				Mining = true,
-				Opening = true,
-				["Herb Gathering"] = true,
-				Archaeology = true,
-				Skinning = true,
-				Mining = true,
-				Disenchanting = true
-			}
-			if lootableSpells[arguments[2]] then
-				Character.lootSpell = arguments[2];
-				Character.lootContainer = arguments[4];
-			end
-			--print(event, ...)
-		end
-
-
-		if event == "PLAYER_TARGET_CHANGED" then
-			UI.portrait.targetHasExiWoWFrame:Hide();
-			if UnitExists("target") then
-				-- Query for the addon
-				Action.useOnTarget("A", "target", true);
-			end
-		end
-
-		if event == "PLAYER_DEAD" then
-			ExiWoW.ME:addExcitement(0, true);
-		end
-		
-		if event == "LOOT_OPENED" or event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_FAILED_QUIET" then
-			if Character.lootContainer then 
-				print("LootContainer = ", Character.lootContainer);
-			
-				print("Nr items", GetNumLootItems())
-				print("Autoloot", arguments[1])
-				for i=1, GetNumLootItems() do
-					print("Item", i, GetLootSlotInfo(i))
-				end
-			end
-
-		end
-
-		if event == "LOOT_CLOSED" then
-			print("Clearing container")
-			Character.lootContainer = nil
-		end
-
-		if event == "UNIT_AURA" then
-
-			local unit = ...;
-			if unit ~= "player" then return end
-			local active = {} -- spellID = {name=name, count=count}
-
-			local function auraExists(tb, aura)
-				for i,a in pairs(tb) do
-					if a.spellId == aura.spellId and a.unitCaster == aura.unitCaster and a.harmful == aura.harmful then
-						return true;
-					end
-				end
-				return false
-			end
-			
-			local function addAura(spellId, name, harmful, unitCaster, count)
-
-				local uc = unitCaster;
-				if not uc then uc = "??" else uc = UnitName(unitCaster) end
-
-				local char = Character.buildNPC(unitCaster, uc)
-				--spellId, name, harmful, unitCaster, count, crit, char
-				local aura = buildSpellTrigger(spellId, name, harmful, unitCaster, count, false, char)
-				table.insert(active, aura)
-				if not auraExists(Character.AURAS, aura) then
-					SpellBinding:onAdd(char, aura)
-				end
-
-			end
-
-			
-
-			-- Read all buffs
-			for i=1,40 do 
-				local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId = UnitAura(unit, i)
-				if name == nil then break end
-				addAura(spellId, name, false, unitCaster, count)
-			end
-			-- Read all debuffs
-			for i=1,40 do 
-				local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId = UnitAura(unit, i, "HARMFUL")
-				if name == nil then break end
-				addAura(spellId, name, true, unitCaster, count)
-			end
-
-			-- See what auras were removed
-			for i,a in pairs(Character.AURAS) do
-				if not auraExists(active, a) then
-					SpellBinding:onRemove(a.char, a)
-				end
-			end
-
-			Character.AURAS = active
-
-		end
-
-	end
-
-	function Character.bind(evt, fn, numTriggers)
-
-		Character.eventBindingIndex = Character.eventBindingIndex+1;
-		table.insert(Character.eventBindings, {
-			id = Character.eventBindingIndex,
-			evt = evt,
-			fn = fn,
-			numTriggers = numTriggers or math.huge
-		});
-
-		return Character.eventBindingIndex;
-
-	end
-
-	function Character.unbind(id)
-
-		for k,v in pairs(Character.eventBindings) do
-			if v.id == id then
-				Character.eventBindings[k] = nil;
-				return
-			end
-		end
 
 	end
 
@@ -369,33 +66,6 @@ local Character = {}
 	end
 
 
-	function Character.setTakehitTimer()
-		local rate = globalStorage.takehit_rp_rate;
-		Timer.clear(Character.takehitCD);
-		Character.takehitCD = Timer.set(function()
-			Character.takehitCD = nil;
-		end, rate)
-	end
-
-	function Character:hasAura(names)
-		if type(names) ~= "table" then print("Invalid name var for aura check, type was", type(names)); return false end 
-		for k,v in pairs(names) do
-			if type(v) ~= "table" then
-				print("Error in hasAura, value is not a table")
-			else
-				local name = v.name;
-				local caster = v.caster;
-				for _,aura in pairs(Character.AURAS) do
-					if (aura.name == name or name == nil) and (aura.cname == caster or caster == nil) then
-						return true
-					end
-				end
-			end
-			
-		end
-		return false;
-	end
-
 	-- See RPText RTYPE_HAS_INVENTORY
 	function Character:hasInventory(names)
 		if type(names) ~= "table" then print("Invalid name var for inventory check, type was", type(names)); return false end 
@@ -417,8 +87,6 @@ local Character = {}
 		end
 		return false;
 	end
-
-
 
 	-- Removes an equipped item and puts it into inventory if possible
 	function Character:removeEquipped( slot )
@@ -487,7 +155,6 @@ local Character = {}
 
 			if add and type(item.points) == "table" then
 				add = isCloseToPoints(item.points);
-				print("B", item.items[1].id, add);
 			end
 
 			if add then
@@ -778,7 +445,7 @@ local Character = {}
 		Event.raise(Event.Types.EXADD, {amount=amount, set=set, multiplyMasochism=multiplyMasochism})
 
 		self.excitement =max(min(self.excitement, Character.EXCITEMENT_MAX), 0);
-		self:updateExcitementDisplay();
+		UI.portrait.updateExcitementDisplay();
 
 		if (self.excitement >= 1) ~= pre then
 			self:onCapChange()
@@ -802,14 +469,6 @@ local Character = {}
 		end
 
 	end
-
-	function Character:updateExcitementDisplay()
-
-		UI.portrait.portraitExcitementBar:SetHeight(UI.portrait.FRAME_HEIGHT*max(self:getExcitementPerc(), 0.00001));
-
-	end
-
-
 
 	function Character:isGenderless()
 		if self.penis_size == false and self.vagina_size == false and self.type == "player" then
@@ -884,8 +543,7 @@ export(
 	"Character", 
 	Character,
 	{
-		getTakehitCD = Character.getTakehitCD,
-		getWhisperCD = Character.getWhisperCD
+		
 	},
 	Character
 )

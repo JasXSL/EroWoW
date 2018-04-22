@@ -56,7 +56,7 @@ SpellBinding.__index = SpellBinding;
 		local rpText = SpellBinding.getRpText(sender, data, t, name)
 		if rpText then
 			rpText:convertAndReceive(sender, ExiWoW.ME, false, data)
-			Character.setTakehitTimer();
+			RPText.setTakehitTimer();
 			return rpText
 		end
 	end
@@ -76,7 +76,7 @@ SpellBinding.__index = SpellBinding;
 			if 
 				Tools.multiSearch(name, v.name) and 
 				(self.allow_in_vehicle or not UnitInVehicle("player")) and
-				(not Character.getTakehitCD() or always_run) and
+				(not RPText.getTakehitCD() or always_run) and
 				(not v.always_run == not always_run) -- Boolean compare
 			then
 				if callback(v) == false then 

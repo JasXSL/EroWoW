@@ -9,6 +9,7 @@ function internal.build.actions()
 	local Tools = require("Tools");
 	local UI = require("UI");
 	local RPText = require("RPText");
+	local Event = require("Event");
 
 	local ef = ExiWoW.LibAssets.effects
 	local extension = ExiWoW.R;
@@ -149,7 +150,7 @@ function internal.build.actions()
 			DoEmote("SIT");
 			ExiWoW.ME.meditating = true;
 			ExiWoW.ME:toggleResting(true)
-			Character.bind("PLAYER_STARTED_MOVING", function()
+			Event.on("PLAYER_STARTED_MOVING", function()
 				ExiWoW.ME:toggleResting(false)
 				ExiWoW.ME.meditating = false;
 			end, 1);

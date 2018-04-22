@@ -246,7 +246,7 @@ UI = {}
 		t:SetVertexColor(1,0.75,1)
 		t:AddMaskTexture(mask);
 		UI.portrait.portraitExcitementBar = t;
-		ExiWoW.ME:updateExcitementDisplay();
+		UI.portrait.updateExcitementDisplay();
 
 		-- Border
 
@@ -307,6 +307,11 @@ UI = {}
 		bg:Hide();
 	end
 
+	function UI.portrait.updateExcitementDisplay()
+
+		UI.portrait.portraitExcitementBar:SetHeight(UI.portrait.FRAME_HEIGHT*max(ExiWoW.ME:getExcitementPerc(), 0.00001));
+
+	end
 
 	-- Settings for pages with buttons
 	UI.buttonPage = {

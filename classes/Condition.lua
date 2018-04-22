@@ -108,7 +108,7 @@ Condition.__index = Condition;
 		elseif t == ty.RTYPE_RANDOM then
 			out = math.random() < data.chance;
 		elseif t == ty.RTYPE_HAS_AURA then
-			out = Character:hasAura(data);
+			out = Event.hasAura(data);
 		elseif t == ty.RTYPE_HAS_INVENTORY then
 			out = Character:hasInventory(data);
 		elseif t == ty.RTYPE_REQUIRE_MALE then

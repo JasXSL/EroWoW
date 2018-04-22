@@ -6,6 +6,8 @@ local Condition, Database, Tools, Index;
 local RPText = {};
 RPText.__index = RPText;
 RPText.DEBUG = false
+RPText.takehitCD = nil			-- Cooldown for takehit texts
+RPText.whisperCD = nil
 
 	function RPText.ini()
 		Condition = require("Condition");
@@ -13,6 +15,9 @@ RPText.DEBUG = false
 		Tools = require("Tools");
 		Index = require("Index");
 	end
+
+	function RPText.getTakehitCD() return RPText.takehitCD end
+	function RPText.getWhisperCD() return RPText.whisperCD end
 
 	-- The syntax of these are %S<type> for sender %T<type> for receiver. If no extra type is specified, it gets name
 	local TAG_SENDER_NAME = "%S";
@@ -230,7 +235,13 @@ RPText.DEBUG = false
 		return false
 	end
 
-
+	function RPText.setTakehitTimer()
+		local rate = globalStorage.takehit_rp_rate;
+		Timer.clear(RPText.takehitCD);
+		RPText.takehitCD = Timer.set(function()
+			RPText.takehitCD = nil;
+		end, rate)
+	end
 
 	function RPText.getSynonym(tag, target, spelldata)
 

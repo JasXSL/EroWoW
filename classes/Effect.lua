@@ -2,7 +2,7 @@ local appName, internal = ...
 local export = internal.Module.export;
 local require = internal.require;
 
-local Database, Character, Timer;
+local Database, Character, Timer, Event;
 
 local Effect = {}
 	Effect.__index = Effect;
@@ -12,6 +12,7 @@ local Effect = {}
 	function Effect.ini()
 		Database = require("Database");
 		Character = require("Character");
+		Event = require("Event");
 		Timer = require("Timer");
 	end
 
@@ -142,7 +143,7 @@ local Effect = {}
 			local _, handle = PlaySound(self.sound_loop, "SFX", false, true);
 			self.loopPlaying = handle;
 			local se = self;
-			Character.bind("SOUNDKIT_FINISHED", function(data)
+			Event.on("SOUNDKIT_FINISHED", function(data)
 				if data[1] == se.loopPlaying then 
 					local _, handle = PlaySound(se.sound_loop, "SFX", false, true);
 					se.loopPlaying = handle;

@@ -879,7 +879,7 @@ Action.__index = Action;
 		if action.cast_sound_loop then
 			local _, handle = PlaySound(action.cast_sound_loop, "SFX", false, true);
 			Action.CASTING_SOUND_LOOP = handle;
-			Action.CASTING_SOUND_FINISH_EVENT = Character.bind("SOUNDKIT_FINISHED", function(data)
+			Action.CASTING_SOUND_FINISH_EVENT = Event.on("SOUNDKIT_FINISHED", function(data)
 				if data[1] == Action.CASTING_SOUND_LOOP then 
 					local _, handle = PlaySound(action.cast_sound_loop, "SFX", false, true);
 					Action.CASTING_SOUND_LOOP = handle;
@@ -889,14 +889,14 @@ Action.__index = Action;
 
 		-- Move interrupt
 		if not action.allow_caster_moving then
-			Action.CASTING_MOVEMENT_BINDING = Character.bind("PLAYER_STARTED_MOVING", interrupt)
+			Action.CASTING_MOVEMENT_BINDING = Event.on("PLAYER_STARTED_MOVING", interrupt)
 		end
 
 		-- Official effect
-		Action.CASTING_SPELL_BINDING = Character.bind("UNIT_SPELLCAST_START", function(data)
+		Action.CASTING_SPELL_BINDING = Event.on("UNIT_SPELLCAST_START", function(data)
 			if UnitIsUnit(data[1], "PLAYER") then interrupt() end
 		end)
-		Action.FINISHING_SPELL_BINDING = Character.bind("UNIT_SPELLCAST_SUCCESS", function(data)
+		Action.FINISHING_SPELL_BINDING = Event.on("UNIT_SPELLCAST_SUCCESS", function(data)
 			if UnitIsUnit(data[1], "PLAYER") then interrupt() end
 		end)
 
@@ -910,10 +910,10 @@ Action.__index = Action;
 
 		local self = Action.CASTING_SPELL;
 		
-		Character.unbind(Action.CASTING_MOVEMENT_BINDING);
-		Character.unbind(Action.CASTING_SPELL_BINDING);
-		Character.unbind(Action.FINISHING_SPELL_BINDING);
-		Character.unbind(Action.CASTING_SOUND_FINISH_EVENT);
+		Event.off(Action.CASTING_MOVEMENT_BINDING);
+		Event.off(Action.CASTING_SPELL_BINDING);
+		Event.off(Action.FINISHING_SPELL_BINDING);
+		Event.off(Action.CASTING_SOUND_FINISH_EVENT);
 
 		-- Let it play the fade out animation
 		if not success then
@@ -948,7 +948,10 @@ export(
 		sort = Action.sort,
 		get = Action.get,
 		useOnTarget = Action.useOnTarget,
-		endSpellCast = Action.endSpellCast
+		endSpellCast = Action.endSpellCast,
+		sendRPText = Action.sendRPText,
+		computeDistance = Action.computeDistance,
+		
 	},
 	Action
 )
