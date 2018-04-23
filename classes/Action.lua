@@ -128,7 +128,8 @@ Action.__index = Action;
 		self.charges = data.charges or math.huge;						-- Charges tied to this spell. Charges can be added by loot?
 		self.max_charges = type(data.max_charges) == "number" and data.max_charges or math.huge;
 
-		
+		Condition.checkSyntax(self, self.conditions);
+		Condition.checkSyntax(self, self.filters);
 
 		-- Custom
 		self.hidden = data.hidden or false;								-- Hides action from action window

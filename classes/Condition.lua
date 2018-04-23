@@ -182,6 +182,7 @@ Condition.__index = Condition;
 		
 	}
 
+
 	function Condition.ini()
 		RPText = require("RPText");
 		Character = require("Character");
@@ -206,9 +207,7 @@ Condition.__index = Condition;
 		return self
 	end
 
-	function Condition.get(id)
-		return Database.getID("Condition", id);
-	end
+	
 
 	function Condition:validate(senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action)
 
@@ -339,6 +338,21 @@ Condition.__index = Condition;
 			error = Condition.Errors[self.type][2];
 		end
 		return Tools.reportError(error, ignore);
+	end
+
+	function Condition.get(id)
+		return Database.getID("Condition", id);
+	end
+
+	function Condition.checkSyntax(asset, conditions)
+		if type(conditions) ~= "table" then
+			conditions = {conditions};
+		end
+		for i,v in ipairs(conditions) do
+			if not v then
+				print("Invalid condition found in asset", asset.id, "at index", i)
+			end
+		end
 	end
 
 	-- Validate all conditions

@@ -272,6 +272,8 @@ Character.__index = Character;
 
 		if settings.uw then self.underwear = Underwear.import(settings.uw) end
 
+		
+		
 
 		-- Feature tests
 		--self:addExcitement(1.1);

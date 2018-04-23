@@ -155,7 +155,6 @@ local Index = {}
 		internal.build.conditions();
 		internal.build.conditions = nil;
 		Extension.index();
-		print("Extension re-indexed")
 		for k,fn in pairs(internal.build) do
 			fn();
 		end

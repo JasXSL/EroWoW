@@ -196,7 +196,7 @@ local Event = {}
 				Disenchanting = true
 			}
 			if lootableSpells[arguments[2]] then
-				Character.lootSpell = arguments[2];
+				Event.lootSpell = arguments[2];
 				Event.lootContainer = arguments[4];
 			end
 			--print(event, ...)

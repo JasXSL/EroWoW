@@ -33,9 +33,6 @@ function internal.build.conditions()
 	ext:addCondition({id="largeBreasts", type = ty.RTYPE_BREASTS_GREATER, data={2}});
 	ext:addCondition({id="largePenis", type = ty.RTYPE_PENIS_GREATER, data={2}});
 	ext:addCondition({id="largeButt", type = ty.RTYPE_BUTT_GREATER, data={2}});
-	ext:addCondition({id="spellAdd", type=ty.RTYPE_SPELL_ADD});
-	ext:addCondition({id="spellRem", type=ty.RTYPE_SPELL_REM});
-	ext:addCondition({id="spellTick", type=ty.RTYPE_SPELL_TICK});
 	ext:addCondition({id="attackerIsTentacleFiend", type=ty.RTYPE_NAME, data=npc.tentacleFiend, sender=true});
 	ext:addCondition({id="attackerIsPinchy", type=ty.RTYPE_NAME, data=npc.pincer, sender=true});
 	ext:addCondition({id="attackerIsWasp", type=ty.RTYPE_NAME, data=npc.wasp, sender=true});

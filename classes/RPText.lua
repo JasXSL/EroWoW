@@ -85,6 +85,8 @@ RPText.whisperCD = nil
 			self.id = id;
 		end
 
+		Condition.checkSyntax(self, self.requirements);
+
 		return self
 	end
 
