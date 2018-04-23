@@ -13,6 +13,7 @@ function internal.build.rptexts()
 	end
 	local ef = ExiWoW.LibAssets.effects;		-- RP Text effects library
 	local RPText = require("RPText");
+	local Func = require("Func");
 
 	-- Root extension
 	local ext = internal.ext;
@@ -39,14 +40,14 @@ function internal.build.rptexts()
 		text_bystander = "%T tickles %Thimself!",
 		text_receiver = "You tickle yourself!",
 		requirements = {},
-		--fn = ef.addExcitementMasochisticDefault
+		--fn = Func.get("addExcitementMasochistic")
 	})
 	ext:addRpText({
 		id = "TICKLE",
 		text_bystander = "%T tickles %Thimself with %This %item!",
 		text_receiver = "You use your %item to tickle yourself!",
 		requirements = {getCondition("invFeathers")},
-		--fn = ef.addExcitementMasochisticDefault
+		--fn = Func.get("addExcitementMasochistic")
 	})
 
 	-- Wedgie
@@ -57,7 +58,7 @@ function internal.build.rptexts()
 		text_receiver = "%S grabs a hold of your %Tundies, giving you a wedgie!",
 		sound = 25626,
 		requirements = {getCondition("targetWearsUnderwear")},
-		--fn = ef.addExcitementMasochisticDefault
+		--fn = Func.get("addExcitementMasochistic")
 	})
 
 	ext:addRpText({
@@ -66,7 +67,7 @@ function internal.build.rptexts()
 		text_receiver = "You grab a hold of your %Tundies and give yourself a wedgie!",
 		sound = 25626,
 		requirements = {getCondition("targetWearsUnderwear")},
-		--fn = ef.addExcitementMasochisticDefault
+		--fn = Func.get("addExcitementMasochistic")
 	})
 	
 
@@ -76,7 +77,7 @@ function internal.build.rptexts()
 		text_receiver = "The insects get into your equipment, skittering across your body!",
 		--sound = 35103,
 		requirements = {getCondition("spellAdd")},
-		fn = ef.addExcitementDefault
+		fn = Func.get("addExcitementDefault")
 	})
 
 	-- Sand ADD
@@ -85,7 +86,7 @@ function internal.build.rptexts()
 		text_receiver = "Sand gets into your clothes!",
 		--sound = 35103,
 		requirements = {getCondition("spellAdd")},
-		fn = ef.addExcitementMasochisticDefault
+		fn = Func.get("addExcitementMasochistic")
 	})
 
 	ext:addRpText({
@@ -93,7 +94,7 @@ function internal.build.rptexts()
 		text_receiver = "Some dirt gets into your clothes!",
 		--sound = 35103,
 		requirements = {getCondition("spellTick")},
-		fn = ef.addExcitementMasochisticDefault
+		fn = Func.get("addExcitementMasochistic")
 	})
 
 	ext:addRpText({

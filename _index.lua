@@ -151,7 +151,9 @@ local Index = {}
 		Action.ini();
 
 		-- Build libraries
-		-- Conditions first since they're required
+		-- Load order
+		internal.build.functions();
+		internal.build.functions = nil;
 		internal.build.conditions();
 		internal.build.conditions = nil;
 		Extension.index();

@@ -6,7 +6,7 @@ Extension = {}
 Extension.LIB = {}
 Extension.__index = Extension;
 
-local RPText, Action, SpellBinding, Effect, Underwear, Database;
+local RPText, Action, SpellBinding, Effect, Underwear, Database, Func;
 
 
 	function Extension:ini()
@@ -17,6 +17,7 @@ local RPText, Action, SpellBinding, Effect, Underwear, Database;
 		Effect = require("Effect");
 		Underwear = require("Underwear");
 		Condition = require("Condition");
+		Func = require("Func");
 	end
 
 	function Extension:new(data, isRoot)
@@ -99,7 +100,9 @@ local RPText, Action, SpellBinding, Effect, Underwear, Database;
 	function Extension:addCondition(data)
 		table.insert(self.conditions, Condition:new(data))
 	end
-		
+	function Extension:addFunction(data)
+		table.insert(self.functions, Func:new(data));
+	end
 
 
 	-- STATIC --
@@ -108,16 +111,17 @@ local RPText, Action, SpellBinding, Effect, Underwear, Database;
 	function Extension.index()
 
 		-- Reset libraries	
-		Database.clearTables("RPText", "Action", "SpellBinding", "Effect", "Underwear", "Condition")
+		Database.clearTables("RPText", "Action", "SpellBinding", "Effect", "Underwear", "Condition", "Func")
 
 		for k,v in pairs(Extension.LIB) do
-			
 			Database.add("RPText", v.rpTexts);
 			Database.add("Action", v.actions);
 			Database.add("SpellBinding", v.spellBindings);
 			Database.add("Effect", v.effects);
 			Database.add("Underwear", v.underwear);
 			Database.add("Condition", v.conditions);
+			Database.add("Func", v.functions);
+			
 		end
 		
 

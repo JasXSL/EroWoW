@@ -21,6 +21,7 @@ _index.lua
 ext/json.lua
 
 # Main classes
+classes/Func.lua
 classes/Settings.lua
 classes/Condition.lua
 classes/Action.lua
@@ -44,6 +45,7 @@ lib/spells.lua
 lib/loot.lua
 
 # Asset database
+db/functions.lua
 db/conditions.lua
 db/effects.lua
 db/rptexts.lua

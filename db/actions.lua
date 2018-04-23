@@ -11,6 +11,7 @@ function internal.build.actions()
 	local RPText = require("RPText");
 	local Event = require("Event");
 	local Condition = require("Condition");
+	local Func = require("Func");
 
 	local ef = ExiWoW.LibAssets.effects
 	local extension = internal.ext;
@@ -264,13 +265,13 @@ function internal.build.actions()
 			local gender = UnitSex(target)
 			return self:sendRPText(sender, target, suppressErrors, function(se, success)
 					if success and not UnitIsUnit(target, "player") then
-					ExiWoW.LibAssets.effects:painSound(race, gender)
+					Func.get("painSound")(race, gender)
 				end
 			end);
 		end,
 		fn_receive = function(self, sender, target, args)
 			DoEmote("GASP");
-			ExiWoW.LibAssets.effects.addExcitementMasochisticDefault();
+			Func.get("addExcitementMasochistic")();
 			self:receiveRPText(sender, target, args);
 			return true
 		end
@@ -362,13 +363,13 @@ function internal.build.actions()
 			local gender = UnitSex(target)
 			return self:sendRPText(sender, target, suppressErrors, function(se, success)
 				if success and not UnitIsUnit(target, "player") then
-					ExiWoW.LibAssets.effects:painSound(race, gender)
+					Func.get("painSound")(race, gender)
 				end
 			end);
 		end,
 		fn_receive = function(self, sender, target, args)
 			self:receiveRPText(sender, target, args)
-			ef.addExcitementMasochisticDefault();
+			Func.get("addExcitementMasochistic")();
 			return true
 		end
 	});
@@ -386,13 +387,13 @@ function internal.build.actions()
 			local gender = UnitSex(target)
 			return self:sendRPText(sender, target, suppressErrors, function(se, success)
 				if success and not UnitIsUnit(target, "player") then
-					ExiWoW.LibAssets.effects:painSound(race, gender)
+					Func.get("painSound")(race, gender)
 				end
 			end);
 		end,
 		fn_receive = function(self, sender, target, args)
 			self:receiveRPText(sender, target, args)
-			ef.addExcitementMasochisticDefault();
+			Func.get("addExcitementMasochistic")();
 			return true
 		end
 	});
