@@ -23,7 +23,10 @@ Func.__index = Func;
 		self.id = data.id;
 		self.fn = data.fn;									
 		
-		if not self.id then print("Error, a function is missing ID"); end
+		if not self.id then 
+			print("Error, a function is missing ID"); 
+			print(debugstack());
+		end
 		if not self.fn then print("Error, a function is missing function data:", self.id); end
 		
 		return self

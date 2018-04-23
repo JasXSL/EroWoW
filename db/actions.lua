@@ -59,6 +59,26 @@ function internal.build.actions()
 
 	})
 
+	-- Test action
+	extension:addAction({
+		id = "TEST_ACTION",
+		name = "Test Item",
+		texture = "achievement_worldevent_littlehelper",
+		conditions = {},
+		max_charges = 100,
+		charges = 0,
+		-- Custom sending logic
+		fn_send = function(self, sender, target, suppressErrors)
+			print("TestAction Send")
+		end,
+		-- Handle the receiving end here
+		fn_receive = function(self, sender, target, data)
+			print("TestAction Receive")
+			return true
+		end
+
+	})
+
 	-- Disrobe --
 	extension:addAction({
 		id = "DISROBE",
@@ -298,7 +318,7 @@ function internal.build.actions()
 			return nil;
 		end,
 		fn_receive = function(self, sender, target, args)
-			Character.forage()
+			Event.raise(Event.Types.FORAGE, {});
 			return true
 		end
 	});

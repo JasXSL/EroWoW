@@ -22,12 +22,9 @@ Zone.__index = Zone;
 
 		self.id = data.id;			-- Id should be a name
 		self.sub_of = data.sub_of;														-- Set a string here of a parent zone ID
-		self.tags = type(data.tags) == "table" and data.targs or {};					-- Text tags of your choosing
+		self.tags = type(data.tags) == "table" and data.tags or {};					-- Text tags of your choosing
 
 		if not self.id then print("Invalid ID found for a zone"); end
-
-		self.tags = Tools.createSet(self.tags);
-		
 		return self
 	end
 
@@ -53,9 +50,29 @@ Zone.__index = Zone;
 		end
 	end
 
+	function Zone:getTags()
+		local out = {};
+		for _,v in pairs(self.tags) do
+			table.insert(out, "ZONE_"..v);
+		end
+		return out;
+	end
+
 	-- A little bit different to the others in that it returns only the function, not the Func object
 	function Zone.get(id)
 		return Database.getID("Zone", id);
+	end
+
+	-- Returns tags of active zone
+	function Zone.getCurrentTags()
+		local zone = Zone.get(GetRealZoneText());
+		local out = {};
+		if not zone then return out end
+		out = Tools.concat(out, zone:getTags());
+		local sub = zone:getSub(GetSubZoneText());
+		if not sub then return out end
+		out = Tools.concat(out, sub:getTags());
+		return out;
 	end
 
 
@@ -64,7 +81,9 @@ export(
 	Zone,
 	{
 		get = Zone.get,
-		new = Zone.new
+		new = Zone.new,
+		getCurrentTags = Zone.getCurrentTags,
+		getTags = Zone.getTags
 	},
 	{}
 )

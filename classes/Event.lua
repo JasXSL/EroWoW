@@ -35,6 +35,8 @@ local Event = {}
 		SPELL_REM = "SPELL_REM",									-- Spell removed --||--
 		SPELL_TICK = "SPELL_TICK",									-- Spell ticked --||--
 		SWING_CRIT = "SWING_CRIT",									-- Same as swing
+		MONSTER_KILL = "MONSTER_KILL",								-- {name=deadNPCName}
+		FORAGE = "FORAGE",											-- void
 	}
 
 
@@ -108,8 +110,7 @@ local Event = {}
 				if 
 					bit.band(destFlags, COMBATLOG_OBJECT_CONTROL_NPC) > 0
 				then
-					print("Todo: Loot, sourceFlags", sourceFlags, "sourceName", sourceName)
-					--Character.rollLoot(destName);
+					Event.raise(Event.Types.MONSTER_KILL, {name=destName});
 				end
 			end
 
@@ -314,6 +315,7 @@ local Event = {}
 	end
 
 	function Event.off(id)
+		if id == nil then return end
 		Event.bindings[id] = nil
 	end
 

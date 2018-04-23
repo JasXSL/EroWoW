@@ -15,16 +15,8 @@ UIParentLoadAddOn("Blizzard_DebugTools")
 	/run ExiWoW.UI.drawLoot("Test", "inv_pants_leather_04")
 
 	TODO:
-	- Make condition a standalone asset type
-	- Make actions and everything run off of conditions
-	- Improve the NPC generator
-	- Move events into its own module
-	- Make all RP text fetching and outputting run in the RPText module
-	- Move UI code from Character module
-	- Keep improving so static calls always use . instead of :
-	- internal.ext should be local to ExiWoW
-
-	- Maybe make bundles of rptexts instead of spellbindings?
+	- Rework loot
+	- Re-add whispers
 	- Add pagination once you manage to fill up the whole first page and/or underwear page
 	- Character backup
 	 
@@ -145,7 +137,7 @@ local Index = {}
 		SLASH_EWACT1 = '/ewact'
 		function SlashCmdList.EWACT(msg, editbox) Action.useOnTarget(msg, "target") end
 		SLASH_EWRESET1 = '/ewreset'
-		function SlashCmdList.EWRESET(msg, editbox) ExiWoW:resetSettings() end
+		function SlashCmdList.EWRESET(msg, editbox) Index.resetSettings() end
 
 		-- Initialize actions
 		Action.ini();
@@ -304,6 +296,8 @@ local Index = {}
 	end
 
 	function Index.onPlayerLogout()
+
+		if Index.blockSave then return false; end
 		-- Saving
 		local l = localStorage;
 
@@ -363,12 +357,10 @@ local Index = {}
 
 	-- Reset settings
 	function Index.resetSettings()
-		local s = globalStorage;
-		for k,v in pairs(GLOBALSTORAGE_DEFAULTS) do s[k] = v end
-		s = localStorage;
-		for k,v in pairs(LOCALSTORAGE_DEFAULTS) do s[k] = v end
-		ExiWoW:loadFromStorage();
-		print("Settings reset")
+		globalStorage = {};
+		localStorage = {};
+		Index.blockSave = true;
+		ReloadUI();
 	end
 
 	-- Load settings

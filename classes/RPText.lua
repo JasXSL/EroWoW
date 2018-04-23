@@ -91,42 +91,8 @@ RPText.whisperCD = nil
 	end
 
 	-- senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action
-	function RPText:validate(senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action)
-
-		local se = self;
-		function validateThese(input, noOr)
-
-			for k,v in pairs(input) do
-
-				-- Validate a sub
-				local success = true
-				if v[1] ~= nil then 
-					success = validateThese(v)	-- We must go deeper
-				else
-					if not v or type(v.validate) ~= "function" then
-						print("Invalid condition in ", self.text_receiver);
-					end
-					success = v:validate(senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action) -- This entry was a condition
-					if v.type == Condition.Types.RTYPE_HAS_INVENTORY and success then
-						se.item = success;
-					end
-				end
-
-				if success and not noOr then 
-					return true
-				elseif not success and noOr then
-					return false
-				end
-			end
-			return noOr
-
-		end
-
-		if not validateThese(self.requirements, true) then 
-			return false 
-		end
-		return true
-
+	function RPText:validate(...)
+		return Condition.all(self.requirements, ...);
 	end
 
 	function RPText.convert(text, sender, receiver, spelldata, item)
@@ -314,7 +280,7 @@ RPText.whisperCD = nil
 			if math.random() < 0.5 then return "left" end
 			return "right"
 		elseif tag == TAG_GENERIC.SPELL then
-			if type(spelldata) == "table" and spelldata.name then return spelldata.name end
+			if type(spelldata) == "table" and spelldata.spellName then return spelldata.spellName end
 			return "spell"
 		elseif tag == TAG_GENERIC.HARDEN then
 			return getRandom("harden", "stiffen")

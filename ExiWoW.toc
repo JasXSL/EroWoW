@@ -40,15 +40,8 @@ classes/Effect.lua
 classes/Timer.lua
 classes/Callback.lua
 classes/Zone.lua
-	
+classes/Loot.lua
 
-
-# Libraries: Spell effects, monster collections, etc that should be used in multiple types of assets.
-lib/_index.lua
-lib/zones.lua
-lib/npc.lua
-lib/spells.lua
-lib/loot.lua
 
 # Asset database
 db/functions.lua
@@ -60,5 +53,5 @@ db/effects.lua
 db/rptexts.lua
 db/actions.lua
 db/underwear.lua
-
+db/loot.lua
 

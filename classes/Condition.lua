@@ -2,7 +2,7 @@ local appName, internal = ...
 local export = internal.Module.export;
 local require = internal.require;
 
-local RPText, Character, Tools, Database, Action, Event;
+local RPText, Character, Tools, Database, Action, Event, Zone;
 
 local Condition = {};
 Condition.__index = Condition;
@@ -48,6 +48,11 @@ Condition.__index = Condition;
 		RTYPE_INSTANCE = "instance",					-- Player unit must be in an instance
 		RTYPE_DEAD = "dead",							-- Target unit must be dead
 		RTYPE_VEHICLE = "vehicle",						-- Target unit must be in a vehicle
+
+		RTYPE_ZONE = "zone",							-- zoneName
+		RTYPE_SUBZONE = "subzone",						-- subZoneName
+		RTYPE_LOC = "loc",								-- {x = 42.84, y=17.36, rad=0.1}
+
 	}
 
 	-- Index 1 = noninverted, index 2 = inverted
@@ -180,7 +185,22 @@ Condition.__index = Condition;
 			"You are not in a vehicle.",
 			"You are in a vehicle."
 		},
-		
+		[Condition.Types.RTYPE_LOC] = {
+			"You are not in the right spot.",
+			"You are not in the right spot."
+		},
+		[Condition.Types.RTYPE_SUBZONE] = {
+			"You are not in the right subzone.",
+			"This subzone is not allowed."
+		},
+		[Condition.Types.RTYPE_ZONE] = {
+			"You are not in the right zone.",
+			"This zone is not allowed."
+		},
+		[Condition.Types.RTYPE_TAG] = {
+			"Required tag missing.",
+			"Blocking tag set."
+		},		
 	}
 
 
@@ -191,6 +211,7 @@ Condition.__index = Condition;
 		Database = require("Database");
 		Action = require("Action");
 		Event = require("Event");
+		Zone = require("Zone");
 	end
 
 	function Condition:new(data)
@@ -255,6 +276,19 @@ Condition.__index = Condition;
 			out = Tools.multiSearch(targ.class, data)
 		elseif t == ty.RTYPE_TYPE then 
 			out = Tools.multiSearch(targ.type, data)
+		elseif t == ty.RTYPE_ZONE then
+			out = Tools.multiSearch(GetRealZoneText(), data);
+		elseif t == ty.RTYPE_SUBZONE then
+			out = Tools.multiSearch(GetSubZoneText(), data);
+		elseif t == ty.RTYPE_LOC then
+			SetMapToCurrentZone();
+			local px,py = GetPlayerMapPosition("player");
+			px = px*100; py = py*100;
+			local x = data.x;
+			local y = data.y;
+			local radius = data.rad or 1;
+			local dist = math.sqrt((px-x)*(px-x)+(py-y)*(py-y));
+			out = dist <= radius;
 		elseif t == ty.RTYPE_CRIT then
 			out = type(spellData) == "table" and spellData.crit;
 		elseif t == ty.RTYPE_DETRIMENTAL then
@@ -305,10 +339,14 @@ Condition.__index = Condition;
 				(data[1] == true and und ~= false) or
 				(type(und) == "table" and data[und.id])
 		elseif t == ty.RTYPE_TAG then
-			local tags = targ:getTags();
+			local tags = Tools.concat(
+				targ:getTags(),
+				Zone.getCurrentTags()
+			)
 			if type(spellData) == "table" then
 				tags = Tools.concat(tags, spellData.tags);
 			end 
+			
 			tags = Tools.createSet(tags);
 			if type(data) == "string" then data = {data} end
 			for _,v in pairs(data) do
@@ -347,11 +385,16 @@ Condition.__index = Condition;
 		return out; 
 	end
 
-	function Condition:reportError(ignore)
+	function Condition:reportError(ignore, ret)
+		if not Condition.Errors[self.type] then
+			print("No error text for type", self.type);
+			return false;
+		end
 		local error = Condition.Errors[self.type][1];
 		if self.inverse then
 			error = Condition.Errors[self.type][2];
 		end
+		if ret then return error.." (Expected: "..ExiWoW.json.encode(self.data)..")" end
 		return Tools.reportError(error, ignore);
 	end
 
@@ -371,15 +414,43 @@ Condition.__index = Condition;
 	end
 
 	-- Validate all conditions
-	function Condition.all(conditions, ...)
-		for _,cond in pairs(conditions) do
-			
-			if not cond:validate(...) then
-				return false, cond;
+	function Condition.all(conditions, senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action)
+
+		local se = self;
+		local function validateThese(input, noOr)
+
+			for k,v in pairs(input) do
+
+				local failOutput = v;
+
+				-- Validate a sub
+				local success = true
+				if v[1] ~= nil then 
+					success, failOutput = validateThese(v)	-- We must go deeper
+				else
+					if not v or type(v.validate) ~= "function" then
+						print("Invalid condition in ", self.text_receiver);
+					end
+					success = v:validate(senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action) -- This entry was a condition
+					if v.type == Condition.Types.RTYPE_HAS_INVENTORY and success then
+						se.item = success;
+					end
+				end
+
+				if success and not noOr then 
+					return true
+				elseif not success and noOr then
+					return false, failOutput
+				end
 			end
+
+			if not noOr then return false, input[1] end
+			return true
+
 		end
 
-		return true;
+		local success, cond = validateThese(conditions, true);
+		return success, cond;
 	end
 
 export(
