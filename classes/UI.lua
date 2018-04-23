@@ -23,7 +23,7 @@ UI = {}
 
 	-- Local helper functions
 	local function onSettingsChange()
-		Event.raise(ACTION_SETTING_CHANGE)
+		Event.raise(Event.Types.ACTION_SETTING_CHANGE)
 	end
 
 	-- Helpful internal build function

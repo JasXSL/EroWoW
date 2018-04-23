@@ -20,7 +20,8 @@ Condition.__index = Condition;
 		RTYPE_RACE = "race",							-- {raceEN=true, raceEn=true...} Table of races that are accepted. Example: {Gnome=true, HighmountainTauren=true}
 		RTYPE_CLASS = "class",							-- {englishClass=true, englishClass=true...} Table of classes that are accepted. Example: {DEATHKNIGHT=true, MONK=true}
 		RTYPE_TYPE = "type",							-- {typeOne=true, typeTwo=true...} For players this is always "player", otherwise refer to the type of NPC, such as "Humanoid"
-		RTYPE_NAME = "name",							-- {nameOne=true, nameTwo=true...} Primairly useful for NPCs
+		RTYPE_NAME = "name",							-- {nameOne=true, nameTwo=true...} Name of targ. If used with NPCs, consider using a tag instead
+		RTYPE_TAG = "tag",								-- {a, or b, or c...}
 		RTYPE_RANDOM = "rand",							-- {chance=0-1} 1 = 100%
 		RTYPE_HAS_AURA = "aura",						-- {{name=name, caster=casterName}...} Player has one or more of these auras
 		RTYPE_HAS_INVENTORY = "inv",					-- {{name=name, quant=min_quant}}
@@ -199,7 +200,7 @@ Condition.__index = Condition;
 		self.id = data.id;
 		self.type = data.type or false;									-- RTYPE_*
 		self.sender = data.sender or false;								-- Validate against sender							-- 
-		self.data = type(data.data) == "table" and data.data or {};		-- See RTYPE_*
+		self.data = data.data;													-- See RTYPE_*
 		self.inverse = data.inverse;											-- Returns false if it DOES validate
 
 		if self.type == false then print("No type definition of condition", self.id) end
@@ -211,7 +212,6 @@ Condition.__index = Condition;
 
 	function Condition:validate(senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action)
 
-		-- Todo: Validate a requirement
 		local t = self.type;
 		local targ = receiverChar;
 		local targUnit = receiverUnit;
@@ -256,9 +256,9 @@ Condition.__index = Condition;
 		elseif t == ty.RTYPE_TYPE then 
 			out = Tools.multiSearch(targ.type, data)
 		elseif t == ty.RTYPE_CRIT then
-			out = type(spelldata) == "table" and spelldata.crit;
+			out = type(spellData) == "table" and spellData.crit;
 		elseif t == ty.RTYPE_DETRIMENTAL then
-			out = type(spelldata) == "table" and spelldata.harmful;
+			out = type(spellData) == "table" and spellData.harmful;
 		elseif t == ty.RTYPE_MELEE then
 			out = spelltype == ty.RTYPE_MELEE
 		elseif t == ty.RTYPE_SPELL_ADD then
@@ -279,6 +279,8 @@ Condition.__index = Condition;
 			out = globalStorage.taunt_female == true
 		elseif t == ty.RTYPE_REQUIRE_OTHER then
 			out = globalStorage.taunt_other == true
+		elseif t == ty.RTYPE_EVENT then
+			out = Tools.multiSearch(event, data)
 		elseif t == ty.RTYPE_EQUIPMENT then
 			local unit = false
 			if targ == ExiWoW.ME then unit = "player" 
@@ -302,6 +304,19 @@ Condition.__index = Condition;
 				(data[1] == false and und == false) or
 				(data[1] == true and und ~= false) or
 				(type(und) == "table" and data[und.id])
+		elseif t == ty.RTYPE_TAG then
+			local tags = targ:getTags();
+			if type(spellData) == "table" then
+				tags = Tools.concat(tags, spellData.tags);
+			end 
+			tags = Tools.createSet(tags);
+			if type(data) == "string" then data = {data} end
+			for _,v in pairs(data) do
+				out = Tools.multiSearch(v, tags)
+				if out then
+					break
+				end
+			end
 		elseif t == ty.RTYPE_SELF_ONLY then
 			out = isSelf;
 		elseif t == ty.RTYPE_STEALTH then

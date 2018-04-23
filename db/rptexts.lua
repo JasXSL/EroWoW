@@ -6,12 +6,9 @@ function internal.build.rptexts()
 	local Condition = require("Condition");	-- RPText requirement constructor
 	local Database = require("Database");
 	local ty = Condition.Types;			-- Local filter types
-	local assetLib = ExiWoW.LibAssets;
-	local spellKits = assetLib.spell_kits;		-- RP Text spell kits library
 	local function getCondition(id)
 		return Database.getID("Condition", id);
 	end
-	local ef = ExiWoW.LibAssets.effects;		-- RP Text effects library
 	local RPText = require("RPText");
 	local Func = require("Func");
 
@@ -40,14 +37,14 @@ function internal.build.rptexts()
 		text_bystander = "%T tickles %Thimself!",
 		text_receiver = "You tickle yourself!",
 		requirements = {},
-		--fn = Func.get("addExcitementMasochistic")
+		
 	})
 	ext:addRpText({
 		id = "TICKLE",
 		text_bystander = "%T tickles %Thimself with %This %item!",
 		text_receiver = "You use your %item to tickle yourself!",
 		requirements = {getCondition("invFeathers")},
-		--fn = Func.get("addExcitementMasochistic")
+		
 	})
 
 	-- Wedgie
@@ -58,7 +55,7 @@ function internal.build.rptexts()
 		text_receiver = "%S grabs a hold of your %Tundies, giving you a wedgie!",
 		sound = 25626,
 		requirements = {getCondition("targetWearsUnderwear")},
-		--fn = Func.get("addExcitementMasochistic")
+		
 	})
 
 	ext:addRpText({
@@ -67,33 +64,36 @@ function internal.build.rptexts()
 		text_receiver = "You grab a hold of your %Tundies and give yourself a wedgie!",
 		sound = 25626,
 		requirements = {getCondition("targetWearsUnderwear")},
-		--fn = Func.get("addExcitementMasochistic")
+		
 	})
 	
 
 	-- Insect swarm
 	ext:addRpText({
-		id = spellKits.insects,
 		text_receiver = "The insects get into your equipment, skittering across your body!",
-		--sound = 35103,
-		requirements = {getCondition("spellAdd")},
+		requirements = {
+			getCondition("is_spell_add"), 
+			getCondition("ts_insects"), 
+		},
 		fn = Func.get("addExcitementDefault")
 	})
 
 	-- Sand ADD
 	ext:addRpText({
-		id = spellKits.sand,
 		text_receiver = "Sand gets into your clothes!",
-		--sound = 35103,
-		requirements = {getCondition("spellAdd")},
+		requirements = {
+			getCondition("is_spell_add"),
+			getCondition("ts_sand"), 
+		},
 		fn = Func.get("addExcitementMasochistic")
 	})
 
 	ext:addRpText({
-		id = spellKits.dirt,
 		text_receiver = "Some dirt gets into your clothes!",
-		--sound = 35103,
-		requirements = {getCondition("spellTick")},
+		requirements = {
+			getCondition("is_spell_tick"),
+			getCondition("ts_dirt"),
+		},
 		fn = Func.get("addExcitementMasochistic")
 	})
 

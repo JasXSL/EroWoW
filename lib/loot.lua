@@ -3,13 +3,9 @@ local require = internal.require;
 
 local RPText = require("RPText")
 
--- LOOT TABLES --
-local zones = ExiWoW.LibAssets.zones
-local npc = ExiWoW.LibAssets.npcs
-
 -- Loot tables
 	ExiWoW.LibAssets.loot = {};
-local f = ExiWoW.LibAssets.loot
+	local f = ExiWoW.LibAssets.loot
 	-- Syntax:
 	--[[
 		{
@@ -34,8 +30,8 @@ local f = ExiWoW.LibAssets.loot
 	kultirasBoxers["Sergeant Curtis"] = true
 	kultirasBoxers["Lieutenant Palliter"] = true
 	table.insert(f, {
-		zone = "Durotar",
-		name = kultirasBoxers,
+		--zone = "Durotar",
+		--name =kultirasBoxers,
 		items = {
 			{
 				type = "Underwear", 
@@ -50,8 +46,8 @@ local f = ExiWoW.LibAssets.loot
 	})
 
 	table.insert(f, {
-		zone = "Blade's Edge Mountains",
-		name = "%Razaani",
+		--zone = "Blade's Edge Mountains",
+		--name ="%Razaani",
 		items = {
 			{
 				type = "Underwear", 
@@ -66,8 +62,8 @@ local f = ExiWoW.LibAssets.loot
 	})
 
 	table.insert(f, {
-		zone = "Netherstorm",
-		name = "Spellreaver Marathelle",
+		--zone = "Netherstorm",
+		--name ="Spellreaver Marathelle",
 		items = {
 			{
 				type = "Underwear", 
@@ -82,8 +78,8 @@ local f = ExiWoW.LibAssets.loot
 	})
 
 	table.insert(f, {
-		zone = "Netherstorm",
-		name = "Summoner Kanthin",
+		--zone = "Netherstorm",
+		--name ="Summoner Kanthin",
 		items = {
 			{
 				type = "Underwear", 
@@ -99,7 +95,7 @@ local f = ExiWoW.LibAssets.loot
 
 	-- Furbolg drops
 	table.insert(f, {
-		name = npc.furbolg,
+		--name =npc.furbolg,
 		items = {
 			{
 				type = "Underwear", 
@@ -115,7 +111,7 @@ local f = ExiWoW.LibAssets.loot
 
 	-- Satyr drops
 	table.insert(f, {
-		name = npc.satyr,
+		--name =npc.satyr,
 		items = {
 			{
 				type = "Underwear",
@@ -130,7 +126,7 @@ local f = ExiWoW.LibAssets.loot
 	})
 
 	table.insert(f, {
-		name = npc.harpy,
+		--name =npc.harpy,
 		items = {
 			{
 				type = "Underwear",
@@ -147,9 +143,9 @@ local f = ExiWoW.LibAssets.loot
 
 	-- Foraged loot
 	table.insert(f, {
-		zone = "Durotar",
+		--zone = "Durotar",
 		sub = "Razor Hill",
-		name = "_FORAGE_",
+		--name ="_FORAGE_",
 		items={
 			{
 				type = "Underwear", 
@@ -164,9 +160,9 @@ local f = ExiWoW.LibAssets.loot
 	})
 
 	table.insert(f, {
-		zone = "Mount Hyjal",
+		--zone = "Mount Hyjal",
 		sub = "The Forge of Supplication",
-		name = "_FORAGE_",
+		--name ="_FORAGE_",
 		items={
 			{
 				type = "Underwear", 
@@ -181,12 +177,12 @@ local f = ExiWoW.LibAssets.loot
 	})
 
 	table.insert(f, {
-		zone = "Azsuna",
+		--zone = "Azsuna",
 		sub = "Runas's Hovel",
 		points = {
 			{x = 42.84, y=17.36, rad=0.1},
 		},
-		name = "_FORAGE_",
+		--name ="_FORAGE_",
 		items={
 			{
 				type = "Underwear", 
@@ -201,12 +197,12 @@ local f = ExiWoW.LibAssets.loot
 	})
 
 	table.insert(f, {
-		zone = "Azsuna",
+		--zone = "Azsuna",
 		sub = "Lair of the Deposed",
 		points = {
 			{x = 49.49, y=8.1, rad=0.11},
 		},
-		name = "_FORAGE_",
+		--name ="_FORAGE_",
 		items={
 			{
 				type = "Underwear", 
@@ -221,12 +217,12 @@ local f = ExiWoW.LibAssets.loot
 	})
 
 	table.insert(f, {
-		zone = "Suramar",
+		--zone = "Suramar",
 		sub = "Estate of the First Arcanist",
 		points = {
 			{x = 65.75, y=62.89, rad=0.26},
 		},
-		name = "_FORAGE_",
+		--name ="_FORAGE_",
 		items={
 			{
 				type = "Underwear", 
@@ -242,9 +238,9 @@ local f = ExiWoW.LibAssets.loot
 
 	-- FEL_LEATHER_BRIEFS
 	table.insert(f, {
-		zone = "Felsoul Hold",
+		--zone = "Felsoul Hold",
 		sub = "Den of the Demented",
-		name = "_FORAGE_",
+		--name ="_FORAGE_",
 		items={
 			{
 				type = "Underwear", 
@@ -261,9 +257,9 @@ local f = ExiWoW.LibAssets.loot
 	
 
 	table.insert(f, {
-		zone = "Feralas",
+		--zone = "Feralas",
 		sub = "Woodpaw Den",
-		name = "_FORAGE_",
+		--name ="_FORAGE_",
 		items={
 			{
 				type = "Underwear", 
@@ -279,9 +275,9 @@ local f = ExiWoW.LibAssets.loot
 
 
 	table.insert(f, {
-		zone = "Burning Steppes",
+		--zone = "Burning Steppes",
 		sub = "The Skull Warren",
-		name = "_FORAGE_",
+		--name ="_FORAGE_",
 		items={
 			{
 				type = "Underwear", 
@@ -296,9 +292,9 @@ local f = ExiWoW.LibAssets.loot
 	})
 
 	table.insert(f, {
-		zone = "Felwood",
+		--zone = "Felwood",
 		sub = "Whisperwind Grove",
-		name = "_FORAGE_",
+		--name ="_FORAGE_",
 		points = {
 			{x = 45.06, y=29.37, rad=0.06},
 		},
@@ -316,9 +312,9 @@ local f = ExiWoW.LibAssets.loot
 	})
 
 	table.insert(f, {
-		zone = "Winterspring",
+		--zone = "Winterspring",
 		sub = "Everlook",
-		name = "_FORAGE_",
+		--name ="_FORAGE_",
 		points = {
 			{x = 59.21, y=50.16, rad=0.1},
 			{x = 59.01, y=50.19, rad=0.14},
@@ -342,8 +338,8 @@ local f = ExiWoW.LibAssets.loot
 	
 	
 	table.insert(f, {
-		zone = zones.sandy,
-		name = "_FORAGE_",
+		--zone = zones.sandy,
+		--name ="_FORAGE_",
 		items={
 			{
 				type = "Charges", 
@@ -358,7 +354,7 @@ local f = ExiWoW.LibAssets.loot
 	})
 	table.insert(f, {
 		sub = "%Strand",
-		name = "_FORAGE_",
+		--name ="_FORAGE_",
 		items={
 			{
 				type = "Charges", 
@@ -373,9 +369,9 @@ local f = ExiWoW.LibAssets.loot
 	})
 
 	table.insert(f, {
-		zone = "Swamp of Sorrows",
+		--zone = "Swamp of Sorrows",
 		sub = "Bogpaddle",
-		name = "_FORAGE_",
+		--name ="_FORAGE_",
 		points = {
 			{x = 72.41, y=16.89, rad=0.22},
 			{x = 72.39, y=12.77, rad=0.32},
@@ -394,8 +390,8 @@ local f = ExiWoW.LibAssets.loot
 	})
 
 	table.insert(f, {
-		zone = "Hellfire Peninsula",
-		name = "_FORAGE_",
+		--zone = "Hellfire Peninsula",
+		--name ="_FORAGE_",
 		points = {
 			{x = 22.13, y=68.27, rad=0.1},
 		},
@@ -414,8 +410,8 @@ local f = ExiWoW.LibAssets.loot
 
 	-- Crescent thong
 	table.insert(f, {
-		zone = "Zangarmarsh",
-		name = "_FORAGE_",
+		--zone = "Zangarmarsh",
+		--name ="_FORAGE_",
 		points = {
 			{x = 23.41, y=66.33, rad=0.08},
 		},
@@ -433,7 +429,7 @@ local f = ExiWoW.LibAssets.loot
 	})
 
 	table.insert(f, {
-		name = npc.pincer,
+		--name =npc.pincer,
 		items={
 			{
 				type = "Charges", 

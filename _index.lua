@@ -157,10 +157,22 @@ local Index = {}
 		internal.build.conditions();
 		internal.build.conditions = nil;
 		Extension.index();
+		internal.build.npcs();
+		internal.build.npcs = nil;
+		internal.build.zones();
+		internal.build.zones = nil;
+		Extension.index();
+		internal.build.spells();
+		internal.build.spells = nil;
+		Extension.index();
 		for k,fn in pairs(internal.build) do
 			fn();
 		end
 		internal.build = nil
+
+		-- Setup gateway
+		internal.Gateway();
+		internal.Gateway = nil;
 		
 		-- Bind listeners
 		RegisterAddonMessagePrefix(appName.."a")		-- Sends an action	 {cb:cbToken, id:action_id, data:(var)data}

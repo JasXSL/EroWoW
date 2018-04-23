@@ -151,7 +151,7 @@ function internal.build.functions()
 
 	ext:addFunction({
 		id = "addExcitementDefault",
-		function(self, ignoreVhProgram)
+		fn = function(self, ignoreVhProgram)
 			Event.raise(Event.Types.EXADD_DEFAULT, {vh = not ignoreVhProgram})
 			ExiWoW.ME:addExcitement(0.1);
 		end
@@ -159,7 +159,7 @@ function internal.build.functions()
 
 	ext:addFunction({
 		id="addExcitementCrit",
-		function(self, ignoreVhProgram)
+		fn = function(self, ignoreVhProgram)
 			if type(self) ~= "table" or not (self.id.SWING and not self.id.SWING_CRIT) then
 				ef:painSound()
 			end

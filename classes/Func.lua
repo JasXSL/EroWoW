@@ -18,7 +18,7 @@ Func.__index = Func;
 
 	function Func:new(data)
 		local self = {}
-		setmetatable(self, Condition);
+		setmetatable(self, Func);
 
 		self.id = data.id;
 		self.fn = data.fn;									

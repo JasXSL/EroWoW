@@ -9,7 +9,8 @@ function internal.build.conditions()
 	local Action = require("Action");
 	local ty = Condition.Types;				-- Local filter types
 	local ext = internal.ext;
-	local npc = ExiWoW.LibAssets.npcs;
+	local NPC = require("NPC");
+	local Event = require("Event");
 
 	-- Random chance
 	ext:addCondition({id="rand10", type=ty.RTYPE_RANDOM, data={chance=0.1}});
@@ -33,13 +34,13 @@ function internal.build.conditions()
 	ext:addCondition({id="largeBreasts", type = ty.RTYPE_BREASTS_GREATER, data={2}});
 	ext:addCondition({id="largePenis", type = ty.RTYPE_PENIS_GREATER, data={2}});
 	ext:addCondition({id="largeButt", type = ty.RTYPE_BUTT_GREATER, data={2}});
-	ext:addCondition({id="attackerIsTentacleFiend", type=ty.RTYPE_NAME, data=npc.tentacleFiend, sender=true});
-	ext:addCondition({id="attackerIsPinchy", type=ty.RTYPE_NAME, data=npc.pincer, sender=true});
-	ext:addCondition({id="attackerIsWasp", type=ty.RTYPE_NAME, data=npc.wasp, sender=true});
-	ext:addCondition({id="attackerIsLasher", type=ty.RTYPE_NAME, data=npc.lasher, sender=true});
-	ext:addCondition({id="attackerIsVines", type=ty.RTYPE_NAME, data=npc.vines, sender=true});
-	ext:addCondition({id="attackerIsOoze", type=ty.RTYPE_NAME, data=npc.ooze, sender=true});
-	ext:addCondition({id="attackerIsFeltotemMale", type=ty.RTYPE_NAME, data=npc.feltotemMale, sender=true});
+	ext:addCondition({id="attackerIsTentacleFiend", type=ty.RTYPE_TAG, data={"NPC_TENTACLE_FIEND"}, sender=true});
+	ext:addCondition({id="attackerIsPinchy", type=ty.RTYPE_TAG, data={"NPC_PINCHY"}, sender=true});
+	ext:addCondition({id="attackerIsWasp", type=ty.RTYPE_TAG, data={"NPC_WASP"}, sender=true});
+	ext:addCondition({id="attackerIsLasher", type=ty.RTYPE_TAG, data={"NPC_LASHER"}, sender=true});
+	ext:addCondition({id="attackerIsVines", type=ty.RTYPE_TAG, data={"NPC_VINES"}, sender=true});
+	ext:addCondition({id="attackerIsOoze", type=ty.RTYPE_TAG, data={"NPC_OOZE"}, sender=true});
+	ext:addCondition({id="attackerIsFeltotem", type=ty.RTYPE_TAG, data={"NPC_FELTOTEM"}, sender=true});
 	ext:addCondition({id="maleWhispers", type=ty.RTYPE_REQUIRE_MALE});
 	ext:addCondition({id="femaleWhispers", type=ty.RTYPE_REQUIRE_FEMALE});
 	ext:addCondition({id="otherWhispers", type=ty.RTYPE_REQUIRE_OTHER});
@@ -73,5 +74,29 @@ function internal.build.conditions()
 	ext:addCondition({id="victim_alive", type=ty.RTYPE_DEAD, inverse=true});
 	ext:addCondition({id="sender_not_in_vehicle", type=ty.RTYPE_VEHICLE, inverse=true, sender=true});
 	ext:addCondition({id="victim_not_in_vehicle", type=ty.RTYPE_VEHICLE, inverse=true});
-		
+	
+	ext:addCondition({id="is_spell_add", type=ty.RTYPE_EVENT, data=Event.Types.SPELL_ADD});
+	ext:addCondition({id="is_spell_tick", type=ty.RTYPE_EVENT, data=Event.Types.SPELL_TICK});
+	ext:addCondition({id="is_spell_rem", type=ty.RTYPE_EVENT, data=Event.Types.SPELL_REM});
+	ext:addCondition({id="is_melee_attack", type=ty.RTYPE_EVENT, data=Event.Types.SWING});
+	ext:addCondition({id="is_melee_crit", type=ty.RTYPE_EVENT, data=Event.Types.SWING_CRIT});
+	
+	-- Spell tick/add/rem tag conditions
+	ext:addCondition({id="ts_insects", type=ty.RTYPE_TAG, data={"TMPSPELL_INSECTS"}, sender=true});
+	ext:addCondition({id="ts_sand", type=ty.RTYPE_TAG, data={"TMPSPELL_SAND"}, sender=true});
+	ext:addCondition({id="ts_dirt", type=ty.RTYPE_TAG, data={"TMPSPELL_DIRT"}, sender=true});
+	ext:addCondition({id="ts_cold", type=ty.RTYPE_TAG, data={"TMPSPELL_COLD"}, sender=true});
+	ext:addCondition({id="ts_electric", type=ty.RTYPE_TAG, data={"TMPSPELL_ELECTRIC"}, sender=true});
+	ext:addCondition({id="ts_petrify", type=ty.RTYPE_TAG, data={"TMPSPELL_PETRIFY"}, sender=true});
+	ext:addCondition({id="ts_shield_bash", type=ty.RTYPE_TAG, data={"TMPSPELL_SHIELD_BASH"}, sender=true});
+	ext:addCondition({id="ts_steam_below", type=ty.RTYPE_TAG, data={"TMPSPELL_STEAM_BELOW"}, sender=true});
+	ext:addCondition({id="ts_ground_spike", type=ty.RTYPE_TAG, data={"TMPSPELL_GROUND_SPIKE"}, sender=true});
+	ext:addCondition({id="ts_magic_whip", type=ty.RTYPE_TAG, data={"TMPSPELL_MAGIC_WHIP"}, sender=true});
+	ext:addCondition({id="ts_spillable", type=ty.RTYPE_TAG, data={"TMPSPELL_SPILLABLE"}, sender=true});
+	ext:addCondition({id="ts_slosh", type=ty.RTYPE_TAG, data={"TMPSPELL_SLOSH"}, sender=true});
+	ext:addCondition({id="ts_shards", type=ty.RTYPE_TAG, data={"TMPSPELL_SHARDS"}, sender=true});
+	ext:addCondition({id="ts_roots", type=ty.RTYPE_TAG, data={"TMPSPELL_ROOTS"}, sender=true});
+	
+	
+	
 end

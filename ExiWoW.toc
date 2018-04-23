@@ -14,8 +14,11 @@ Module.lua
 Tools.lua
 Database.lua
 
+
 # Entry point
 _index.lua
+# IO
+Gateway.lua
 
 # External Libraries
 ext/json.lua
@@ -24,22 +27,25 @@ ext/json.lua
 classes/Func.lua
 classes/Settings.lua
 classes/Condition.lua
+classes/NPC.lua
+classes/Spell.lua
 classes/Action.lua
 classes/Character.lua
 classes/UI.lua
 classes/RPText.lua
 classes/Extension.lua
-classes/SpellBinding.lua
 classes/Underwear.lua
 classes/Event.lua
 classes/Effect.lua
 classes/Timer.lua
 classes/Callback.lua
+classes/Zone.lua
+	
+
 
 # Libraries: Spell effects, monster collections, etc that should be used in multiple types of assets.
 lib/_index.lua
 lib/zones.lua
-lib/effects.lua
 lib/npc.lua
 lib/spells.lua
 lib/loot.lua
@@ -47,9 +53,12 @@ lib/loot.lua
 # Asset database
 db/functions.lua
 db/conditions.lua
+db/zones.lua
+db/spells.lua
+db/npcs.lua
 db/effects.lua
 db/rptexts.lua
 db/actions.lua
-db/spellbindings.lua
 db/underwear.lua
+
 

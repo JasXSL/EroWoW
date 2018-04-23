@@ -2,22 +2,25 @@ local appName, internal = ...
 local export = internal.Module.export;
 local require = internal.require;
 
+
 Extension = {}
 Extension.LIB = {}
 Extension.__index = Extension;
 
-local RPText, Action, SpellBinding, Effect, Underwear, Database, Func;
+local RPText, Action, Effect, Underwear, Database, Func, NPC, Zone, Spell;
 
 
 	function Extension:ini()
 		Database = require("Database");
 		RPText = require("RPText");
 		Action = require("Action");
-		SpellBinding = require("SpellBinding");
 		Effect = require("Effect");
 		Underwear = require("Underwear");
 		Condition = require("Condition");
 		Func = require("Func");
+		NPC = require("NPC");
+		Zone = require("Zone");
+		Spell = require("Spell");
 	end
 
 	function Extension:new(data, isRoot)
@@ -40,9 +43,6 @@ local RPText, Action, SpellBinding, Effect, Underwear, Database, Func;
 
 		-- Import actions
 		self.actions = importTable(data.actions)
-
-		-- Import SpellBindings
-		self.spellBindings = importTable(data.spellBindings)
 
 		-- Effects
 		self.effects = importTable(data.effects)
@@ -87,10 +87,7 @@ local RPText, Action, SpellBinding, Effect, Underwear, Database, Func;
 	function Extension:addAction(data)
 		table.insert(self.actions, Action:new(data))
 	end
-	function Extension:addSpellBinding(data)
-		table.insert(self.spellBindings, SpellBinding:new(data))
-	end
-	
+
 	function Extension:addEffect(data)
 		table.insert(self.effects, Effect:new(data))
 	end
@@ -103,6 +100,16 @@ local RPText, Action, SpellBinding, Effect, Underwear, Database, Func;
 	function Extension:addFunction(data)
 		table.insert(self.functions, Func:new(data));
 	end
+	function Extension:addNPC(data)
+		table.insert(self.npcs, NPC:new(data));
+	end
+	function Extension:addSpell(data)
+		table.insert(self.spells, Spell:new(data));
+	end
+	function Extension:addZone(data)
+		table.insert(self.zones, Zone:new(data));
+	end
+	
 
 
 	-- STATIC --
@@ -111,16 +118,18 @@ local RPText, Action, SpellBinding, Effect, Underwear, Database, Func;
 	function Extension.index()
 
 		-- Reset libraries	
-		Database.clearTables("RPText", "Action", "SpellBinding", "Effect", "Underwear", "Condition", "Func")
+		Database.clearTables("RPText", "Action", "Effect", "Underwear", "Condition", "Func", "NPC", "Spell", "Zone")
 
 		for k,v in pairs(Extension.LIB) do
 			Database.add("RPText", v.rpTexts);
 			Database.add("Action", v.actions);
-			Database.add("SpellBinding", v.spellBindings);
 			Database.add("Effect", v.effects);
 			Database.add("Underwear", v.underwear);
 			Database.add("Condition", v.conditions);
 			Database.add("Func", v.functions);
+			Database.add("NPC", v.npcs);
+			Database.add("Spell", v.spells);
+			Database.add("Zone", v.zones);
 			
 		end
 		
@@ -153,7 +162,7 @@ local RPText, Action, SpellBinding, Effect, Underwear, Database, Func;
 			Extension.LIB[ex.id] = ex
 			Extension.index()
 			if ex.id ~= "ROOT" then
-				print("-- Using: ", ex.id, "["..#ex.spellBindings.." bindings]")
+				print("-- Using: ", ex.id)
 			end
 			if ExiWoW.loaded then ExiWoW.Menu:refreshAll(); end
 			return ex

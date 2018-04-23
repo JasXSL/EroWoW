@@ -3,7 +3,7 @@ local export = internal.Module.export;
 local require = internal.require;
 local evtFrame = CreateFrame("Frame");
 
-local RPText, Character, SpellBinding, Index, Action;
+local RPText, Character, Index, Action;
 
 local Event = {}
 	Event.index = 0
@@ -29,13 +29,18 @@ local Event = {}
 		ACTION_UNDERWEAR_EQUIP = "ACTION_UNDERWEAR_EQUIP",			-- {id=id}
 		ACTION_UNDERWEAR_UNEQUIP = "ACTION_UNDERWEAR_UNEQUIP",		-- {id=id}
 		ACTION_SETTING_CHANGE = "ACTION_SETTING_CHANGE",			-- void
+
+		SWING = "SWING",											-- Melee swing {unit=unit, name=senderName}
+		SPELL_ADD = "SPELL_ADD",									-- Spell added {aura=see buildSpellTrigger, unit=unit, name=NPCName}
+		SPELL_REM = "SPELL_REM",									-- Spell removed --||--
+		SPELL_TICK = "SPELL_TICK",									-- Spell ticked --||--
+		SWING_CRIT = "SWING_CRIT",									-- Same as swing
 	}
 
 
 	function Event.ini()
 		RPText = require("RPText");
 		Character = require("Character");
-		SpellBinding = require("SpellBinding");
 		Index = require("Index");
 		Action = require("Action");
 		
@@ -99,21 +104,23 @@ local Event = {}
 			elseif sourceGUID == UnitGUID("player") then u = "player"
 			end
 
-			if combatEvent == "UNIT_DIED" then
+			if combatEvent == "PARTY_KILL" then
 				if 
-					bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) == 0 and
 					bit.band(destFlags, COMBATLOG_OBJECT_CONTROL_NPC) > 0
 				then
-					Character.rollLoot(destName);
+					print("Todo: Loot, sourceFlags", sourceFlags, "sourceName", sourceName)
+					--Character.rollLoot(destName);
 				end
 			end
+
+			
 
 			-- Only player themselves after this point
 			if bit.band(destFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == 0 then return end 
 
 			
 			-- These only work for healing or damage
-			if not RPText.takehitCD and (eventPrefix == "SPELL" or eventPrefix == "SPELL_PERIODIC") and (eventSuffix == "DAMAGE" or eventSuffix=="HEAL") then
+			if not RPText.getTakehitCD() and (eventPrefix == "SPELL" or eventPrefix == "SPELL_PERIODIC") and (eventSuffix == "DAMAGE" or eventSuffix=="HEAL") then
 				
 				local npc = Character:new({}, sourceName);
 				if u then npc = Character.buildNPC(u, sourceName) end
@@ -136,7 +143,13 @@ local Event = {}
 					crit, -- Crit
 					npc
 				)
-				SpellBinding.onTick(u, npc, trig)
+				--SpellBinding.onTick(u, npc, trig)
+				Event.raise(Event.Types.SPELL_TICK, {
+					aura = trig,
+					unit = u,
+					name = sourceName
+				});
+
 				if harmful and eventPrefix ~= "SPELL_PERIODIC" then
 					triggerWhisper(u, npc, trig, Condition.Types.RTYPE_SPELL_TICK)
 				end
@@ -149,34 +162,20 @@ local Event = {}
 				local damage = 0	
 				damage = arguments[12]
 
-				
-				local chance = globalStorage.swing_text_freq;
-				if crit ~= "" then chance = chance*4 end -- Crits have 3x chance for swing text
+				Event.raise(Event.Types.SWING..crit, {
+					unit = u,
+					name = sourceName
+				});
 
-				local npc = Character.buildNPC(u, sourceName)
-				local rand = math.random()
-				if not RPText.takehitCD and rand < chance and u and not UnitIsPlayer(u) then
-
-					-- id, senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action
-					local rp = RPText.get(eventPrefix..crit, u, "player", npc, ExiWoW.ME);
-					if rp then
-						RPText.setTakehitTimer();
-						rp:convertAndReceive(npc, ExiWoW.ME)
-					end
-
-				end
-
-				if damage <= 0 then return end
-				local percentage = damage/UnitHealthMax("player");
-				ExiWoW.ME:addExcitement(percentage*0.1, false, true);
-
+				--print("Todo, whispers")
+				--[[
 				triggerWhisper(
 					u,
 					npc, 
 					buildSpellTrigger("ATTACK", "ATTACK", true, sourceName, 1, crit, npc), 
 					Condition.Types.RTYPE_MELEE
 				)
-				
+				]]
 
 			end
 		end
@@ -257,7 +256,11 @@ local Event = {}
 				local aura = buildSpellTrigger(spellId, name, harmful, unitCaster, count, false, char)
 				table.insert(active, aura)
 				if not auraExists(Event.AURAS, aura) then
-					SpellBinding.onAdd(unitCaster, char, aura);
+					Event.raise(Event.Types.SPELL_ADD, {
+						aura = aura,
+						unit = unit,
+						name = uc
+					});
 				end
 
 			end
@@ -280,7 +283,11 @@ local Event = {}
 			-- See what auras were removed
 			for i,a in pairs(Event.AURAS) do
 				if not auraExists(active, a) then
-					SpellBinding.onRemove(nil, a.char, a);
+					Event.raise(Event.Types.SPELL_REM, {
+						aura = a,
+						unit = "none",
+						name = a.char.name
+					});
 				end
 			end
 
@@ -292,7 +299,15 @@ local Event = {}
 
 
 	function Event.on(event, callback)
-		if type(callback) ~= "function" then print("Callback in event binding is not a function, got", type(callback)); return false end
+		if type(callback) ~= "function" then 
+			print("Callback in event binding is not a function, got", type(callback));
+			print(debugstack());
+			return false;
+		end
+		if type(event) ~= "string" then
+			print("Invalid event binding passed to Event.on, got ", event);
+			print(debugstack())
+		end
 		Event.index = Event.index + 1;
 		Event.bindings[Event.index] = {event=event, callback=callback}
 		return Event.index
@@ -303,6 +318,10 @@ local Event = {}
 	end
 
 	function Event.raise(evt, data)
+		if not evt then
+			print("Invalid event raised")
+			print(debugstack())
+		end
 		for _,v in pairs(Event.bindings) do
 			if v.event == evt then
 				v.callback(data)

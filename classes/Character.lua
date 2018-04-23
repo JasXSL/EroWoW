@@ -2,7 +2,7 @@ local appName, internal = ...
 local export = internal.Module.export;
 local require = internal.require;
 
-local UI, Timer, Event, Action, Underwear, Index, SpellBinding, Tools, RPText, Condition;
+local UI, Timer, Event, Action, Underwear, Index, Tools, RPText, Condition, NPC;
 local myGUID = UnitGUID("player")
 
 -- Contains info about a character, 
@@ -26,10 +26,10 @@ Character.__index = Character;
 		Action = require("Action");
 		Underwear = require("Underwear");
 		Index = require("Index");
-		SpellBinding = require("SpellBinding");
 		Tools = require("Tools");
 		RPText = require("RPText");
 		Condition = require("Condition");
+		NPC = require("NPC");
 
 		-- Main character timer, ticking once per second
 		Timer.set(function()
@@ -50,17 +50,29 @@ Character.__index = Character;
 	function Character.buildNPC(u, name)
 
 		if not name then name = "???" end
-		local npc = Character:new({}, name);
-		if not u then u = "???" end
-		npc.type = UnitCreatureType(u) or "???";
-		--npc.race = UnitRace(u);
-		npc.class = UnitClass(u) or "???";
+		if not u then u = "none" end
 
-		local sex = UnitSex(u) or 0;
-		if sex == 2 then npc.penis_size = 2
-		elseif sex == 3 then 
-			npc.breast_size = 2;
-			npc.vagina_size = 0;
+		local npc = Character:new({}, name);
+
+		npc.type = UnitCreatureType(u) or "???";
+		npc.class = UnitClass(u) or "???";
+		npc.sex = nil;
+
+		-- See if this one lives in NPC DB
+		local db = NPC.get(name);
+		if db then
+			-- Fetch some predefined info
+			npc.tags = db.tags;
+			npc.sex = db.gender;
+		end
+
+		if not npc.sex then
+			local sex = UnitSex(u) or 0;
+			if sex == 2 then npc.penis_size = 2
+			elseif sex == 3 then 
+				npc.breast_size = 2;
+				npc.vagina_size = 0;
+			end
 		end
 		return npc;
 	end
@@ -254,6 +266,7 @@ Character.__index = Character;
 		self.type = "player";				-- Can be overridden like humanoid etc. 
 		
 		-- 
+		self.tags = {};						-- For now, only used by NPCs
 
 		-- Importable properties
 		-- Use Character:getnSize
@@ -306,6 +319,10 @@ Character.__index = Character;
 		return out;
 	end
 
+	function Character:getTags()
+		-- Todo: Expand with future tags
+		return self.tags;
+	end
 
 	-- Gets a clamped excitement value
 	function Character:getExcitementPerc()

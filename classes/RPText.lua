@@ -67,7 +67,7 @@ RPText.whisperCD = nil
 		local self = {}
 		setmetatable(self, RPText);
 
-		self.id = data.id or "";			-- Generally matches an Action ID. Gets converted into a table with {id = true}
+		self.id = data.id or "";			-- Generally matches an Action ID. Gets converted into a table with {id = true}. If "" then it's a wildcard, and only conditions are checked
 		self.text_sender = data.text_sender or false; 		-- RP Text
 		self.text_receiver = data.text_receiver or ""; 		-- RP Text
 		self.text_bystander = data.text_bystander or false;	-- RP Text for bystanders
@@ -103,6 +103,9 @@ RPText.whisperCD = nil
 				if v[1] ~= nil then 
 					success = validateThese(v)	-- We must go deeper
 				else
+					if not v or type(v.validate) ~= "function" then
+						print("Invalid condition in ", self.text_receiver);
+					end
 					success = v:validate(senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action) -- This entry was a condition
 					if v.type == Condition.Types.RTYPE_HAS_INVENTORY and success then
 						se.item = success;
@@ -201,7 +204,7 @@ RPText.whisperCD = nil
 		local lib = Database.filter("RPText");
 		for k,v in pairs(lib) do
 
-			if Tools.multiSearch(id, v.id) then
+			if v.id == "" or Tools.multiSearch(id, v.id) then
 
 				local valid = v:validate(senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action);
 				if 
@@ -229,12 +232,24 @@ RPText.whisperCD = nil
 
 	end
 
+	function RPText.buildSpellData(spellID, spellName, harmful, casterName, count, crit, tags)
+		return {
+			spellID = spellID or 0,
+			spellName = spellName or "",
+			harmful = harmful or false,
+			casterName = casterName or "",
+			count = count or 0,
+			crit = crit or false,
+			tags = tags
+		};
+	end
+
 	-- Same as above but triggers as well
 	--senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action
-	function RPText.trigger(id, sender, receiver, spelldata, spellType)
-		local text = RPText.get(id, sender, receiver, spelldata, spellType)
+	function RPText.trigger(id, senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action)
+		local text = RPText.get(id, senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action)
 		if text then 
-			text:convertAndReceive(sender, receiver, false) 
+			text:convertAndReceive(senderChar, receiverChar, false) 
 			return text
 		end
 		return false
@@ -386,7 +401,6 @@ RPText.whisperCD = nil
 		ChatFrame1:AddMessage(sender, color[1], color[2], color[3]);
 		UIErrorsFrame:AddMessage(sender, color[1], color[2], color[3], 53, 6);
 	end
-
 
 
 

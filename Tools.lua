@@ -49,7 +49,10 @@ local Tools = {};
 	-- Creates a set like {name, name2...} => {name=true, name2=true...}
 	function Tools.createSet(list)
 		local set = {}
-		for _, l in ipairs(list) do set[l] = true end
+		if type(list) ~= "table" then list = {list} end
+		for _, l in pairs(list) do 
+			set[l] = true 
+		end
 		return set
 	end
 
@@ -68,5 +71,22 @@ local Tools = {};
 		all_slots[19] = "tabard"
 		return all_slots[slot]
 	end
+
+	function Tools.concat(...)
+		local out = {};
+		local input = {...};
+		for _,i in pairs(input) do
+			if i ~= nil then
+				if type(i) ~= "table" then
+					i = {i};
+				end
+				for _,v in pairs(i) do
+					table.insert(out, v);
+				end
+			end
+		end
+		return out;
+	end
+
 
 export("Tools", Tools)
