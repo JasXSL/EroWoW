@@ -9,6 +9,7 @@ function internal.Gateway()
 	local Spell = require("Spell");
 	local Loot = require("Loot");
 	local Action = require("Action");
+	local Database = require("Database");
 
 	-- Swing
 	local function onSwing(unit, sender, crit)
@@ -18,7 +19,7 @@ function internal.Gateway()
 		end -- Crits have 3x chance for swing text
 
 		local rand = math.random();
-		if not RPText.getTakehitCD() and rand < chance and unit and not UnitIsPlayer(unit) then
+		if not RPText.getTakehitCD() and rand < chance and unit and not UnitIsPlayer(unit) and not UnitInVehicle("player") then
 
 			local chance = globalStorage.swing_text_freq;
 			if crit ~= "" then chance = chance*4 end -- Crits have 3x chance for swing text
@@ -54,10 +55,24 @@ function internal.Gateway()
 		local spellData = RPText.buildSpellData(aura.spellId, aura.name, aura.harmful, npc.name, aura.count, aura.crit);
 
 		-- See if this spell was bound at all
-		local spell = Spell.filter(aura.name, unit, "player", npc, ExiWoW.ME, spellData, event)[1];
-		if spell and not RPText.getTakehitCD() and math.random() < chance and not UnitInVehicle("player") then
+		local spells = Spell.filter(aura.name, unit, "player", npc, ExiWoW.ME, spellData, event);
+		
+		local all = Database.getIDs("Spell", aura.name);
+		for _,sp in pairs(all) do
+			if type(sp.onTrigger) == "function" then
+				sp:onTrigger(event, unit, "player", npc, ExiWoW.ME);
+			end
+		end
+
+		-- Trigger random RP texts
+		local spell = spells[1];
+		if spell and not RPText.getTakehitCD() and math.random() < chance*spell.chanceMod and not UnitInVehicle("player") then
 			spellData.tags = spell:exportTags();
-			local rp = RPText.get(event, unit, "player", npc, ExiWoW.ME, spellData, event);
+			local name = event;
+			if spell.alias then
+				name = spell.alias;
+			end
+			local rp = RPText.get(name, unit, "player", npc, ExiWoW.ME, spellData, name);
 			if rp then
 				RPText.setTakehitTimer();
 				rp:convertAndReceive(npc, ExiWoW.ME, false, spellData);
@@ -127,6 +142,16 @@ function internal.Gateway()
 		end
 	end);
 	
+
+
+
+	-- WoW Loot
+	Event.on(Event.Types.CONTAINER_OPENED, function(data)
+		print("Container opened", ExiWoW.json.encode(data));
+		for i=1, GetNumLootItems() do
+			print("Item", i, GetLootSlotInfo(i))
+		end
+	end);
 
 
 end

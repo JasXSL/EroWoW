@@ -10,8 +10,10 @@ local Event = {}
 	Event.bindings = {}		-- {id={event:(str)event, callback:(str)callback}...}
 	Event.AURAS = {}
 	Event.lootContainer = nil					-- Loot container name when looting a container through the "Open" spell
+	Event.lootSpell = nil
 
 	-- Custom events
+	-- Keep in mind events bound in Event.TYPES will also be raised
 	Event.Types = {
 		LOADED = "LOADED",									-- ExiWoW loaded
 		EXADD = "EXADD",									-- {amount=amount, set=set, multiplyMasochism=multiplyMasochism} Excitement has been added or subtracted
@@ -37,6 +39,8 @@ local Event = {}
 		SWING_CRIT = "SWING_CRIT",									-- Same as swing
 		MONSTER_KILL = "MONSTER_KILL",								-- {name=deadNPCName}
 		FORAGE = "FORAGE",											-- void
+
+		CONTAINER_OPENED = "CONTAINER_OPENED",						-- {autoloot:1/0, action:"Herb Gathering"/"Open" etc, container:"Starlight Rose" etc} World container opened			
 	}
 
 
@@ -121,7 +125,7 @@ local Event = {}
 
 			
 			-- These only work for healing or damage
-			if not RPText.getTakehitCD() and (eventPrefix == "SPELL" or eventPrefix == "SPELL_PERIODIC") and (eventSuffix == "DAMAGE" or eventSuffix=="HEAL") then
+			if (eventPrefix == "SPELL" or eventPrefix == "SPELL_PERIODIC") and (eventSuffix == "DAMAGE" or eventSuffix=="HEAL") then
 				
 				local npc = Character:new({}, sourceName);
 				if u then npc = Character.buildNPC(u, sourceName) end
@@ -185,6 +189,8 @@ local Event = {}
 
 		if event == "UNIT_SPELLCAST_SENT" then
 			
+			Event.lootContainer = nil;
+			Event.lootSpell = nil;
 			local lootableSpells = {
 				Fishing = true,
 				Mining = true,
@@ -193,8 +199,9 @@ local Event = {}
 				Archaeology = true,
 				Skinning = true,
 				Mining = true,
-				Disenchanting = true
+				Disenchanting = true,
 			}
+			--print(arguments[2], lootableSpells[arguments[2]], arguments[3], arguments[4]);
 			if lootableSpells[arguments[2]] then
 				Event.lootSpell = arguments[2];
 				Event.lootContainer = arguments[4];
@@ -215,20 +222,20 @@ local Event = {}
 			ExiWoW.ME:addExcitement(0, true);
 		end
 		
-		if event == "LOOT_OPENED" or event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_FAILED_QUIET" then
-			if Event.lootContainer then 
-				print("LootContainer = ", Event.lootContainer);
-			
-				print("Nr items", GetNumLootItems())
-				print("Autoloot", arguments[1])
-				for i=1, GetNumLootItems() do
-					print("Item", i, GetLootSlotInfo(i))
-				end
+		if event == "LOOT_OPENED" then
+			if Event.lootContainer then
+				Event.raise(Event.Types.CONTAINER_OPENED, {
+					autoloot = arguments[1],
+					container = Event.lootContainer,
+					action = Event.lootSpell,
+				});
 			end
-
+			Event.lootContainer = nil
 		end
-
-		if event == "LOOT_CLOSED" then
+		if event == "LOOT_CLOSED" or event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_FAILED_QUIET" then
+			if event ~= "LOOT_CLOSED" and arguments[2] ~= Event.lootSpell then
+				return;
+			end
 			Event.lootContainer = nil
 		end
 

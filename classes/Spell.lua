@@ -30,10 +30,11 @@ Spell.__index = Spell;
 		self.id = data.id;				-- Id is the name of the spell. Can contain a % or table (not set, ex) {"id1", "id2"}
 		self.tags = type(data.tags) == "table" and data.tags or {};						-- Text tags of your choosing
 		self.conditions = type(data.conditions) == "table" and data.conditions or {};	-- Conditions to run this
-		self.onTrigger = data.trigger;			-- Function. Raised with args: str type, casterUnit, victimUnit, casterChar, victimChar
-		self.always_trigger = data.always_trigger;	-- Set to true to have events ALWAYS trigger for this one. Otherwise trigger chance is random.
+		self.onTrigger = data.onTrigger;				-- Function. Raised with args: self, event, casterUnit, victimUnit, casterChar, victimChar
+														-- This function is ALWAYS, no RNG involved, and no conditions are checked
 		self.alias = data.alias;						-- Allows you to change the ID when scanning for RP texts bound to this
-
+		self.custom = data.custom;						-- Lets you set some custom variables
+		self.chanceMod = data.chanceMod or 1;			-- Multiplier of trigger chance
 		if not self.id then print("Spell inserted without an ID"); end
 
 		self.id = Tools.createSet(self.id);

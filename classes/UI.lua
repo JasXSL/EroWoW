@@ -6,17 +6,19 @@ local Action, Underwear, Database, Event, Timer;
 
 UI = {}
 	UI.FRAME = false 					-- Page browser for ExiWoW
-	UI.open = true 					-- Set to false when done debugging. Setting to false by default will have it visible by default
+	UI.open = false 					-- Set to false when done debugging. Setting to false by default will have it visible by default
 	UI.lootQueue = {}					-- {{name=name, icon=icon}} - Queue of loot to show when the loot toast pops up
 
 
 	function UI.ini()
 
+		UI.open = globalStorage.UI_OPEN;
 		Action = require("Action");
 		Underwear = require("Underwear");
 		Database = require("Database");
 		Event = require("Event");
 		Timer = require("Timer");
+		
 
 	end
 
@@ -126,6 +128,7 @@ UI = {}
 	-- Main UI functions
 	function UI.toggle()
 		UI.open = not UI.open
+		globalStorage.UI_OPEN = UI.open;
 		if UI.open then
 			UI.FRAME:Show();
 			PlaySound(SOUNDKIT.IG_CHARACTER_INFO_OPEN );

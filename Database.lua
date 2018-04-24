@@ -46,13 +46,20 @@ end
 
 function Database.getIDs(tbl, ids)
 	if type(ids) ~= "table" then
-		ids = {ids=true};
+		ids = {[ids]=true};
 	end
 	local all = Database.filter(tbl);
 	local out = {};
 	for _,v in pairs(all) do
 		if ids[v.id] then
 			table.insert(out, v);
+		elseif type(v.id) == "table" then
+			for id,_ in pairs(v.id) do
+				if ids[id] then
+					table.insert(out, v);
+					break;
+				end
+			end
 		end
 	end
 	return out;
