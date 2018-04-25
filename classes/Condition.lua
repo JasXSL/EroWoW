@@ -26,11 +26,18 @@ Condition.__index = Condition;
 		RTYPE_HAS_AURA = "aura",						-- {{name=name, caster=casterName}...} Player has one or more of these auras
 		RTYPE_HAS_INVENTORY = "inv",					-- {{name=name, quant=min_quant}}
 		RTYPE_UNDIES = "undies",						-- false = none, true = req, {name=true, name2=true...} = limit by name
-		-- The following will only validate from spells received --
+		
+		-- The following will only validate from spell based eventData
 		RTYPE_CRIT = "crit",						-- Spell was a critical hit
 		RTYPE_DETRIMENTAL = "detrimental",			-- Spell was detrimental
 		RTYPE_EQUIPMENT = "equipment",				-- {slot=(int)equipmentSlot(http://wowwiki.wikia.com/wiki/InventorySlotId), type="Plate/Mail/Leather/Cloth"}
 		RTYPE_EVENT = "event",							-- Event that raised this
+
+		-- These require the container open event
+		-- Name of the container opened can be checked with RTYPE_NAME
+		RTYPE_CONTAINER_ACTION = "c_action",			-- Action used to open the container, like Opening or Herb Gathering
+
+
 
 		-- These are primarily used for whisper texts
 		RTYPE_REQUIRE_MALE = "req_male",			-- Allow male must be checked in settings
@@ -231,7 +238,7 @@ Condition.__index = Condition;
 
 	
 
-	function Condition:validate(senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action)
+	function Condition:validate(senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action)
 
 		local t = self.type;
 		local targ = receiverChar;
@@ -290,9 +297,9 @@ Condition.__index = Condition;
 			local dist = math.sqrt((px-x)*(px-x)+(py-y)*(py-y));
 			out = dist <= radius;
 		elseif t == ty.RTYPE_CRIT then
-			out = type(spellData) == "table" and spellData.crit;
+			out = type(eventData) == "table" and eventData.crit;
 		elseif t == ty.RTYPE_DETRIMENTAL then
-			out = type(spellData) == "table" and spellData.harmful;
+			out = type(eventData) == "table" and eventData.harmful;
 		elseif t == ty.RTYPE_MELEE then
 			out = spelltype == ty.RTYPE_MELEE
 		elseif t == ty.RTYPE_SPELL_ADD then
@@ -343,8 +350,8 @@ Condition.__index = Condition;
 				targ:getTags(),
 				Zone.getCurrentTags()
 			)
-			if type(spellData) == "table" then
-				tags = Tools.concat(tags, spellData.tags);
+			if type(eventData) == "table" then
+				tags = Tools.concat(tags, eventData.tags);
 			end 
 			
 			tags = Tools.createSet(tags);
@@ -414,7 +421,7 @@ Condition.__index = Condition;
 	end
 
 	-- Validate all conditions
-	function Condition.all(conditions, senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action)
+	function Condition.all(conditions, senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action)
 
 		local se = self;
 		local function validateThese(input, noOr)
@@ -431,7 +438,7 @@ Condition.__index = Condition;
 					if not v or type(v.validate) ~= "function" then
 						print("Invalid condition in ", self.text_receiver);
 					end
-					success = v:validate(senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action) -- This entry was a condition
+					success = v:validate(senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action) -- This entry was a condition
 					if v.type == Condition.Types.RTYPE_HAS_INVENTORY and success then
 						se.item = success;
 					end

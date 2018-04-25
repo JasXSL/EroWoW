@@ -143,12 +143,13 @@ local Effect = {}
 			local _, handle = PlaySound(self.sound_loop, "SFX", false, true);
 			self.loopPlaying = handle;
 			local se = self;
-			Event.on("SOUNDKIT_FINISHED", function(data)
+			self.loopEvent = Event.on("SOUNDKIT_FINISHED", function(data)
 				if data[1] == se.loopPlaying then 
 					local _, handle = PlaySound(se.sound_loop, "SFX", false, true);
 					se.loopPlaying = handle;
 				end
 			end)
+			print("Sound handle ", handle);
 
 		end
 
@@ -251,6 +252,9 @@ local Effect = {}
 		local fx = effect.effect;
 		if type(fx.onRemove) == "function" then
 			fx:onRemove();
+		end
+		if fx.loopEvent then
+			Event.off(fx.loopEvent);
 		end
 		if fx.loopPlaying then
 			StopSound(fx.loopPlaying);

@@ -10,6 +10,7 @@ function internal.Gateway()
 	local Loot = require("Loot");
 	local Action = require("Action");
 	local Database = require("Database");
+	local Timer = require("Timer");
 
 	-- Swing
 	local function onSwing(unit, sender, crit)
@@ -23,7 +24,7 @@ function internal.Gateway()
 
 			local chance = globalStorage.swing_text_freq;
 			if crit ~= "" then chance = chance*4 end -- Crits have 3x chance for swing text
-			-- id, senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action
+			-- id, senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action
 			local npc = Character.buildNPC(unit, sender);
 			local rp = RPText.get(Event.Types.SWING..crit, unit, "player", npc, ExiWoW.ME, nil, Event.Types.SWING..crit);
 			if rp then
@@ -52,10 +53,10 @@ function internal.Gateway()
 		chance = chance*globalStorage.spell_text_freq;
 		
 		local npc = Character.buildNPC(unit, sender);
-		local spellData = RPText.buildSpellData(aura.spellId, aura.name, aura.harmful, npc.name, aura.count, aura.crit);
+		local eventData = RPText.buildSpellData(aura.spellId, aura.name, aura.harmful, npc.name, aura.count, aura.crit);
 
 		-- See if this spell was bound at all
-		local spells = Spell.filter(aura.name, unit, "player", npc, ExiWoW.ME, spellData, event);
+		local spells = Spell.filter(aura.name, unit, "player", npc, ExiWoW.ME, eventData, event);
 		
 		local all = Database.getIDs("Spell", aura.name);
 		for _,sp in pairs(all) do
@@ -67,15 +68,15 @@ function internal.Gateway()
 		-- Trigger random RP texts
 		local spell = spells[1];
 		if spell and not RPText.getTakehitCD() and math.random() < chance*spell.chanceMod and not UnitInVehicle("player") then
-			spellData.tags = spell:exportTags();
+			eventData.tags = spell:exportTags();
 			local name = event;
 			if spell.alias then
 				name = spell.alias;
 			end
-			local rp = RPText.get(name, unit, "player", npc, ExiWoW.ME, spellData, name);
+			local rp = RPText.get(name, unit, "player", npc, ExiWoW.ME, eventData, name);
 			if rp then
 				RPText.setTakehitTimer();
-				rp:convertAndReceive(npc, ExiWoW.ME, false, spellData);
+				rp:convertAndReceive(npc, ExiWoW.ME, false, eventData);
 			end
 		end
 
@@ -86,13 +87,14 @@ function internal.Gateway()
 	
 
 
-	local function rollLoot(event, npcName)
+	local function rollLoot(event, npcName, eventData)
 		
 		local npc = Character.buildNPC("none", npcName);
 		
-		---- senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action
-		local available = Loot.filter("none", "player", npc, ExiWoW.ME, nil, event, Action.get("FORAGE"));
+		---- senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action
+		local available = Loot.filter("none", "player", npc, ExiWoW.ME, eventData, event, Action.get("FORAGE"));
 
+		--print("Rolling loot with", event, npc.name, "found", #available);
 		local out = {};
 
 		for _,loot in pairs(available) do
@@ -141,15 +143,26 @@ function internal.Gateway()
 			RPText.print("You found nothing");
 		end
 	end);
-	
 
-
-
-	-- WoW Loot
+	-- World containers
+	local scanned_containers = {};
 	Event.on(Event.Types.CONTAINER_OPENED, function(data)
-		print("Container opened", ExiWoW.json.encode(data));
+		--print("Container opened", ExiWoW.json.encode(data));
 		for i=1, GetNumLootItems() do
-			print("Item", i, GetLootSlotInfo(i))
+			local items = {GetLootSourceInfo(i)};
+			--print("Item", i, GetLootSlotInfo(i))
+			--print("Sources", GetLootSourceInfo(i));
+			for k,v in ipairs(items) do
+				if k%2 == 1 then
+					if not scanned_containers[v] then
+						scanned_containers[v] = true;
+						Timer.set(function()
+							scanned_containers[v] = nil;
+						end, 300);
+						rollLoot(Event.Types.CONTAINER_OPENED, data.container, data);
+					end
+				end
+			end
 		end
 	end);
 

@@ -112,7 +112,7 @@ local Event = {}
 
 			if combatEvent == "PARTY_KILL" then
 				if 
-					bit.band(destFlags, COMBATLOG_OBJECT_CONTROL_NPC) > 0
+					bit.band(destFlags, COMBATLOG_OBJECT_CONTROL_PLAYER) > 0
 				then
 					Event.raise(Event.Types.MONSTER_KILL, {name=destName});
 				end

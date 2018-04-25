@@ -141,7 +141,7 @@ SpellBinding.__index = SpellBinding;
 	end
 
 	-- Returns an RP text object
-	-- id, senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action
+	-- id, senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action
 	function SpellBinding.getRpText(senderUnit, senderObj, data, type, name)
 		return RPText.get(name, senderUnit, "player", senderObj, ExiWoW.ME, data, type);
 	end

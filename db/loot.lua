@@ -21,6 +21,8 @@ function internal.build.loot()
 	local ext = internal.ext;
 	local evtIsKill = Condition.get("is_monster_kill");
 	local evtIsForage = Condition.get("is_forage");
+	local evtIsWorldContainer = Condition.get("is_world_container");
+	
 
 	ext:addLoot({
 		id = "KulTirasBoxers",
@@ -192,6 +194,13 @@ function internal.build.loot()
 			})
 		}
 	})
+
+
+
+
+	-- World containers
+
+
 
 
 	-- Foraged loot

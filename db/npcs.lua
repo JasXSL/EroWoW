@@ -81,4 +81,8 @@ function internal.build.npcs()
 	ext:addNPC({id="Gorishi Wasp",tags={"SILITHID", "WASP"}});
 	
 
+
+	-- World containers can also use tags
+	
+
 end

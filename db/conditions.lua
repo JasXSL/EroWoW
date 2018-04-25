@@ -82,6 +82,7 @@ function internal.build.conditions()
 	ext:addCondition({id="is_melee_crit", type=ty.RTYPE_EVENT, data=Event.Types.SWING_CRIT});
 	ext:addCondition({id="is_monster_kill", type=ty.RTYPE_EVENT, data=Event.Types.MONSTER_KILL});
 	ext:addCondition({id="is_forage", type=ty.RTYPE_EVENT, data=Event.Types.FORAGE});
+	ext:addCondition({id="is_world_container", type=ty.RTYPE_EVENT, data=Event.Types.CONTAINER_OPENED});
 	
 
 	-- Spell tick/add/rem tag conditions

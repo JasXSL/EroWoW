@@ -348,7 +348,54 @@ Action.__index = Action;
 
 	end
 
-	
+	function Action:getAllConditions()
+		return Tools.concat(self.conditions, self.filters);
+	end
+
+	function Action:requiresStealth()
+		local all = self:getAllConditions();
+		for _,cond in pairs(all) do
+			if cond.type == Condition.Types.RTYPE_STEALTH and not cond.inverse then
+				return true;
+			end
+		end
+	end
+
+	function Action:requiresParty()
+		local all = self:getAllConditions();
+		for _,cond in pairs(all) do
+			if cond.type == Condition.Types.RTYPE_PARTY and not cond.inverse then
+				return true;
+			end
+		end
+	end
+
+	function Action:partyRestricted()
+		local all = self:getAllConditions();
+		for _,cond in pairs(all) do
+			if cond.type == Condition.Types.RTYPE_PARTY_RESTRICTED and not cond.inverse then
+				return true;
+			end
+		end
+	end
+
+	function Action:disabledInCombat()
+		local all = self:getAllConditions();
+		for _,cond in pairs(all) do
+			if cond.type == Condition.Types.RTYPE_COMBAT and cond.inverse then
+				return true;
+			end
+		end
+	end
+
+	function Action:selfCastOnly()
+		local all = self:getAllConditions();
+		for _,cond in pairs(all) do
+			if cond.type == Condition.Types.RTYPE_SELF_ONLY and not cond.inverse then
+				return true;
+			end
+		end
+	end
 
 
 		-- TOOLTIP HANDLING --
@@ -379,6 +426,7 @@ Action.__index = Action;
 	function Action.getRangeYards()
 		return 40;
 	end
+
 
 
 	function Action:drawTooltip()
@@ -427,21 +475,21 @@ Action.__index = Action;
 
 		
 
-		if v.require_stealth then
+		if v:requiresStealth() then
 			GameTooltip:AddLine("Requires Stealth", c,c,c);
 		end
 
-		if not v.self_only then
+		if not v:selfCastOnly() then
 
-			if v.require_party then
+			if v:requiresParty() then
 				GameTooltip:AddLine("Requires Party Member", c,c,c);
-			elseif v.party_restricted then
+			elseif v:partyRestricted() then
 				GameTooltip:AddLine("Party Restricted", c,c,c);
 			end
 
 		end
 
-		if not v.allow_caster_combat or not v.allow_targ_combat then
+		if v:disabledInCombat() then
 			GameTooltip:AddLine("Disabled in Combat", c,c,c);
 		end
 
@@ -512,7 +560,7 @@ Action.__index = Action;
 
 		local id = self.id;
 		if self.alias then id = self.alias end
-		-- id, senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action
+		-- id, senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action
 		local rptext = RPText.get(id, sender, target, ts, tt, nil, nil, self);
 
 		if not rptext then return false end
@@ -695,7 +743,7 @@ Action.__index = Action;
 		end
 
 		-- Self cast actions don't need to send a message
-		if action.self_only or not UnitExists("target") then
+		if action:selfCastOnly() or not UnitExists("target") then
 			target = "player"
 		end
 

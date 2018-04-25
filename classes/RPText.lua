@@ -90,7 +90,7 @@ RPText.whisperCD = nil
 		return self
 	end
 
-	-- senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action
+	-- senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action
 	function RPText:validate(...)
 		return Condition.all(self.requirements, ...);
 	end
@@ -162,7 +162,7 @@ RPText.whisperCD = nil
 
 	-- STATIC
 	-- Returns an RPText object
-	function RPText.get(id, senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action)
+	function RPText.get(id, senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action)
 
 		local viable = {};
 		local isSelfCast = UnitIsUnit(senderChar:getName(), receiverChar:getName())
@@ -172,7 +172,7 @@ RPText.whisperCD = nil
 
 			if v.id == "" or Tools.multiSearch(id, v.id) then
 
-				local valid = v:validate(senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action);
+				local valid = v:validate(senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action);
 				if 
 					valid and 
 					(
@@ -211,9 +211,9 @@ RPText.whisperCD = nil
 	end
 
 	-- Same as above but triggers as well
-	--senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action
-	function RPText.trigger(id, senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action)
-		local text = RPText.get(id, senderUnit, receiverUnit, senderChar, receiverChar, spellData, event, action)
+	--senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action
+	function RPText.trigger(id, senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action)
+		local text = RPText.get(id, senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action)
 		if text then 
 			text:convertAndReceive(senderChar, receiverChar, false) 
 			return text
