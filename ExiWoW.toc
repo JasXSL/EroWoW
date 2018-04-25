@@ -3,49 +3,55 @@
 ## Notes: Improving your RP by adding RP actions and more detailed descriptions of your character!
 ## Version: 0.0.1
 
-## SavedVariables: ExiWoWGlobalStorage
-## SavedVariablesPerCharacter: ExiWoWLocalStorage
+## SavedVariables: globalStorage
+## SavedVariablesPerCharacter: localStorage
 
 # XML templates 
 xml/panel.xml
 
+# Module loader and tools
+Module.lua
+Tools.lua
+Database.lua
+
+
 # Entry point
 _index.lua
+# IO
+Gateway.lua
 
-# Libraries
-libraries/json.lua
-libraries/Timer.lua
-libraries/Callbacks.lua
+# External Libraries
+ext/json.lua
 
 # Main classes
-Settings.lua
-Action.lua
-Character.lua
-Menu.lua
-RPText.lua
-Extension.lua
-SpellBinding.lua
-Underwear.lua
-Event.lua
-Effect.lua
-
-# Collections of NPCs, spell effects etc that can be reused. Also loot tables
-collections/_index.lua
-collections/zones.lua
-collections/effects.lua
-collections/npc.lua
-collections/rptext_conditions.lua
-collections/spells.lua
-collections/loot.lua
-
-
-
+classes/Func.lua
+classes/Settings.lua
+classes/Condition.lua
+classes/NPC.lua
+classes/Spell.lua
+classes/Action.lua
+classes/Character.lua
+classes/UI.lua
+classes/RPText.lua
+classes/Extension.lua
+classes/Underwear.lua
+classes/Event.lua
+classes/Effect.lua
+classes/Timer.lua
+classes/Callback.lua
+classes/Zone.lua
+classes/Loot.lua
 
 
 # Asset database
-assets/lib_Effect.lua
-assets/lib_RPText.lua
-assets/lib_Actions.lua
-assets/lib_SpellBindings.lua
-assets/lib_Underwear.lua
+db/functions.lua
+db/conditions.lua
+db/zones.lua
+db/spells.lua
+db/npcs.lua
+db/effects.lua
+db/rptexts.lua
+db/actions.lua
+db/underwear.lua
+db/loot.lua
 

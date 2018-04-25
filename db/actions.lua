@@ -1,21 +1,39 @@
 local appName, internal = ...
+local require = internal.require;
+
 -- Library for Actions --
-function ExiWoW.Action:buildLibrary()
+function internal.build.actions()
+
+	local Action = require("Action");
+	local Character = require("Character");
+	local Tools = require("Tools");
+	local UI = require("UI");
+	local RPText = require("RPText");
+	local Event = require("Event");
+	local Condition = require("Condition");
+	local Func = require("Func");
 
 	local ef = ExiWoW.LibAssets.effects
+	local extension = internal.ext;
+	
+
 			-- LIBRARY --
 
 	-- Meta action that checks if target has ExiWoW --
-	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
+	extension:addAction({
 		id = "A",
 		global_cooldown = false,
 		suppress_all_errors = true,
-		party_restricted = false,
-		allow_stunned = true,
-		allow_instance = true,
-		allow_caster_dead = true,
-		allow_targ_dead = true,
 		hidden = true,
+		conditions = {},
+		not_defaults = {
+			"party_restricted",
+			"not_stunned",
+			"not_in_instance",
+			"sender_alive",
+			"victim_alive",
+			"not_in_vehicle"
+		},
 		-- Custom sending logic
 		fn_send = function(self, sender, target, suppressErrors)
 			ExiWoW.TARGET = nil
@@ -25,12 +43,12 @@ function ExiWoW.Action:buildLibrary()
 				if not success then return end
 				sender = Ambiguate(sender, "all")
 				if success and UnitIsUnit(sender, "target") then
-					ExiWoW.TARGET = ExiWoW.Character:new(data, sender);
+					ExiWoW.TARGET = Character:new(data, sender);
 					local offset = 0;
 					if ExiWoW.TARGET:isFemale() then offset = 0.25;
 					elseif not ExiWoW.TARGET:isMale() then offset = 0.5; end
-					ExiWoW.Frames.targetHasExiWoWFrame.genderTexture:SetTexCoord(offset,offset+0.25,0,1);
-					ExiWoW.Frames.targetHasExiWoWFrame:Show();
+					UI.portrait.targetHasExiWoWFrame.genderTexture:SetTexCoord(offset,offset+0.25,0,1);
+					UI.portrait.targetHasExiWoWFrame:Show();
 				end
 			end
 		end,
@@ -39,23 +57,48 @@ function ExiWoW.Action:buildLibrary()
 			return true, ExiWoW.ME:export(true)
 		end
 
-	}))
+	})
+
+	-- Test action
+	extension:addAction({
+		id = "TEST_ACTION",
+		name = "Test Item",
+		texture = "achievement_worldevent_littlehelper",
+		conditions = {},
+		max_charges = 100,
+		charges = 0,
+		-- Custom sending logic
+		fn_send = function(self, sender, target, suppressErrors)
+			print("TestAction Send")
+		end,
+		-- Handle the receiving end here
+		fn_receive = function(self, sender, target, data)
+			print("TestAction Receive")
+			return true
+		end
+
+	})
 
 	-- Disrobe --
-	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
+	extension:addAction({
 		id = "DISROBE",
 		name = "Disrobe",
 		description = "Removes a piece of armor from your target.",
 		texture = "ability_rogue_plunderarmor",
 		--cooldown = 120,
 		cooldown = 10,
-		require_stealth = true,
-		allow_targ_combat = false,
-		party_restricted = true,
 		cast_time = 2,
-		allow_caster_moving = false,
 		cast_sound_loop = 6425,				-- Tailoring, see http://www.wowhead.com/sound=6425/tailoring
-		max_distance = ExiWoW.Action.MELEE_RANGE,
+		conditions = {
+			Condition.get("require_stealth"),
+			Condition.get("victim_no_combat"),
+			Condition.get("sender_no_combat"),
+			Condition.get("require_party"),
+			Condition.get("sender_not_moving"),
+			Condition.get("melee_range"),
+		},
+		not_defaults = {},
+
 		-- allow_self = false,
 		fn_cast = function(self, sender, target, suppressErrors)
 			DoEmote("KNEEL", target);
@@ -66,14 +109,14 @@ function ExiWoW.Action:buildLibrary()
 			-- Return no data, but one callback
 			return nil, function(se, success, data)
 				if not success then
-					if data and data[1] then ExiWoW:reportError(data[1], suppressErrors); end
+					if data and data[1] then Tools.reportError(data[1], suppressErrors); end
 					self:resetCooldown();
 				else
 					PlaySound(1202, "SFX");
-					ExiWoW:reportError(
-						ExiWoW:unitRpName(sender) .. " successfully removed "..
+					Tools.reportError(
+						Tools.unitRpName(sender) .. " successfully removed "..
 						Ambiguate(UnitName(target), "all").."'s "..
-						ExiWoW:itemSlotToname(data.slot).."!"
+						Tools.itemSlotToname(data.slot).."!"
 					);
 				end
 			end
@@ -106,95 +149,110 @@ function ExiWoW.Action:buildLibrary()
 			end
 
 			local slot = equipped_slots[ math.random( #equipped_slots ) ];
-			ExiWoW.Character:removeEquipped(slot);
-			ExiWoW:reportError(ExiWoW:unitRpName(sender) .. " tugged off your "..ExiWoW:itemSlotToname(slot).."!");
+			Character:removeEquipped(slot);
+			Tools.reportError(Tools.unitRpName(sender) .. " tugged off your "..Tools.itemSlotToname(slot).."!");
 			if not UnitIsUnit(Ambiguate(sender, "ALL"), "player") then 
 				PlaySound(1202, "SFX");
 			end
 			return true, {slot=slot}
 		end
 
-	}))
+	})
 
 	-- meditate --
-	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
+	extension:addAction({
 		id = "MEDITATE",
-		self_only = true,
 		name = "Meditate",
 		description = "Meditate for a while, allowing your excitement to fade at a greatly increased rate.",
 		texture = "monk_ability_transcendence",
 		cooldown = 0,
-		allow_caster_moving = false,
-		allow_targ_combat = false,
 		important = true,
+		conditions = {
+			Condition.get("sender_no_combat"),
+			Condition.get("sender_not_moving"),
+			Condition.get("only_selfcast"),
+		},
+		not_defaults = {},
 		-- Handle the receiving end here
 		fn_receive = function(self, sender, target, suppressErrors)
 
 			if ExiWoW.ME.meditating then
-				return ExiWoW:reportError("You are already meditating!");
+				return Tools.reportError("You are already meditating!");
 			end
 
 			-- Start meditation --
 			DoEmote("SIT");
 			ExiWoW.ME.meditating = true;
 			ExiWoW.ME:toggleResting(true)
-			ExiWoW.Character:bind("PLAYER_STARTED_MOVING", function()
+			Event.on("PLAYER_STARTED_MOVING", function()
 				ExiWoW.ME:toggleResting(false)
 				ExiWoW.ME.meditating = false;
 			end, 1);
 			return true
 
 		end
-	}))
+	})
 
 	-- Spot excitement (Public, melee range) --
-	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
+	extension:addAction({
 		id = "ASSESS",
 		name = "Assess",
 		important = true,
 		description = "Take a good look at your target, revealing some information about them.",
 		texture = "inv_darkmoon_eye",
 		cooldown = 0,
-		max_distance = ExiWoW.Action.MELEE_RANGE,
-		party_restricted = false,
+		conditions = {
+			Condition.get("melee_range"),
+		},
+		not_defaults = {
+			"party_restricted"
+		},
 		fn_send = function(self, sender, target, suppressErrors)
 			-- We only need a callback for this
-			return nil, function(se, success, data) ExiWoW.Action:handleInspectCallback(target, success, data) end
+			return nil, function(se, success, data) Action.handleInspectCallback(target, success, data) end
 		end,
 		fn_receive = function()
 			return true, ExiWoW.ME:export(true)
 		end
-	}));
+	});
 
 	-- Sniff (Worgen) --
-	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
+	extension:addAction({
 		id = "SNIFF",
 		name = "Sniff",
 		description = "Sniff out some information about your target from a distance.",
 		texture = "inv_wolfdraenormountshadow",
 		cooldown = 0,
-		max_distance = ExiWoW.Action.CASTER_RANGE,
-		party_restricted = false,
-		allowed_races = {"Worgen"},
+		conditions = {
+			Condition.get("caster_range"),
+		},
+		filters = {
+			Condition:new({type=Condition.Types.RTYPE_RACE, data={Worgen=true}, sender=true})
+		},
+		not_defaults = {
+			"party_restricted",
+		},
 		fn_send = function(self, sender, target, suppressErrors)
 			DoEmote("SNIFF", target);
 			-- Callback
-			return nil, function(se, success, data) ExiWoW.Action:handleInspectCallback(target, success, data) end
+			return nil, function(se, success, data) Action.handleInspectCallback(target, success, data) end
 		end,
 		fn_receive = function()
 			return true, ExiWoW.ME:export(true)
 		end
-	}));
+	});
 
 	-- Tickle --
-	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
+	extension:addAction({
 		id = "TICKLE",
 		name = "Tickle",
 		description = "Tickle a player.",
 		texture = "Spell_shadow_fingerofdeath",
 		cooldown = 6,
-		max_distance = ExiWoW.Action.MELEE_RANGE,
-		party_restricted = false,
+		conditions = {
+			Condition.get("melee_range"),
+		},
+		not_defaults = {},
 		fn_send = function(self, sender, target, suppressErrors)
 			if not UnitIsUnit(target, "player") then 
 				DoEmote("TICKLE", target);
@@ -206,46 +264,53 @@ function ExiWoW.Action:buildLibrary()
 			self:receiveRPText(sender, target, args)
 			return true
 		end
-	}));
+	});
 
 	-- Wedgie --
-	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
+	extension:addAction({
 		id = "WEDGIE",
 		name = "Wedgie",
 		description = "Give a player a wedgie, provided they're wearing underwear.",
 		texture = "Spell_holy_fistofjustice",
 		cooldown = 6,
-		max_distance = ExiWoW.Action.MELEE_RANGE,
-		target_has_underwear = true,
-		party_restricted = false,
+		conditions = {
+			Condition.get("targetWearsUnderwear"),
+			Condition.get("melee_range"),
+		},
+		no_defaults = {
+			"party_restricted"
+		},
 		fn_send = function(self, sender, target, suppressErrors)
 			local race = UnitRace(target)
 			local gender = UnitSex(target)
 			return self:sendRPText(sender, target, suppressErrors, function(se, success)
 					if success and not UnitIsUnit(target, "player") then
-					ExiWoW.LibAssets.effects:painSound(race, gender)
+					Func.get("painSound")(race, gender)
 				end
 			end);
 		end,
 		fn_receive = function(self, sender, target, args)
 			DoEmote("GASP");
-			ExiWoW.LibAssets.effects.addExcitementMasochisticDefault();
+			Func.get("addExcitementMasochistic")();
 			self:receiveRPText(sender, target, args);
 			return true
 		end
-	}));
+	});
 
 	-- Forage --
-	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
+	extension:addAction({
 		id = "FORAGE",
 		name = "Forage",
 		description = "Search your active area for items.",
 		texture = "icon_treasuremap",
 		cooldown = 0,
-		self_only = true,
 		cast_sound_loop = 1104,
-		allow_caster_moving = false,
 		cast_time = 3,
+		conditions = {
+			Condition.get("only_selfcast"),
+			Condition.get("sender_not_moving"),
+		},
+		not_defaults = {},
 		fn_cast = function(self, sender, target, suppressErrors)
 			DoEmote("KNEEL", target);
 		end,
@@ -253,19 +318,22 @@ function ExiWoW.Action:buildLibrary()
 			return nil;
 		end,
 		fn_receive = function(self, sender, target, args)
-			ExiWoW.Character:forage()
+			Event.raise(Event.Types.FORAGE, {});
 			return true
 		end
-	}));
+	});
 
 	-- Pace --
-	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
+	extension:addAction({
 		id = "PACE",
 		name = "Pace",
 		description = "First use: Stake a starting point. Second use: Get the distance from the starting point, measured in map coordinates.",
 		texture = "ability_tracking",
 		cooldown = 0,
-		self_only = true,
+		conditions = {
+			Condition.get("only_selfcast"),
+		},
+		not_defaults = {},
 		fn_send = function(self, sender, target, suppressErrors)
 			return nil;
 		end,
@@ -280,16 +348,16 @@ function ExiWoW.Action:buildLibrary()
 				local y = self.starting_point.y
 				local dist = math.floor(math.sqrt((px-x)*(px-x)+(py-y)*(py-y))*100)/100
 				self.starting_point = nil
-				ExiWoW.RPText:print("You are comfortable that you paced a distance of "..dist.." units")
+				RPText.print("You are comfortable that you paced a distance of "..dist.." units")
 				PlaySound(73276, "SFX")
 			else
 				self.starting_point = {x=px, y=py}
 				PlaySound(42485, "SFX")
-				ExiWoW.RPText:print("You stake a starting point at X:"..(math.floor(px*100)/100)..", Y:"..(math.floor(py*100)/100))
+				RPText.print("You stake a starting point at X:"..(math.floor(px*100)/100)..", Y:"..(math.floor(py*100)/100))
 			end
 			return true
 		end
-	}));
+	});
 
 
 
@@ -301,7 +369,7 @@ function ExiWoW.Action:buildLibrary()
 
 
 		-- Consumable --
-	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
+	extension:addAction({
 		id = "THROW_SAND",
 		name = "Sand",
 		description = "Throw sand at your target.",
@@ -315,19 +383,19 @@ function ExiWoW.Action:buildLibrary()
 			local gender = UnitSex(target)
 			return self:sendRPText(sender, target, suppressErrors, function(se, success)
 				if success and not UnitIsUnit(target, "player") then
-					ExiWoW.LibAssets.effects:painSound(race, gender)
+					Func.get("painSound")(race, gender)
 				end
 			end);
 		end,
 		fn_receive = function(self, sender, target, args)
 			self:receiveRPText(sender, target, args)
-			ef.addExcitementMasochisticDefault();
+			Func.get("addExcitementMasochistic")();
 			return true
 		end
-	}));
+	});
 
 	-- Claw pinch
-	table.insert(ExiWoW.R.actions, ExiWoW.Action:new({
+	extension:addAction({
 		id = "CLAW_PINCH",
 		name = "Claw Pinch",
 		description = "Use your large claw to pinch your target.",
@@ -339,16 +407,16 @@ function ExiWoW.Action:buildLibrary()
 			local gender = UnitSex(target)
 			return self:sendRPText(sender, target, suppressErrors, function(se, success)
 				if success and not UnitIsUnit(target, "player") then
-					ExiWoW.LibAssets.effects:painSound(race, gender)
+					Func.get("painSound")(race, gender)
 				end
 			end);
 		end,
 		fn_receive = function(self, sender, target, args)
 			self:receiveRPText(sender, target, args)
-			ef.addExcitementMasochisticDefault();
+			Func.get("addExcitementMasochistic")();
 			return true
 		end
-	}));
+	});
 	
 
 end

@@ -1,38 +1,42 @@
 local appName, internal = ...
+local require = internal.require;
+local export = internal.Module.export;
+internal.build = {}							-- Collection of libraries to build
+internal.ext = nil							-- Root extension
+local Tools = require("Tools")
+local Action, Extension, Character, UI, Effect, Timer, Event, Callback, Database;
+
+
 UIParentLoadAddOn("Blizzard_DebugTools")
+
+-- Create base tables that can be accessed immediately without needing to use an extension
 --[[
 	/console scriptErrors 1
-	/run ExiWoW.Menu:drawLoot("Test", "inv_pants_leather_04")
+	/run ExiWoW.UI.drawLoot("Test", "inv_pants_leather_04")
 
 	TODO:
+	- Rework loot
+	- Re-add whispers
 	- Add pagination once you manage to fill up the whole first page and/or underwear page
 	- Character backup
 	 
 ]]
-
-local _initialized = false
-
 ExiWoW = {};
-ExiWoW.APP_NAME = "ExiWoW"
-ExiWoW.R = nil					-- Root extension
+ExiWoW.require = internal.Module.require;
+ExiWoW.initialized = false
+ExiWoW.LibAssets = {}			-- Reusable thingie library
 
 -- Targets
 ExiWoW.ME = nil					-- My character
 ExiWoW.TARGET = nil				-- Target character, do not use in actions
 ExiWoW.CAST_TARGET = nil		-- Cast target character, use this in actions
-ExiWoW.loaded = false
+ExiWoW.loaded = false;
 
-ExiWoW.Frames = {}
-ExiWoW.Frames.targetHasExiWoWFrame = nil;	-- Gender display
-ExiWoW.Frames.portraitExcitementBar = false; 	-- Excitement bar frame thing
-ExiWoW.Frames.PORTRAIT_FRAME_WIDTH = 19;
-ExiWoW.Frames.PORTRAIT_FRAME_HEIGHT = 19;
-ExiWoW.Frames.PORTRAIT_PADDING = 7;
 
-local coms = {}; 							-- cbid = {parts:[part1,part2...], timeout:(int)timer}
-
+-- Globalstorage and localstorage are persistent variables
+globalStorage = nil
 -- GlobalStorage defaults
-local gDefaults = {
+local GLOBALSTORAGE_DEFAULTS = {
 	swing_text_freq = 0.15,		-- Percent chance of a swing triggering a special text. Crits are 4x this value
 	spell_text_freq = 1,		-- Percent chance of spell damage triggering a special text
 	takehit_rp_rate = 6,			-- RP texts from being hit by spells and abilities can only trigger this often
@@ -44,9 +48,12 @@ local gDefaults = {
 	taunt_female = true,		-- I want to be hit on by females 
 	taunt_male = true,			-- I want to be hit on by males
 	taunt_other = true,			-- I want to be hit on by other
+	tank_mode_perc = 0.05,		-- Tank mode text trigger percentage
 };
+
+localStorage = nil
 -- LocalStorage defaults
-local lDefaults = {
+local LOCALSTORAGE_DEFAULTS = {
 	penis_size = false,
 	vagina_size = false,
 	breast_size = false,
@@ -63,225 +70,138 @@ local lDefaults = {
 	effects = {}
 };
 
--- Constants
-ExiWoW.TANK_MODE_PERC = 0.05;
-
--- Register main frame
-ExiWoW.MAIN = CreateFrame("Frame")
-ExiWoW.MAIN:RegisterEvent("ADDON_LOADED");
-ExiWoW.MAIN:RegisterEvent("PLAYER_LOGOUT");
-ExiWoW.MAIN:RegisterEvent("CHAT_MSG_ADDON")
-ExiWoW.MAIN:SetScript("OnEvent", function(self, event, prefix, message, channel, sender)
-	ExiWoW:onEvent(self, event, prefix, message, channel, sender)
-end)
-
--- Initializer --
-function ExiWoW:ini()
-
-	--ExiWoW.Menu.ini();
-	
-
-	-- Add character
-	ExiWoW.ME = ExiWoW.Character:new();
-
-	ExiWoW:buildUnitFrames();
 
 
-	-- Initialize timer and character
-	
-	ExiWoW.Timer.ini();
-	ExiWoW.Character:ini()
-	ExiWoW.Menu:ini();
-	ExiWoW.ME:onCapChange()
-	
-
-	ExiWoW.R = ExiWoW.Extension:import({id="ROOT"}, true);	-- Build the main extension for assets
-	
-	-- Action slash command
-	SLASH_EWACT1 = '/ewact'
-	function SlashCmdList.EWACT(msg, editbox) ExiWoW.Action:useOnTarget(msg, "target") end
-	SLASH_EWRESET1 = '/ewreset'
-	function SlashCmdList.EWRESET(msg, editbox) ExiWoW:resetSettings() end
-
-	ExiWoW.Action:ini()
-
-	-- Build libraries
-	ExiWoW.Effect:buildLibrary()
-	ExiWoW.RPText:buildLibrary()
-	ExiWoW.Action:buildLibrary()
-	ExiWoW.SpellBinding:buildLibrary()
-	ExiWoW.Underwear:buildLibrary()
-	ExiWoW.Extension:index() -- Update the built libraries
-
-	-- Bind listener
-	RegisterAddonMessagePrefix(ExiWoW.APP_NAME.."a")		-- Sends an action	 {cb:cbToken, id:action_id, data:(var)data}
-	RegisterAddonMessagePrefix(ExiWoW.APP_NAME.."c")		-- Receive a callback {cb:cbToken, success:(bool)success, data:(var)data}
-	RegisterAddonMessagePrefix(ExiWoW.APP_NAME.."b")		-- Bystander text. {tx:(str)text,ch:(bool)is_chat}
-	
-
-	ExiWoW.Timer:set(function()
-		ExiWoW.loadFromStorage()
-		ExiWoW.loaded = true
-		ExiWoW.Menu:refreshAll();
-		ExiWoW.Event:raise(ExiWoW.Event.Types.LOADED)
-		ExiWoW.Effect:ini();
-	end, 1)
-	
-
-	
-	print("ExiWoW online!");
-end
-
--- Checks dungeon/party hardlimit
-internal.checkHardlimits = function(sender, receiver, suppressErrors)
-
-	-- Public toggle
-	if not ExiWoWGlobalStorage.enable_public then
-		local isSelf =
-			(not sender or UnitIsUnit(sender, "player")) and
-			(not receiver or UnitIsUnit(receiver, "player"));
-
-		if sender and not UnitInRaid(sender) and not UnitInParty(sender) and not isSelf then
-			return ExiWoW:reportError("Sender is not in your party", suppressErrors);
-		end
-		if receiver and not UnitInRaid(receiver) and not UnitInParty(receiver) and not isSelf then
-			return ExiWoW:reportError("Target is not in your party", suppressErrors);
-		end
+-- Static class definition for INDEX
+local Index = {}
+	Index["INPUT_BUFFER"] = {};				-- cbid = {parts:[part1,part2...], timeout:(int)timer}
+	Index["FRAME"] = CreateFrame("Frame");
+		
+	-- Event bindings go here, since the script starts on a loaded event
+	function Index.ini()
+		-- Register main frame
+		Index.FRAME:RegisterEvent("ADDON_LOADED");
+		Index.FRAME:RegisterEvent("PLAYER_LOGOUT");
+		Index.FRAME:RegisterEvent("CHAT_MSG_ADDON")
+		Index.FRAME:SetScript("OnEvent", Index.onEvent)
 	end
-
-	if not ExiWoWGlobalStorage.enable_in_dungeons then
-
-		if IsInInstance() then
-			return ExiWoW:reportError("Can't use in an instance.", suppressErrors)
-		end
-
-	end
-	return true;
-
-end
-
-
--- Reset settings
-function ExiWoW:resetSettings()
-	local s = ExiWoWGlobalStorage;
-	for k,v in pairs(gDefaults) do s[k] = v end
-	s = ExiWoWLocalStorage;
-	for k,v in pairs(lDefaults) do s[k] = v end
-	ExiWoW:loadFromStorage();
-	print("Settings reset")
-end
-
-function ExiWoW:loadFromStorage()
-
-	ExiWoW.ME.penis_size = ExiWoWLocalStorage.penis_size;
-	ExiWoW.ME.vagina_size = ExiWoWLocalStorage.vagina_size;
-	ExiWoW.ME.breast_size = ExiWoWLocalStorage.breast_size;
-	ExiWoW.ME.butt_size = ExiWoWLocalStorage.butt_size;
-	ExiWoW.ME.masochism = ExiWoWLocalStorage.masochism;
-	ExiWoW.ME.excitement = ExiWoWLocalStorage.excitement;
-	ExiWoW.ME.underwear_ids = ExiWoWLocalStorage.underwear_ids
-	ExiWoW.ME.underwear_worn = ExiWoWLocalStorage.underwear_worn
-	ExiWoW.ME.muscle_tone = ExiWoWLocalStorage.muscle_tone
-	ExiWoW.ME.fat = ExiWoWLocalStorage.fat
-	ExiWoW.ME.intelligence = ExiWoWLocalStorage.intelligence
-	ExiWoW.ME.wisdom = ExiWoWLocalStorage.wisdom
-	
-	-- Load in abilities
-	for k,v in pairs(ExiWoWLocalStorage.abilities) do
-		local abil = ExiWoW.Action:get(v.id)
-		if abil then abil:import(v) end
-	end
-
-	for k,v in pairs(ExiWoWLocalStorage.effects) do
-		if v.expires == 0 or v.expires > GetTime() then
-			ExiWoW.Effect:run(v.id, v.stacks, v);
-		end
-	end
-
-	-- Redraw with cooldowns
-	ExiWoW.Menu:refreshAll()
-	_initialized = true
-	
-end
-
-function internal:jencode(input)
-	return ExiWoW.json.encode(input);
-end
-
-	-- Primary event handler --
+		
+	-- Event gateway
 	-- Handles addon commands and loading --
-function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
-
-
-	if event == "ADDON_LOADED" and prefix == ExiWoW.APP_NAME then
-		
-		-- Debug
-		if not ExiWoWLocalStorage then ExiWoWLocalStorage = {} end
-		if not ExiWoWGlobalStorage then ExiWoWGlobalStorage = {} end
-		
-		-- Loading
-		for k,v in pairs(gDefaults) do
-			if ExiWoWGlobalStorage[k] == nil then ExiWoWGlobalStorage[k] = v end
+	function Index.onEvent(frame, event, prefix, message, channel, sender)
+		-- This addon has loaded, begin
+		if event == "ADDON_LOADED" and prefix == appName then 
+			Index.onLoad();
+		elseif event == "PLAYER_LOGOUT" and ExiWoW.initialized then Index.onPlayerLogout();
+		elseif event == "CHAT_MSG_ADDON" then Index.onChatMessage(prefix, sender, message);
 		end
-		for k,v in pairs(lDefaults) do
-			if ExiWoWLocalStorage[k] == nil then ExiWoWLocalStorage[k] = v end
-		end
-		
-		-- From here we can initialize
-		ExiWoW:ini();
+	end
 
+		-- Initialize when the addon has loaded
+	function Index.onLoad()
+		
+		-- Character must be created before action
+		
+
+		-- Load the required classes here
+		Action = require("Action");
+		Extension = require("Extension");
+		Character = require("Character");
+		Effect = require("Effect");
+		UI = require("UI");
+		Timer = require("Timer");
+		Event = require("Event");
+		Callback = require("Callback");
+		Database = require("Database");
+		Effect = require("Effect");
+		
+
+		ExiWoW.ME = Character:new();
+		UI.build();
+
+		if type(globalStorage) ~= "table" then globalStorage = {} end
+		if type(localStorage) ~= "table" then localStorage = {} end
+		
+
+		-- Load defaults into local and globalstorage 
+		for k,v in pairs(GLOBALSTORAGE_DEFAULTS) do
+			if globalStorage[k] == nil then globalStorage[k] = v end
+		end
+		for k,v in pairs(LOCALSTORAGE_DEFAULTS) do
+			if localStorage[k] == nil then localStorage[k] = v end
+		end
+
+		internal.ext = Extension.import({id="ROOT"}, true);	-- Build the main extension for assets
+
+		-- Bind slash commands
+		SLASH_EWACT1 = '/ewact'
+		function SlashCmdList.EWACT(msg, editbox) Action.useOnTarget(msg, "target") end
+		SLASH_EWRESET1 = '/ewreset'
+		function SlashCmdList.EWRESET(msg, editbox) Index.resetSettings() end
+
+		-- Initialize actions
+		Action.ini();
+
+		-- Build libraries
+		-- Load order
+		internal.build.functions();
+		internal.build.functions = nil;
+		internal.build.conditions();
+		internal.build.conditions = nil;
+		Extension.index();
+		internal.build.npcs();
+		internal.build.npcs = nil;
+		internal.build.zones();
+		internal.build.zones = nil;
+		Extension.index();
+		internal.build.spells();
+		internal.build.spells = nil;
+		Extension.index();
+		for k,fn in pairs(internal.build) do
+			fn();
+		end
+		internal.build = nil
+
+		-- Setup gateway
+		internal.Gateway();
+		internal.Gateway = nil;
+		
+		-- Bind listeners
+		RegisterAddonMessagePrefix(appName.."a")		-- Sends an action	 {cb:cbToken, id:action_id, data:(var)data}
+		RegisterAddonMessagePrefix(appName.."c")		-- Receive a callback {cb:cbToken, success:(bool)success, data:(var)data}
+		RegisterAddonMessagePrefix(appName.."b")		-- Bystander text. {tx:(str)text,ch:(bool)is_chat}
+		
+		Timer.set(function()
+			Index.loadFromStorage()
+			ExiWoW.initialized = true;
+			UI.refreshAll();
+			Extension.index();
+			Event.raise(Event.Types.LOADED)
+			Effect.onLoad();
+			print("ExiWoW initialized")
+		end, 1)
+
+		-- If you need a big box for debug
 		--[[
-		local f=CreateFrame("ScrollFrame", "DebugBox", UIParent, "InputScrollFrameTemplate")
-		f:SetSize(300,300)
-		f:SetPoint("CENTER")
-		f.EditBox:SetFontObject("ChatFontNormal")
-		f.EditBox:SetMaxLetters(1024)
-		f.CharCount:Hide()
-		local editBox = f.EditBox -- already created in above template
-		editBox:SetFontObject("ChatFontNormal")
-		editBox:SetAllPoints(true)
-		editBox:SetWidth(f:GetWidth()) -- multiline editboxes need a width declared!!
-		-- when ESC is hit while editbox has focus, clear focus (a second ESC closes window)
-		editBox:SetScript("OnEscapePressed",editBox.ClearFocus)
+			local f=CreateFrame("ScrollFrame", "DebugBox", UIParent, "InputScrollFrameTemplate")
+			f:SetSize(300,300)
+			f:SetPoint("CENTER")
+			f.EditBox:SetFontObject("ChatFontNormal")
+			f.EditBox:SetMaxLetters(1024)
+			f.CharCount:Hide()
+			local editBox = f.EditBox -- already created in above template
+			editBox:SetFontObject("ChatFontNormal")
+			editBox:SetAllPoints(true)
+			editBox:SetWidth(f:GetWidth()) -- multiline editboxes need a width declared!!
+			-- when ESC is hit while editbox has focus, clear focus (a second ESC closes window)
+			editBox:SetScript("OnEscapePressed",editBox.ClearFocus)
 		]]
-		
-
 	end
 
-	if event == "PLAYER_LOGOUT" and _initialized then
-
-		-- Saving
-		local l = ExiWoWLocalStorage;
-
-		l.excitement = ExiWoW.ME.excitement;
-		l.underwear_ids = ExiWoW.ME.underwear_ids
-		l.underwear_worn = ExiWoW.ME.underwear_worn
-		
-		l.abilities = {};
-		for k,v in pairs(ExiWoW.Action.LIB) do
-			if not v.hidden then
-				table.insert( l.abilities, v:export() )
-			end
-		end
-
-		l.effects = {}
-		for k,v in pairs(ExiWoW.Effect.applied) do
-			table.insert(l.effects, {
-				id = v.effect.id,
-				expires = v.expires,
-				ticks = v.ticks,
-				stacks = v.stacks,
-			})
-		end
-		
-	end
-
-	-- Action received
-	if event == "CHAT_MSG_ADDON" then 
-		
+	function Index.onChatMessage(prefix, sender, message)
 		local function getChunkedMessage(input, debug)
 
-			local timer = ExiWoW.Timer;
+			local timer = Timer;
 			local data = {}
 			for msg in input:gmatch("([^§]+)") do
 				table.insert(data, msg)
@@ -297,28 +217,28 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 			if debug then print(out) end
 			if not token or not section or not total then return false end
 
-			if not coms[token] then 
-				coms[token] = {parts={}, timeout=timer:set(function() coms[token] = nil end, 5)} 
+			if not Index.INPUT_BUFFER[token] then 
+				Index.INPUT_BUFFER[token] = {parts={}, timeout=Timer.set(function() Index.INPUT_BUFFER[token] = nil end, 5)} 
 			end
-			coms[token].parts[section] = out
+			Index.INPUT_BUFFER[token].parts[section] = out
 			
 			local joined = ""
 			for i=1,total do
-				if coms[token].parts[i] == nil then return false end
-				joined = joined..coms[token].parts[i]
+				if Index.INPUT_BUFFER[token].parts[i] == nil then return false end
+				joined = joined..Index.INPUT_BUFFER[token].parts[i]
 			end
 
-			-- Remove from coms
-			timer:clear(coms[token].timeout)
-			coms[token] = nil
+			-- Remove from Index.INPUT_BUFFER
+			Timer.clear(Index.INPUT_BUFFER[token].timeout)
+			Index.INPUT_BUFFER[token] = nil
 
 			return joined, token
 
 		end
 
-		if prefix == ExiWoW.APP_NAME.."a" then
+		if prefix == appName.."a" then
 
-			--coms
+			--Index.INPUT_BUFFER
 			local data, cb = getChunkedMessage(message)
 			if data == false then return end
 
@@ -327,26 +247,26 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 			
 			local da = ExiWoW.json.decode(data); 		-- JSON decode message
 			local aID = da.id								-- Action ID
-			local success, response = ExiWoW.Action:receive(aID, sender, da.da);
+			local success, response = Action.receive(aID, sender, da.da);
 			if cb then
-				ExiWoW:sendCallback(cb, sname, success, response);
+				Index.sendCallback(cb, sname, success, response);
 			end
 			
 
 		end
 
-		if prefix == ExiWoW.APP_NAME.."c" then
+		if prefix == appName.."c" then
 
 			local data, cb = getChunkedMessage(message)
 			if data == false then return end
 			--DebugBox.EditBox:SetText(data)
 			local sname = Ambiguate(sender, "all")
 			local response = ExiWoW.json.decode(data);
-			ExiWoW.Callbacks:trigger(cb, response.su, response.da, sender);
+			Callback.trigger(cb, response.su, response.da, sender);
 
 		end
 
-		if prefix == ExiWoW.APP_NAME.."b" and not UnitIsUnit(Ambiguate(sender, "all"), "player") then
+		if prefix == appName.."b" and not UnitIsUnit(Ambiguate(sender, "all"), "player") then
 
 			local data, cb = getChunkedMessage(message)
 			if data == false then return end
@@ -360,7 +280,7 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 
 			-- Add to chat log
 			if response.ch then
-				ExiWoW.RPText:npcSpeak(response.tx);
+				RPText.npcSpeak(response.tx);
 			-- Add bystander text to combat log
 			else
 				for i = 1,10 do
@@ -373,258 +293,195 @@ function ExiWoW:onEvent(self, event, prefix, message, channel, sender)
 			
 			
 		end
+	end
+
+	function Index.onPlayerLogout()
+
+		if Index.blockSave then return false; end
+		-- Saving
+		local l = localStorage;
+
+		l.excitement = ExiWoW.ME.excitement;
+		l.underwear_ids = ExiWoW.ME.underwear_ids;
+		l.underwear_worn = ExiWoW.ME.underwear_worn;
+
+		l.abilities = {};
+		local lib = Database.filter("Action");
+		for k,v in pairs(lib) do
+			if not v.hidden then
+				table.insert( l.abilities, v:export() )
+			end
+		end
+
+		l.effects = {}
+		for k,v in pairs(Effect.applied) do
+			table.insert(l.effects, {
+				id = v.effect.id,
+				expires = v.expires,
+				ticks = v.ticks,
+				stacks = v.stacks,
+			})
+		end
 
 	end
-end
 
 
-	-- Communications --
-function ExiWoW:sendAction(unit, actionID, data, callback)
-	if UnitFactionGroup(unit) ~= UnitFactionGroup("player") then return false end
-	local out = {
-		id = actionID,
-		da = data
-	};
-	local text = ExiWoW.json.encode(out);
-	local cb = ExiWoW.Callbacks:add(callback);
-	ExiWoW:sendChunks("a", cb, ExiWoW.json.encode(out), unit)
 
-end
+	-- Check public and dungeon limits, this is used everywhere so
+	function Index.checkHardlimits(sender, receiver, suppressErrors)
 
-function ExiWoW:sendCallback(token, unit, success, data)
+		-- Public toggle
+		if not globalStorage.enable_public then
+			local isSelf =
+				(not sender or UnitIsUnit(sender, "player")) and
+				(not receiver or UnitIsUnit(receiver, "player"));
 
-	local out = {
-		su = success,
-		da = data
-	};
+			if sender and not UnitInRaid(sender) and not UnitInParty(sender) and not isSelf then
+				return Tools.reportError("Sender is not in your party", suppressErrors);
+			end
+			if receiver and not UnitInRaid(receiver) and not UnitInParty(receiver) and not isSelf then
+				return Tools.reportError("Target is not in your party", suppressErrors);
+			end
+		end
 
-	--DebugBox.EditBox:SetText(ExiWoW.json.encode(out))
-	ExiWoW:sendChunks("c", token, ExiWoW.json.encode(out), unit)
+		if not globalStorage.enable_in_dungeons then
 
-end
+			if IsInInstance() then
+				return Tools.reportError("Can't use in an instance.", suppressErrors)
+			end
 
-function ExiWoW:sendBystanderText(text, isChat)
-	local out = {
-		tx = text,
-		ch = isChat
+		end
+		return true;
+
+	end
+
+	-- Reset settings
+	function Index.resetSettings()
+		globalStorage = {};
+		localStorage = {};
+		Index.blockSave = true;
+		ReloadUI();
+	end
+
+	-- Load settings
+	function Index.loadFromStorage()
+
+		ExiWoW.ME.penis_size = localStorage.penis_size;
+		ExiWoW.ME.vagina_size = localStorage.vagina_size;
+		ExiWoW.ME.breast_size = localStorage.breast_size;
+		ExiWoW.ME.butt_size = localStorage.butt_size;
+		ExiWoW.ME.masochism = localStorage.masochism;
+		ExiWoW.ME.excitement = localStorage.excitement;
+		ExiWoW.ME.underwear_ids = localStorage.underwear_ids
+		ExiWoW.ME.underwear_worn = localStorage.underwear_worn
+		ExiWoW.ME.muscle_tone = localStorage.muscle_tone
+		ExiWoW.ME.fat = localStorage.fat
+		ExiWoW.ME.intelligence = localStorage.intelligence
+		ExiWoW.ME.wisdom = localStorage.wisdom
+
+		-- Load in abilities
+		for k,v in pairs(localStorage.abilities) do
+			local abil = Action.get(v.id);
+			if abil then abil:import(v) end
+		end
+
+		for k,v in pairs(localStorage.effects) do
+			if v.expires == 0 or v.expires > GetTime() then
+				Effect.run(v.id, v.stacks, v);
+			end
+		end
+
+		Index.onPlayerLogout()
+		
+	end
+
+
+	-- Communication methods
+	function Index.sendAction(unit, actionID, data, callback)
+		if UnitFactionGroup(unit) ~= UnitFactionGroup("player") then return false end
+		local out = {
+			id = actionID,
+			da = data
+		};
+		local text = ExiWoW.json.encode(out);
+		local cb = Callback.add(callback);
+		Index.sendChunks("a", cb, ExiWoW.json.encode(out), unit)
+
+	end
+
+	function Index.sendCallback(token, unit, success, data)
+
+		local out = {
+			su = success,
+			da = data
+		};
+
+		--DebugBox.EditBox:SetText(ExiWoW.json.encode(out))
+		Index.sendChunks("c", token, ExiWoW.json.encode(out), unit)
+
+	end
+
+
+	function Index.sendBystanderText(text, isChat)
+		local out = {
+			tx = text,
+			ch = isChat
+		}
+		local text = ExiWoW.json.encode(out);
+		local token = Callback.generateToken();
+		--print("Sending bystander", text)
+		Index.sendChunks("b", token, ExiWoW.json.encode(out), nil)
+	end
+
+	function Index.sendChunks(suffix, token, text, unit)
+
+		-- Allowed chunk size
+		local tl = 255-(appName..suffix):len()-20		-- Prefix length
+
+		local chunks = {}
+		for i=0,math.floor(text:len()/tl) do
+			local chunk = text:sub(i*tl+1, i*tl+tl)
+			table.insert(chunks, chunk)
+		end
+		
+		local ctype = "WHISPER"
+		if unit == nil then 
+			ctype = "PARTY"
+		end
+		
+		--DebugBox.EditBox:SetText(ExiWoW.json.encode(out))
+		local total = #chunks
+		for i,ch in ipairs(chunks) do
+			SendAddonMessage(appName..suffix, token.."§"..i.."§"..total.."§"..ch, ctype, unit)
+		end	
+
+	end
+
+
+	
+
+-- Index END
+
+
+-- Export module
+export(
+	"Index", 
+	Index, 
+	{
+		sendAction = Index.sendAction,
+		sendCallback = Index.sendCallback,
+		sendBystanderText = Index.sendBystanderText,
+		sendChunks = Index.sendChunks,
+		onPlayerLogout = Index.onPlayerLogout,
+		checkHardLimits = Index.checkHardlimits,
+	}, 
+	{
+		
 	}
-	local text = ExiWoW.json.encode(out);
-	local token = ExiWoW.Callbacks:generateToken();
-	--print("Sending bystander", text)
-	ExiWoW:sendChunks("b", token, ExiWoW.json.encode(out), nil)
-end
+)
 
-function ExiWoW:sendChunks(suffix, token, text, unit)
-
-	-- Allowed chunk size
-	local tl = 255-(ExiWoW.APP_NAME..suffix):len()-20		-- Prefix length
-
-	local chunks = {}
-	for i=0,math.floor(text:len()/tl) do
-		local chunk = text:sub(i*tl+1, i*tl+tl)
-		table.insert(chunks, chunk)
-	end
-	
-	local ctype = "WHISPER"
-	if unit == nil then 
-		ctype = "PARTY"
-	end
-	
-	--DebugBox.EditBox:SetText(ExiWoW.json.encode(out))
-	local total = #chunks
-	for i,ch in ipairs(chunks) do
-		SendAddonMessage(ExiWoW.APP_NAME..suffix, token.."§"..i.."§"..total.."§"..ch, ctype, unit)
-	end	
-
-end
+-- Initializes index
+require("Index")
 
 
 
-	-- Tools --
--- Returns false so you can use it as a return value
-function ExiWoW:reportError(message, ignore)
-	if ignore then return false end
-	UIErrorsFrame:AddMessage(message, 1.0, 0.0, 0.0, 53, 6);
-	return false;
-end
-
-function ExiWoW:reportNotice(message)
-	UIErrorsFrame:AddMessage(message, 0.5, 1.0, 0.5, 53, 6);
-	return true;
-end
-
--- Returns an RP name, removing realm name if needed and replacing self with you
-function ExiWoW:unitRpName(unit)
-	unit = Ambiguate(unit, "all")
-	if UnitIsUnit(unit, "player") then return "YOU" end
-	return unit;
-end
-
-
--- Searches name in acceptable {name=true, name2=true...}, if acceptable is nil, then it's a wildcard
--- If name is not a string, then it's false
-function ExiWoW:multiSearch(name, acceptable)
-
-	if acceptable == nil then return true end
-	if type(name) ~= "string" then return false end
-
-	local itm = {}
-	if type(acceptable) ~= "table" then itm[acceptable] = true
-	else itm = acceptable
-	end
-	for v,_ in pairs(itm) do
-		if name == v or (v:sub(1,1) == "%" and name:find(v:sub(2))) then return true end				
-	end
-	return false
-end
-
-function ExiWoW:timeFormat(seconds)
-
-	if seconds > 3600 then return tostring(math.ceil(seconds/3600)).." Hr" end
-	if seconds > 60 then return tostring(math.ceil(seconds/60)) .. " Min" end
-	return tostring(math.ceil(seconds)).." Sec"
-end
-
-function ExiWoW:Set(list)
-	local set = {}
-	for _, l in ipairs(list) do set[l] = true end
-	return set
-end
-
-function ExiWoW:itemSlotToname(slot)
-	local all_slots = {}
-	all_slots[1] = "head armor"
-	all_slots[3] = "shoulder armor"
-	all_slots[4] = "shirt"
-	all_slots[5] = "chestpiece"
-	all_slots[6] = "belt"
-	all_slots[7] = "pants"
-	all_slots[8] = "boots"
-	all_slots[10] = "gloves"
-	all_slots[15] = "cloak"
-	all_slots[19] = "tabard"
-	return all_slots[slot]
-end
-
-
--- Unit Frames -
-function ExiWoW:buildUnitFrames()
-
-	local frameWidth = ExiWoW.Frames.PORTRAIT_FRAME_WIDTH;
-	local frameHeight = ExiWoW.Frames.PORTRAIT_FRAME_HEIGHT;
-	local padding = ExiWoW.Frames.PORTRAIT_PADDING;
-
-	-- Icon
-	local bg = CreateFrame("Button",nil,PlayerFrame); --frameType, frameName, frameParent, frameTemplate   
-	bg:SetMovable(true)
-	bg:RegisterForDrag("LeftButton")
-	bg:SetScript("OnDragStart", bg.StartMoving)
-	bg:SetScript("OnDragStop", bg.StopMovingOrSizing)
-	
-	
-
-	-- Bind events
-	bg:RegisterForClicks("AnyUp");
-	bg:SetScript("OnClick", function (self, button, down)
-		ExiWoW.Menu:toggle();
-	end);
-
-	bg:SetFrameStrata("HIGH");
-	bg:SetSize(frameWidth,frameHeight);
-	bg:SetPoint("TOPLEFT",80,-5);
-	
-
-	local mask = bg:CreateMaskTexture()
-	mask:SetTexture("Interface\\CHARACTERFRAME\\TempPortraitAlphaMaskSmall", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
-	mask:SetPoint("CENTER")
-
-	-- Background
-	local t = bg:CreateTexture(nil, "BACKGROUND");
-	t:SetColorTexture(0,0,0,0.5);
-	t:AddMaskTexture(mask)
-	t:SetAllPoints(bg);
-
-
-	-- Status bar
-	local bar = CreateFrame("Frame", nil, bg);
-	bar:SetPoint("TOPLEFT")
-	bar:SetSize(frameWidth,frameHeight)
-
-	t = bar:CreateTexture(nil, "BORDER");
-	t:SetPoint("BOTTOM");
-	t:SetSize(frameWidth,frameHeight);
-	t:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
-	--t:SetHeight(frameHeight*max(self.excitement, 0.00001)); -- Setting to 0 doesn't work
-	t:SetRotation(-math.pi/2);
-	t:SetVertexColor(1,0.75,1)
-	t:AddMaskTexture(mask);
-	ExiWoW.Frames.portraitExcitementBar = t;
-	ExiWoW.ME:updateExcitementDisplay();
-
-	-- Border
-
-	local ol = CreateFrame("Frame", nil, bar);
-	ol:SetPoint("TOPLEFT", -padding+1, padding-1)
-	ol:SetSize(frameWidth+padding*2,frameHeight+padding*2)
-	-- Inner
-	t = ol:CreateTexture(nil, "BACKGROUND");
-	t:SetTexture("Interface/common/portrait-ring-withbg-highlight");
-	t:SetPoint("CENTER", 2);
-	t:SetVertexColor(0.75,1,0.75);
-	t:SetTexCoord(0.3,0.7,0.3,0.7);
-	t:SetAlpha(0);
-	t:SetSize(frameWidth,frameHeight);
-	self.portraitResting = t;
-
-	-- Outer
-	
-	t = ol:CreateTexture(nil, "ARTWORK");
-	t:SetTexture("Interface\\MINIMAP\\MiniMap-TrackingBorder");
-	t:SetTexCoord(0.01,0.61,0,0.6);
-	t:SetPoint("CENTER", 1,4);
-	t:SetAllPoints(ol);
-	self.portraitBorder = t;
-	
-	-- Overlay
-	t = ol:CreateTexture(nil, "OVERLAY");
-	t:SetTexture("Interface/MINIMAP/UI-Minimap-ZoomButton-Highlight");
-	t:SetVertexColor(1,1,0.7);
-	t:SetPoint("CENTER", 0,0);
-	t:SetBlendMode("ADD");
-	t:SetSize(frameWidth+15,frameHeight+15);
-	t:SetAlpha(0);
-	bg.highlight = t;
-	bg:SetScript("OnEnter", function(self) self.highlight:SetAlpha(1) end)
-	bg:SetScript("OnLeave", function(self) self.highlight:SetAlpha(0) end)
-	
-
-	-- BUILD THE TARGET PORTRAIT --
-	bg = CreateFrame("Button",nil,TargetFrame); --frameType, frameName, frameParent, frameTemplate   
-	bg:SetMovable(true)
-	bg:EnableMouse(true);
-	bg:RegisterForDrag("LeftButton")
-	bg:SetScript("OnDragStart", bg.StartMoving)
-	bg:SetScript("OnDragStop", bg.StopMovingOrSizing)
-
-	bg:SetFrameStrata("HIGH");
-	bg:SetSize(20,20);
-	bg:SetPoint("TOPRIGHT",-88,-10);
-	t = bg:CreateTexture(nil, "BACKGROUND");
-	t:SetTexture("Interface/AddOns/ExiWoW/media/icons/genders.blp");
-	t:SetVertexColor(1,0.5,1);
-	t:SetTexCoord(0,0.25,0,1);
-	t:SetAlpha(0.75);
-	t:SetAllPoints(bg);
-	bg.genderTexture = t;
-	ExiWoW.Frames.targetHasExiWoWFrame = bg;
-	bg:Hide();
-
-	--[[
-	t = ol:CreateFontString(nil,"OVERLAY","GameFontNormalSmall")
-	t:SetAllPoints(ol)
-	t:SetJustifyH("CENTER")
-	t:SetJustifyV("MIDDLE")
-	t:SetTextColor(0.75,0.5,0.75,1)
-	t:SetText(floor(ExiWoW.ME.excitement*100))
-]]
-end
