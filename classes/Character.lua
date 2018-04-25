@@ -62,7 +62,7 @@ Character.__index = Character;
 		local db = NPC.get(name);
 		if db then
 			-- Fetch some predefined info
-			npc.tags = db.tags;
+			npc.tags = db:getTags();
 			npc.sex = db.gender;
 		end
 

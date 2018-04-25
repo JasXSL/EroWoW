@@ -353,7 +353,7 @@ Condition.__index = Condition;
 			if type(eventData) == "table" then
 				tags = Tools.concat(tags, eventData.tags);
 			end 
-			
+
 			tags = Tools.createSet(tags);
 			if type(data) == "string" then data = {data} end
 			for _,v in pairs(data) do

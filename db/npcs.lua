@@ -38,6 +38,8 @@ function internal.build.npcs()
 	ext:addNPC({id="%Drysnap",tags={"PINCHY"}});
 	ext:addNPC({id="Deepwater Spikeback",tags={"PINCHY"}});
 	ext:addNPC({id="Coastal Spikeback",tags={"PINCHY"}});
+	ext:addNPC({id="Leyscar Scuttler",tags={"PINCHY"}});
+	
 	
 	ext:addNPC({id="Feltotem Warmonger",tags={"FELTOTEM"}, gender=2});
 	ext:addNPC({id="Feltotem Bloodsinger",tags={"FELTOTEM"}, gender=2});

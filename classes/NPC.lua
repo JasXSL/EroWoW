@@ -26,19 +26,21 @@ NPC.__index = NPC;
 		self.tags = type(data.tags) == "table" and data.tags or {};						-- Text tags of your choosing
 
 		if not self.id then print("NPC inserted without an ID"); end
-		self.tags = Tools.createSet(self.tags);
 		
 		return self
+	end
+
+	function NPC:getTags()
+		local out = {};
+		for _,v in pairs(self.tags) do
+			table.insert(out, "NPC_"..v);
+		end
+		return out;
 	end
 
 	-- A little bit different to the others in that it returns only the function, not the Func object
 	function NPC.get(id)
 		return Database.getID("NPC", id);
-	end
-
-	-- Creates a character from this NPC
-	function NPC.createCharacter(name)
-
 	end
 
 export(

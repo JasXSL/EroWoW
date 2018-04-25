@@ -149,7 +149,6 @@ local Effect = {}
 					se.loopPlaying = handle;
 				end
 			end)
-			print("Sound handle ", handle);
 
 		end
 

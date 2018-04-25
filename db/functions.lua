@@ -186,10 +186,10 @@ function internal.build.functions()
 
 	ext:addFunction({
 		id="toggleVibHubProgram",
-		fn = function(self, program, duration)
+		fn = function(program, duration)
 			if not ExiWoW.VH then return end
-			if not ExiWoW.VH.programs[program] then return end
-			ExiWoW.VH:addTempProgram(ExiWoW.VH.programs[program], duration);
+			if not ExiWoW.VH.programs[program] then print("Unknown VH program", program); return end
+			ExiWoW.VH.addTempProgram(ExiWoW.VH.programs[program], duration);
 		end
 	});
 	

@@ -34,6 +34,9 @@ local Tools = {};
 		else itm = acceptable
 		end
 		for v,_ in pairs(itm) do
+			if type(v) ~= "string" then 
+				for vv, vk in pairs(itm) do print(vv, vk) end
+			end
 			if name == v or (v:sub(1,1) == "%" and name:find(v:sub(2))) then return true end				
 		end
 		return false
@@ -76,13 +79,11 @@ local Tools = {};
 		local out = {};
 		local input = {...};
 		for _,i in pairs(input) do
-			if i ~= nil then
-				if type(i) ~= "table" then
-					i = {i};
-				end
-				for _,v in pairs(i) do
-					table.insert(out, v);
-				end
+			if type(i) ~= "table" then
+				i = {i};
+			end
+			for _,v in pairs(i) do
+				table.insert(out, v);
 			end
 		end
 		return out;
