@@ -165,7 +165,7 @@ RPText.whisperCD = nil
 	function RPText.get(id, senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action)
 
 		local viable = {};
-		local isSelfCast = UnitIsUnit(senderChar:getName(), receiverChar:getName())
+		local isSelfCast = UnitIsUnit(senderUnit, receiverUnit)
 		
 		local lib = Database.filter("RPText");
 		for k,v in pairs(lib) do

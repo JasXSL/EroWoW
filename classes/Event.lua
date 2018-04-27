@@ -112,7 +112,7 @@ local Event = {}
 
 			if combatEvent == "PARTY_KILL" then
 				if 
-					bit.band(destFlags, COMBATLOG_OBJECT_CONTROL_PLAYER) > 0
+					bit.band(destFlags, COMBATLOG_OBJECT_TYPE_NPC) > 0
 				then
 					Event.raise(Event.Types.MONSTER_KILL, {name=destName});
 				end
@@ -121,7 +121,7 @@ local Event = {}
 			
 
 			-- Only player themselves after this point
-			if bit.band(destFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == 0 then return end 
+			if destGUID ~= UnitGUID("player") then return end 
 
 			
 			-- These only work for healing or damage

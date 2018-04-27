@@ -52,7 +52,7 @@ function internal.Gateway()
 		end
 		chance = chance*globalStorage.spell_text_freq;
 		
-		local npc = Character.buildNPC(unit, sender);
+		local npc = Character.buildNPC(unit, name);
 		local eventData = RPText.buildSpellData(aura.spellId, aura.name, aura.harmful, npc.name, aura.count, aura.crit);
 
 		-- See if this spell was bound at all

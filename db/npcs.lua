@@ -76,7 +76,10 @@ function internal.build.npcs()
 	ext:addNPC({id="Sister of Grief",tags={"SUCCUBUS", "LASHER"}, gender=3});
 
 	ext:addNPC({id="%Ooze",tags={"OOZE"}});
+	ext:addNPC({id="%Slime",tags={"OOZE"}});
+	ext:addNPC({id="%Sludge",tags={"OOZE"}});
 	ext:addNPC({id="Boiling Springbubble",tags={"OOZE"}});
+
 	
 
 	ext:addNPC({id="Hazzali Stinger",tags={"SILITHID", "WASP"}});

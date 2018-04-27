@@ -48,7 +48,7 @@ function internal.build.functions()
 				HighmountainTaurenM = 0,
 				HighmountainTaurenF = 0,
 				NightborneM = 0,
-				NightborneF = 0,
+				NightborneF = 76815,
 			}
 			Func.get("playCharSound")(self, sounds, race, sex);
 		end
@@ -92,7 +92,7 @@ function internal.build.functions()
 				HighmountainTaurenM = 0,
 				HighmountainTaurenF = 0,
 				NightborneM = 0,
-				NightborneF = 0,
+				NightborneF = 76816,
 			}
 			Func.get("playCharSound")(self, sounds, race, sex);
 		end
@@ -123,7 +123,7 @@ function internal.build.functions()
 		fn = function(self, ignoreVhProgram)
 			-- Swing pain sounds are handled by WoW
 			if type(self) ~= "table" or not self.id or (not self.id.SWING and not self.id.SWING_CRIT) then
-				ef:painSound()
+				Func.get("painSound")();
 			end
 			Event.raise(Event.Types.EXADD_M_DEFAULT, {vh = not ignoreVhProgram})
 			ExiWoW.ME:addExcitement(0.15, false, true);
@@ -142,7 +142,7 @@ function internal.build.functions()
 					not (self.id.SWING or self.id.SWING_CRIT) or -- It's not a melee swing
 					localStorage.tank_mode -- Or tank mode is on
 				) then 
-					ef:critSound() 
+					Func.get("critSound")(); 
 				end
 			Event.raise(Event.Types.EXADD_M_CRIT, {vh = not ignoreVhProgram})
 			ExiWoW.ME:addExcitement(0.3, false, true);
@@ -161,7 +161,7 @@ function internal.build.functions()
 		id="addExcitementCrit",
 		fn = function(self, ignoreVhProgram)
 			if type(self) ~= "table" or not (self.id.SWING and not self.id.SWING_CRIT) then
-				ef:painSound()
+				Func.get("painSound")();
 			end
 			Event.raise(Event.Types.EXADD_CRIT, {vh = not ignoreVhProgram})
 			ExiWoW.ME:addExcitement(0.2);

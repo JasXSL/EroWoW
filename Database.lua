@@ -2,6 +2,8 @@ local appName, internal = ...
 local export = internal.Module.export;
 local require = internal.require;
 
+local Tools = require("Tools");
+
 local Database = {
 	tables = {}
 };
@@ -38,7 +40,7 @@ end
 function Database.getID(tbl, id)
 	local all = Database.filter(tbl);
 	for _,v in pairs(all) do
-		if v.id == id then
+		if Tools.multiSearch(id, v.id) then
 			return v;
 		end
 	end
