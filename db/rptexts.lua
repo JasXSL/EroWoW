@@ -115,6 +115,18 @@ function internal.build.rptexts()
 	})
 
 	ext:addRpText({
+		id = "MORTAS_ARACHNID_SCEPTER",
+		text_bystander = "%S casts a hex on %T!",
+		text_sender = "You cast a hex on %T!",
+		text_receiver = "%S casts a hex on you!",
+	});
+	ext:addRpText({
+		id = "MORTAS_ARACHNID_SCEPTER",
+		text_receiver = "You cast a hex on yourself!",
+	});
+	
+
+	ext:addRpText({
 		id = "CLAW_PINCH",
 		text_bystander = "%S pinches %T's side with a big claw!",
 		text_sender = "You pinch %T's side with your big claw!",

@@ -37,7 +37,7 @@ function internal.build.loot()
 				chance = 1,
 				sound = 1185,
 				text = RPText:new({
-					text_receiver = "You found a folded pair of %item that %T was carrying!"
+					text_receiver = "You found a folded pair of %item that %S was carrying!"
 				})
 			})
 		}
@@ -56,13 +56,35 @@ function internal.build.loot()
 				chance = 0.1,
 				sound = 1185,
 				text = RPText:new({
-					text_receiver = "%T was holding a small gem studded garment, you decide to hold on to it!"
+					text_receiver = "%S was holding a small gem studded garment, you decide to hold on to it!"
 				})
 			});
 		}
 	})
 
+	-- Morta's Arachnid Scepter
+	ext:addLoot({
+		id = "Morta's Arachnid Scepter",
+		conditions = {
+			evtIsKill,
+			Condition:new({type=ty.RTYPE_ZONE, data="The Hinterlands"}),
+			Condition:new({type=ty.RTYPE_NAME, data={["Morta'gya the Keeper"]=true}, sender=true}),
+		},
+		items = {
+			Item:new({
+				type = "Charges", 
+				id = "MORTAS_ARACHNID_SCEPTER", 
+				chance = 1,
+				quant = math.huge,
+				sound = 1191,
+				text = RPText:new({
+					text_receiver = "%S was holding a dark scepter with spider engravings."
+				})
+			});
+		}
+	})
 
+	--[[
 	ext:addLoot({
 		conditions = {
 			evtIsKill,
@@ -80,7 +102,7 @@ function internal.build.loot()
 				})
 			})
 		}
-	})
+	})]]
 
 	ext:addLoot({
 		conditions = {

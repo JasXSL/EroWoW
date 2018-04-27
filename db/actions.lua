@@ -12,8 +12,7 @@ function internal.build.actions()
 	local Event = require("Event");
 	local Condition = require("Condition");
 	local Func = require("Func");
-
-	local ef = ExiWoW.LibAssets.effects
+	local Effect = require("Effect");
 	local extension = internal.ext;
 	
 
@@ -361,7 +360,25 @@ function internal.build.actions()
 
 
 
-
+	extension:addAction({
+		id = "MORTAS_ARACHNID_SCEPTER",
+		name = "Morta's Arachnid Scepter",
+		description = "Hex your target, making them feel as if hundreds of little spiders are skittering across their body.",
+		charges = 0,
+		texture = "trade_archaeology_nerubianspiderscepter",
+		cast_sound_success = 5419,
+		rarity = 4,
+		cooldown = 300, --300
+		fn_send = function(self, sender, target, suppressErrors)
+			return self:sendRPText(sender, target, suppressErrors);
+		end,
+		fn_receive = function(self, sender, target, args)
+			self:receiveRPText(sender, target, args);
+			local ef = Effect.get(self.id);
+			ef:add(1);
+			return true
+		end
+	});
 
 
 

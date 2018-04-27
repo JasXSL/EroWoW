@@ -68,6 +68,7 @@ function internal.build.npcs()
 	ext:addNPC({id="Uprooted Lasher",tags={"LASHER", "VINES"}});
 	ext:addNPC({id="Corrupted Lasher",tags={"LASHER", "VINES"}});
 	ext:addNPC({id="Uprooted Lasher",tags={"LASHER", "VINES"}});
+	ext:addNPC({id="Lashvine",tags={"LASHER", "VINES"}});
 	ext:addNPC({id="%Lasher",tags={"LASHER"}});
 
 	ext:addNPC({id="Nether Maiden",tags={"SUCCUBUS", "LASHER"}, gender=3});
