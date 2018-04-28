@@ -15,7 +15,8 @@ function internal.build.npcs()
 	ext:addNPC({id="Parasitic Fleshbeast",tags={"TENTACLE_FIEND", "LASHER"}});
 	ext:addNPC({id="Nightmare Terror",tags={"TENTACLE_FIEND", "LASHER"}});
 	ext:addNPC({id="Shadowfiend",tags={"TENTACLE_FIEND", "LASHER"}});
-
+	ext:addNPC({id="Slumbering Nightmare",tags={"TENTACLE_FIEND", "LASHER"}});
+	
 
 	ext:addNPC({id="%Scorpid",tags={"PINCHY"}});
 	ext:addNPC({id="Desert Crawler",tags={"PINCHY"}});
@@ -47,6 +48,7 @@ function internal.build.npcs()
 	
 	ext:addNPC({id="%Thistlefur",tags={"FURBOLG"}});
 	ext:addNPC({id="%Deadwood",tags={"FURBOLG"}});
+	ext:addNPC({id="%Smolderhide",tags={"FURBOLG"}});
 	ext:addNPC({id="%Winterfall",tags={"FURBOLG"}});
 
 	ext:addNPC({id="%Harpy",tags={"HARPY"}, gender=3});
@@ -79,6 +81,7 @@ function internal.build.npcs()
 	ext:addNPC({id="%Ooze",tags={"OOZE"}});
 	ext:addNPC({id="%Slime",tags={"OOZE"}});
 	ext:addNPC({id="%Sludge",tags={"OOZE"}});
+	ext:addNPC({id="Fel Secretion",tags={"OOZE"}});
 	ext:addNPC({id="Boiling Springbubble",tags={"OOZE"}});
 	
 	ext:addNPC({id="Withervine Creeper",tags={"BOG_SHAMBLER"}});
