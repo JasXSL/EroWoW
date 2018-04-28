@@ -150,8 +150,10 @@ function internal.build.functions()
 	});
 
 	ext:addFunction({
-		id = "addExcitementDefault",
 		fn = function(self, ignoreVhProgram)
+			if type(self) ~= "table" or not (self.id.SWING and not self.id.SWING_CRIT) then
+				Func.get("painSound")();
+			end
 			Event.raise(Event.Types.EXADD_DEFAULT, {vh = not ignoreVhProgram})
 			ExiWoW.ME:addExcitement(0.1);
 		end
@@ -161,7 +163,7 @@ function internal.build.functions()
 		id="addExcitementCrit",
 		fn = function(self, ignoreVhProgram)
 			if type(self) ~= "table" or not (self.id.SWING and not self.id.SWING_CRIT) then
-				Func.get("painSound")();
+				Func.get("critSound")();
 			end
 			Event.raise(Event.Types.EXADD_CRIT, {vh = not ignoreVhProgram})
 			ExiWoW.ME:addExcitement(0.2);
@@ -170,16 +172,16 @@ function internal.build.functions()
 
 	ext:addFunction({
 		id="addExcitement",
-		fn = function()
-			return Func.get("addExcitementDefault");
+		fn = function(...)
+			Func.get("addExcitementDefault")(...);
 		end
 	});
 
 
 	ext:addFunction({
 		id="addExcitementMasochistic",
-		fn = function()
-			return Func.get("addExcitementMasochisticDefault");
+		fn = function(...)
+			Func.get("addExcitementMasochisticDefault")(...);
 		end
 	});
 	
