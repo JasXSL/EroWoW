@@ -41,6 +41,8 @@ function internal.build.conditions()
 	ext:addCondition({id="attackerIsVines", type=ty.RTYPE_TAG, data={"NPC_VINES"}, sender=true});
 	ext:addCondition({id="attackerIsOoze", type=ty.RTYPE_TAG, data={"NPC_OOZE"}, sender=true});
 	ext:addCondition({id="attackerIsFeltotem", type=ty.RTYPE_TAG, data={"NPC_FELTOTEM"}, sender=true});
+	ext:addCondition({id="attackerIsBogshambler", type=ty.RTYPE_TAG, data={"NPC_BOG_SHAMBLER"}, sender=true});
+	
 	ext:addCondition({id="maleWhispers", type=ty.RTYPE_REQUIRE_MALE});
 	ext:addCondition({id="femaleWhispers", type=ty.RTYPE_REQUIRE_FEMALE});
 	ext:addCondition({id="otherWhispers", type=ty.RTYPE_REQUIRE_OTHER});

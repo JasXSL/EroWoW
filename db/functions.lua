@@ -150,6 +150,7 @@ function internal.build.functions()
 	});
 
 	ext:addFunction({
+		id="addExcitementDefault",
 		fn = function(self, ignoreVhProgram)
 			if type(self) ~= "table" or not (self.id.SWING and not self.id.SWING_CRIT) then
 				Func.get("painSound")();

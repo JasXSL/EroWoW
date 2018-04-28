@@ -24,6 +24,8 @@ function internal.build.spells()
 	
 	ext:addSpell({id="Entangling Roots", tags={"ROOTS"}});
 	ext:addSpell({id="Strangling Roots", tags={"ROOTS"}});
+	ext:addSpell({id="Creeping Vines", tags={"ROOTS"}});
+	
 	
 	ext:addSpell({id="Stormstrike", tags={"ELECTRIC"}});
 	ext:addSpell({id="%Lightning", tags={"ELECTRIC"}});
@@ -76,5 +78,7 @@ function internal.build.spells()
 	ext:addSpell({id="Big Bop"});
 	ext:addSpell({id="Dancing Thorns"});
 	ext:addSpell({id="Slitherstrike"});
+
+
 
 end

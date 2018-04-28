@@ -136,6 +136,7 @@ function internal.Gateway()
 	end
 	Event.on(Event.Types.MONSTER_KILL, function(data) 
 		rollLoot(Event.Types.MONSTER_KILL, data.name); 
+		RPText.trigger(nil, data.name, "player", Character.buildNPC("none", data.name), ExiWoW.ME, {}, Event.Types.MONSTER_KILL);
 	end);
 	Event.on(Event.Types.FORAGE, function(data) 
 		if not rollLoot(Event.Types.FORAGE, data.name) then

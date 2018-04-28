@@ -80,7 +80,10 @@ function internal.build.npcs()
 	ext:addNPC({id="%Slime",tags={"OOZE"}});
 	ext:addNPC({id="%Sludge",tags={"OOZE"}});
 	ext:addNPC({id="Boiling Springbubble",tags={"OOZE"}});
-
+	
+	ext:addNPC({id="Withervine Creeper",tags={"BOG_SHAMBLER"}});
+	ext:addNPC({id="Withervine Rager",tags={"BOG_SHAMBLER"}});
+	
 	
 
 	ext:addNPC({id="Hazzali Stinger",tags={"SILITHID", "WASP"}});

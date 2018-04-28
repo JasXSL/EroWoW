@@ -248,6 +248,25 @@ function internal.build.loot()
 	ext:addLoot({
 		conditions = {
 			evtIsForage,
+			Condition:new({type=ty.RTYPE_ZONE, data="Dustwallow Marsh", sender=true}),
+			Condition:new({type=ty.RTYPE_LOC, data={x = 42.65, y=38.05, rad=0.16}, sender=true}),
+		},
+		items = {
+			Item:new({
+				type = "Underwear", 
+				id = "KULTIRAS_BOXERS", 
+				chance = 1,
+				sound = 1185,
+				text = RPText:new({
+					text_receiver = "You found a folded pair of %item!"
+				})
+			})
+		}
+	});
+
+	ext:addLoot({
+		conditions = {
+			evtIsForage,
 			Condition:new({type=ty.RTYPE_ZONE, data="Mount Hyjal", sender=true}),
 			Condition:new({type=ty.RTYPE_SUBZONE, data="The Forge of Supplication", sender=true}),
 		},
