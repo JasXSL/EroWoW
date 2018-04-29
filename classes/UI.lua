@@ -8,11 +8,12 @@ UI = {}
 	UI.FRAME = false 					-- Page browser for ExiWoW
 	UI.open = false 					-- Set to false when done debugging. Setting to false by default will have it visible by default
 	UI.lootQueue = {}					-- {{name=name, icon=icon}} - Queue of loot to show when the loot toast pops up
-
+	UI.page = 1
 
 	function UI.ini()
 
 		UI.open = globalStorage.UI_OPEN;
+		UI.page = globalStorage.UI_PAGE;
 		Action = require("Action");
 		Underwear = require("Underwear");
 		Database = require("Database");
@@ -91,6 +92,7 @@ UI = {}
 		-- Global settings
 		UI.globalSettings.build();
 		
+		UI.setPage(UI.page);
 
 		hooksecurefunc(LootAlertSystem,"setUpFunction",function()
 	
@@ -168,6 +170,7 @@ UI = {}
 		UI.underwearPage.update();
 		UI.localSettings.update();
 		UI.globalSettings.update();
+		UI.quests.update();
 	end
 
 	-- Deactivates all tabs
@@ -179,6 +182,18 @@ UI = {}
 	end
 
 	
+	function UI.setPage(tab, playSound)
+		local pages = {"actionPage", "quests", "underwearPage", "localSettings"};
+		if not pages[tab] then print("UI Page not found", tab); return end
+		PanelTemplates_SetTab(UI.FRAME, tab);
+		UI:hideAllTabs();
+		UI[pages[tab]].open();
+		if playSound then
+			PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON);
+		end
+		UI.page = tab;
+		globalStorage.UI_PAGE = tab;
+	end
 
 
 
@@ -332,45 +347,247 @@ UI = {}
 
 	UI.quests = {};
 	UI.quests.listingFrames = {};
+	UI.quests.left = nil
+	UI.quests.right = nil
 	function UI.quests.getListingFrame(index)
+
 		if not UI.quests.listingFrames[index] then
-			local ab = CreateFrame("Button", nil, ExiWoWSettingsFrame_page_quests, "QuestLogTitleTemplate");
-			ab:SetText("Test Quest");
-			--ab:SetAttribute("type", "action");
-			--ab:SetAttribute("action", 1);
-			ab:SetPoint("TOPLEFT", 23, -index*50);
-			--ab:SetSize(50,50);
-			ab.questLogIndex = 0;
-			ab.questID = 0;
-
-			ab:SetScript("OnEnter", function()
-				print("OnEnter");
-			end);
-
+			local ab = CreateFrame("Button", nil, UI.quests.left.scrollchild, "QuestLogTitleTemplate");
 			local sub = CreateFrame("FRAME", nil, ab, "QuestLogObjectiveTemplate");
-			sub.Text:SetText("Objective 1/2");
-			sub:Show();
+			ab.Text:SetWidth(UI.quests.left.scrollchild:GetWidth()-10);
+			sub.Text:SetWidth(UI.quests.left.scrollchild:GetWidth()-10);
 			ab.objectives = sub;
-			local height = sub.Text:GetStringHeight();
-			sub:SetHeight(height);
-			sub:SetPoint("TOPLEFT", ab.Text, "BOTTOMLEFT", 0, -10);
 			UI.quests.listingFrames[index] = ab;
+			ab:SetScript("OnEnter", UI.quests.mouseOver);
+			ab:SetScript("OnLeave", UI.quests.mouseOut);
+			ab:SetScript("OnClick", UI.quests.clicked);
+			
+			
+			
 		end
 		return UI.quests.listingFrames[index];
 	end
+
 	function UI.quests.build()
-		local f = ExiWoWSettingsFrame_page_quests;
 		
-		local nrQuests = 3;
-		for i=1, nrQuests do
-			local f = UI.quests.getListingFrame(i);
-			f.questId = "quest"..i;
+		-- Left side
+		local fr = CreateFrame("ScrollFrame", nil, ExiWoWSettingsFrame_page_quests);
+		UI.quests.left = fr;
+		fr:SetSize(200, 290);
+		fr:SetPoint("TOPLEFT", 15, -25);
 
-			
+		fr:EnableMouse(true)
+		fr:EnableMouseWheel(true)	
+		--local bg = fr:CreateTexture(nil, "BACKGROUND");
+		--bg:SetAllPoints(fr);
+		--bg:SetColorTexture(255,255,255,1);
 
-		end
+		local scrollbar = CreateFrame("Slider", nil, fr, "UIPanelScrollBarTemplate");
+		scrollbar:SetPoint("TOPLEFT",fr,"TOPRIGHT",5,-20) 
+		scrollbar:SetPoint("BOTTOMLEFT",fr,"BOTTOMRIGHT",5,20) 
+		scrollbar:SetMinMaxValues(1,10) 
+		scrollbar:SetValueStep(1) 
+		scrollbar:SetStepsPerPage(7)
+		scrollbar.scrollStep = 20
+		scrollbar:SetValue(0) 
+		scrollbar:SetWidth(16)
+		scrollbar:SetScript("OnValueChanged",function(self,value) 
+      		self:GetParent():SetVerticalScroll(value) 
+		end) 
+		fr.scroll = scrollbar;
+
+		local scrollchild = CreateFrame("Frame");
+		fr.scrollchild = scrollchild;
+		fr:SetScrollChild(scrollchild);
+		scrollchild:SetWidth(fr:GetWidth());
+
+		fr:SetScript("OnMouseWheel", function(self, delta)
+			local cur_val = scrollbar:GetValue()
+			local min_val, max_val = scrollbar:GetMinMaxValues()
+		
+			if delta < 0 and cur_val < max_val then
+				cur_val = math.min(max_val, cur_val + 10)
+				scrollbar:SetValue(cur_val)
+			elseif delta > 0 and cur_val > min_val then
+				cur_val = math.max(min_val, cur_val - 10)
+				scrollbar:SetValue(cur_val)
+			end
+		end)
+
+
+
+		-- Right side
+		fr = CreateFrame("ScrollFrame", nil, ExiWoWSettingsFrame_page_quests);
+		UI.quests.right = fr;
+		fr:SetSize(205, 290);
+		fr:SetPoint("TOPRIGHT", -15, -25);
+
+		fr:EnableMouse(true)
+		fr:EnableMouseWheel(true)	
+		--local bg = fr:CreateTexture(nil, "BACKGROUND");
+		--bg:SetAllPoints(fr);
+		--bg:SetColorTexture(255,255,255,1);
+		--local bg = fr:CreateTexture(nil, "BACKGROUND", "QuestLogBackground");
+		--bg:SetAllPoints(fr);
+
+
+		scrollbar = CreateFrame("Slider", nil, fr, "UIPanelScrollBarTemplate");
+		scrollbar:SetPoint("TOPRIGHT",fr,"TOPLEFT",-5,-20) 
+		scrollbar:SetPoint("BOTTOMRIGHT",fr,"BOTTOMLEFT",-5,20) 
+		scrollbar:SetMinMaxValues(1,10) 
+		scrollbar:SetValueStep(1) 
+		scrollbar:SetStepsPerPage(7)
+		scrollbar.scrollStep = 20
+		scrollbar:SetValue(0) 
+		scrollbar:SetWidth(16)
+		scrollbar:SetScript("OnValueChanged",function(self,value) 
+      		self:GetParent():SetVerticalScroll(value) 
+		end) 
+		fr.scroll = scrollbar;
+
+		scrollchild = CreateFrame("Frame");
+		fr.scrollchild = scrollchild;
+		fr:SetScrollChild(scrollchild);
+		scrollchild:SetWidth(fr:GetWidth());
+		scrollchild:SetHeight(300);
+		
+
+		local header = scrollchild:CreateFontString(nil, "BACKGROUND", "QuestTitleFont");
+		header:SetTextColor(1,1,1,1);
+		header:SetPoint("TOPLEFT", scrollchild);
+		scrollchild.header = header;
+		header:SetText("This is the header");
+
+		local progress = scrollchild:CreateFontString(nil, "BACKGROUND", "QuestFont");
+		progress:SetTextColor(1,1,1,1);
+		progress:SetPoint("TOPLEFT", header, "BOTTOMLEFT", 0, -5);
+		scrollchild.progress = progress;
+		progress:SetText("Progress goes here");
+
+		local description = scrollchild:CreateFontString(nil, "BACKGROUND", "QuestTitleFont");
+		description:SetTextColor(1,1,1,1);
+		description:SetPoint("TOPLEFT", progress, "BOTTOMLEFT", 0, -10);
+		description:SetText("Description");
+
+		local desc = scrollchild:CreateFontString(nil, "BACKGROUND", "QuestFont");
+		desc:SetTextColor(1,1,1,1);
+		desc:SetPoint("TOPLEFT", description, "BOTTOMLEFT", 0, -5);
+		scrollchild.desc = desc;
+		desc:SetText("Quest description");
+
+		local rewards = scrollchild:CreateFontString(nil, "BACKGROUND", "QuestTitleFont");
+		rewards:SetTextColor(1,1,1,1);
+		rewards:SetPoint("TOPLEFT", desc, "BOTTOMLEFT", 0, -10);
+		rewards:SetText("Rewards");
+
+		local reframe = CreateFrame("Frame");
+		reframe:SetPoint("TOPLEFT", rewards, "BOTTOMLEFT", 0, -5);
+		scrollchild.rewards = reframe;
+
+
+		fr:SetScript("OnMouseWheel", function(self, delta)
+			local cur_val = scrollbar:GetValue()
+			local min_val, max_val = scrollbar:GetMinMaxValues()
+		
+			if delta < 0 and cur_val < max_val then
+				cur_val = math.min(max_val, cur_val + 10)
+				scrollbar:SetValue(cur_val)
+			elseif delta > 0 and cur_val > min_val then
+				cur_val = math.max(min_val, cur_val - 10)
+				scrollbar:SetValue(cur_val)
+			end
+		end)
 
 	end
+
+	function UI.quests.mouseOver(frame)
+		
+	end
+
+	function UI.quests.mouseOut(frame)
+		
+	end
+
+	function UI.quests.clicked(frame)
+		print("Todo: Draw quest on righthand side");
+	end
+	
+
+	
+
+	function UI.quests.update()
+		local quests = {
+			Quest.get("SHOCKTACLE"),
+			Quest.get("SHOCKTACLE"),
+			Quest.get("SHOCKTACLE"),
+			Quest.get("SHOCKTACLE"),
+			Quest.get("SHOCKTACLE"),
+			Quest.get("SHOCKTACLE"),
+			Quest.get("SHOCKTACLE"),
+			Quest.get("SHOCKTACLE"),
+			Quest.get("SHOCKTACLE"),
+			Quest.get("SHOCKTACLE"),
+			Quest.get("SHOCKTACLE"),
+		}
+
+		-- LISTING
+		local i, y = 0, 0;
+		while i<#UI.quests.listingFrames or i<#quests do
+			i = i+1;
+			local f = UI.quests.getListingFrame(i);
+			if i > #quests then 
+				f:Hide();
+			else
+				local quest = quests[i];
+				f.questID = quest.id;
+				f:SetText(quest.name);
+				f:SetPoint("TOPLEFT", -15, -y);
+				y = y+f:GetHeight();
+				
+				local sub = f.objectives;
+				local objectives = quest:getCurrentObjectives();
+				local n = 0
+				for _,obj in pairs(objectives) do
+					local text = obj.name;
+					if obj.num > 1 then 
+						text = obj.current_num.."/"..obj.num .. " " .. text;
+					end
+					sub.Text:SetText(text);
+					sub:Show();
+					local height = sub.Text:GetHeight();
+					--sub:SetHeight(height);
+					local base = 8;
+					local h = height+2;
+					sub:SetPoint("TOPLEFT", f.Text, "BOTTOMLEFT", -10, -base-h*n);
+					y = y+base+h;
+					n = n+1;
+				end
+			end
+		end
+
+		local scrollchild = UI.quests.left.scrollchild;
+		scrollchild:SetSize(UI.quests.left:GetWidth(), y);
+		if y-295 < 1 then
+			UI.quests.left.scroll:Hide();
+		else
+			UI.quests.left.scroll:Show();
+			UI.quests.left.scroll:SetMinMaxValues(1,y-300);
+		end
+
+
+		-- ACTIVE QUEST
+		local quest = quests[1];
+		
+
+	end
+	UI.quests.open = function()
+		PanelTemplates_SetTab(UI.FRAME, 2);
+		UI:hideAllTabs();
+		ExiWoWSettingsFrame_page_quests:Show();
+		PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON);
+	end
+
+
 
 
 
@@ -504,6 +721,12 @@ UI = {}
 		end
 	end
 
+	function UI.actionPage.open()
+		PanelTemplates_SetTab(UI.FRAME, 1);
+		UI:hideAllTabs();
+		ExiWoWSettingsFrame_page_actions:Show();
+		PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON);
+	end
 
 
 
@@ -633,11 +856,19 @@ UI = {}
 		end
 	end
 
+	UI.underwearPage.open = function()
+		PanelTemplates_SetTab(UI.FRAME, 3);
+		UI:hideAllTabs();
+		ExiWoWSettingsFrame_page_underwear:Show();
+		PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON);
+	end
 
 
 
 
-	-- Local actions
+
+
+	-- Local settings
 	UI.localSettings = {}
 	function UI.localSettings.build()
 		local f = ExiWoWSettingsFrame_page_settings;
@@ -740,30 +971,18 @@ UI = {}
 
 
 		ExiWoWSettingsFrameTab1:SetScript("OnMouseUp", function (self, button)
-			PanelTemplates_SetTab(UI.FRAME, 1);
-			UI:hideAllTabs();
-			ExiWoWSettingsFrame_page_actions:Show();
-			PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON);
+			UI.setPage(1, true)
 		end)
 
 		ExiWoWSettingsFrameTab2:SetScript("OnMouseUp", function (self, button)
-			PanelTemplates_SetTab(UI.FRAME, 2);
-			UI:hideAllTabs();
-			ExiWoWSettingsFrame_page_quests:Show();
-			PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON);
+			UI.setPage(2, true)
 		end)
 
 		ExiWoWSettingsFrameTab3:SetScript("OnMouseUp", function (self, button)
-			PanelTemplates_SetTab(UI.FRAME, 3);
-			UI:hideAllTabs();
-			ExiWoWSettingsFrame_page_underwear:Show();
-			PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON);
+			UI.setPage(3, true)
 		end)
 		ExiWoWSettingsFrameTab4:SetScript("OnMouseUp", function (self, button)
-			PanelTemplates_SetTab(UI.FRAME, 4);
-			UI:hideAllTabs();
-			ExiWoWSettingsFrame_page_settings:Show();
-			PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON);
+			UI.setPage(4, true)
 		end)
 
 	end
@@ -796,7 +1015,12 @@ UI = {}
 		ExiWoWSettingsFrame_page_settings_tank_mode:SetChecked(localStorage.tank_mode);
 	end
 
-
+	function UI.localSettings.open()
+		PanelTemplates_SetTab(UI.FRAME, 4);
+		UI:hideAllTabs();
+		ExiWoWSettingsFrame_page_settings:Show();
+		PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON);
+	end
 
 
 
