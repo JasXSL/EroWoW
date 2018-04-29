@@ -456,7 +456,7 @@ function internal.build.loot()
 			evtIsForage,
 			{
 				Condition:new({type=ty.RTYPE_TAG, data="ZONE_SANDY", sender=true}),
-				Condition:new({type=ty.RTYPE_SUBZONE, data="%Strand", sender=true}),
+				Condition:new({type=ty.RTYPE_SUBZONE, data={["%Strand"]=true, ["%Beach"]=true, ["%Shore"]=true}, sender=true}),
 			}
 		},
 		items={
@@ -467,6 +467,25 @@ function internal.build.loot()
 				sound = 73172,
 				text = RPText:new({
 					text_receiver = "You found a handful of sand!"
+				})
+			})
+		}
+	})
+
+	-- Calming potion loot
+	ext:addLoot({
+		conditions = {
+			evtIsForage,
+			Condition:new({type=ty.RTYPE_SUBZONE, data="Tabetha's Farm"}),
+		},
+		items={
+			Item:new({
+				type = "Charges", 
+				id = "CALMING_POTION", 
+				chance = 0.5,
+				sound = 1197,
+				text = RPText:new({
+					text_receiver = "You found a calming potion!"
 				})
 			})
 		}

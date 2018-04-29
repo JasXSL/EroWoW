@@ -411,6 +411,27 @@ function internal.build.actions()
 		end
 	});
 
+	extension:addAction({
+		id = "CALMING_POTION",
+		name = "Calming Potion",
+		description = "Instantly clears your excitement.",
+		max_charges = 100,
+		charges = 0,
+		texture = "inv_potion_68",
+		cooldown = 0,
+		cast_time = 0,
+		conditions = {
+			Condition.get("is_self"),
+		},
+		not_defaults = {},
+		fn_receive = function(self, sender, target, args)
+			DoEmote("drink", "player");
+			PlaySound(3373, "SFX");
+			ExiWoW.ME:addExcitement(0, true);
+			return true
+		end
+	});
+
 	-- Claw pinch
 	extension:addAction({
 		id = "CLAW_PINCH",

@@ -22,6 +22,7 @@ local RPText, Action, Effect, Underwear, Database, Func, NPC, Zone, Spell, Loot;
 		Zone = require("Zone");
 		Spell = require("Spell");
 		Loot = require("Loot");
+		Quest = require("Quest");
 	end
 
 	function Extension:new(data, isRoot)
@@ -69,6 +70,9 @@ local RPText, Action, Effect, Underwear, Database, Func, NPC, Zone, Spell, Loot;
 		-- Functions
 		self.functions = importTable(data.functions);
 
+		-- Quests
+		self.quests = importTable(data.quests);
+
 
 		return self
 	end
@@ -113,6 +117,9 @@ local RPText, Action, Effect, Underwear, Database, Func, NPC, Zone, Spell, Loot;
 	function Extension:addLoot(data)
 		table.insert(self.loot, Loot:new(data));
 	end
+	function Extension:addQuest(data)
+		table.insert(self.quests, Quest:new(data));
+	end
 
 
 	-- STATIC --
@@ -121,7 +128,7 @@ local RPText, Action, Effect, Underwear, Database, Func, NPC, Zone, Spell, Loot;
 	function Extension.index()
 
 		-- Reset libraries	
-		Database.clearTables("RPText", "Action", "Effect", "Underwear", "Condition", "Func", "NPC", "Spell", "Zone", "Loot")
+		Database.clearTables("RPText", "Action", "Effect", "Underwear", "Condition", "Func", "NPC", "Spell", "Zone", "Loot", "Quest");
 
 		for k,v in pairs(Extension.LIB) do
 			Database.add("RPText", v.rpTexts);
@@ -134,6 +141,7 @@ local RPText, Action, Effect, Underwear, Database, Func, NPC, Zone, Spell, Loot;
 			Database.add("Spell", v.spells);
 			Database.add("Zone", v.zones);
 			Database.add("Loot", v.loot);
+			Database.add("Quest", v.quests);
 		end
 		
 

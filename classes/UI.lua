@@ -2,7 +2,7 @@ local appName, internal = ...
 local export = internal.Module.export;
 local require = internal.require;
 
-local Action, Underwear, Database, Event, Timer;
+local Action, Underwear, Database, Event, Timer, Quest;
 
 UI = {}
 	UI.FRAME = false 					-- Page browser for ExiWoW
@@ -18,7 +18,7 @@ UI = {}
 		Database = require("Database");
 		Event = require("Event");
 		Timer = require("Timer");
-		
+		Quest = require("Quest");		
 
 	end
 
@@ -67,7 +67,7 @@ UI = {}
 		f:SetScript("OnDragStart", f.StartMoving)
 		f:SetScript("OnDragStop", f.StopMovingOrSizing)
 
-		PanelTemplates_SetNumTabs(f, 3);
+		PanelTemplates_SetNumTabs(f, 4);
 		PanelTemplates_SetTab(f, 1);
 		--ExiWoWSettingsFrame_page_settings:Show();
 		--ExiWoWSettingsFrame_page_actions:Hide();
@@ -77,6 +77,8 @@ UI = {}
 		end
 
 		UI.portrait.build();
+
+		UI.quests.build();
 
 		-- Build actions page
 		UI.actionPage.build();
@@ -173,6 +175,7 @@ UI = {}
 		ExiWoWSettingsFrame_page_settings:Hide();
 		ExiWoWSettingsFrame_page_actions:Hide();
 		ExiWoWSettingsFrame_page_underwear:Hide();	
+		ExiWoWSettingsFrame_page_quests:Hide();
 	end
 
 	
@@ -326,6 +329,48 @@ UI = {}
 
 
 
+
+	UI.quests = {};
+	UI.quests.listingFrames = {};
+	function UI.quests.getListingFrame(index)
+		if not UI.quests.listingFrames[index] then
+			local ab = CreateFrame("Button", nil, ExiWoWSettingsFrame_page_quests, "QuestLogTitleTemplate");
+			ab:SetText("Test Quest");
+			--ab:SetAttribute("type", "action");
+			--ab:SetAttribute("action", 1);
+			ab:SetPoint("TOPLEFT", 23, -index*50);
+			--ab:SetSize(50,50);
+			ab.questLogIndex = 0;
+			ab.questID = 0;
+
+			ab:SetScript("OnEnter", function()
+				print("OnEnter");
+			end);
+
+			local sub = CreateFrame("FRAME", nil, ab, "QuestLogObjectiveTemplate");
+			sub.Text:SetText("Objective 1/2");
+			sub:Show();
+			ab.objectives = sub;
+			local height = sub.Text:GetStringHeight();
+			sub:SetHeight(height);
+			sub:SetPoint("TOPLEFT", ab.Text, "BOTTOMLEFT", 0, -10);
+			UI.quests.listingFrames[index] = ab;
+		end
+		return UI.quests.listingFrames[index];
+	end
+	function UI.quests.build()
+		local f = ExiWoWSettingsFrame_page_quests;
+		
+		local nrQuests = 3;
+		for i=1, nrQuests do
+			local f = UI.quests.getListingFrame(i);
+			f.questId = "quest"..i;
+
+			
+
+		end
+
+	end
 
 
 
@@ -704,11 +749,18 @@ UI = {}
 		ExiWoWSettingsFrameTab2:SetScript("OnMouseUp", function (self, button)
 			PanelTemplates_SetTab(UI.FRAME, 2);
 			UI:hideAllTabs();
+			ExiWoWSettingsFrame_page_quests:Show();
+			PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON);
+		end)
+
+		ExiWoWSettingsFrameTab3:SetScript("OnMouseUp", function (self, button)
+			PanelTemplates_SetTab(UI.FRAME, 3);
+			UI:hideAllTabs();
 			ExiWoWSettingsFrame_page_underwear:Show();
 			PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON);
 		end)
-		ExiWoWSettingsFrameTab3:SetScript("OnMouseUp", function (self, button)
-			PanelTemplates_SetTab(UI.FRAME, 3);
+		ExiWoWSettingsFrameTab4:SetScript("OnMouseUp", function (self, button)
+			PanelTemplates_SetTab(UI.FRAME, 4);
 			UI:hideAllTabs();
 			ExiWoWSettingsFrame_page_settings:Show();
 			PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON);

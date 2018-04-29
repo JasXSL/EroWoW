@@ -41,6 +41,7 @@ classes/Timer.lua
 classes/Callback.lua
 classes/Zone.lua
 classes/Loot.lua
+classes/Quest.lua
 
 
 # Asset database
@@ -54,4 +55,5 @@ db/rptexts.lua
 db/actions.lua
 db/underwear.lua
 db/loot.lua
+db/quests.lua
 
