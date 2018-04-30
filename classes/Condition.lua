@@ -335,7 +335,7 @@ Condition.__index = Condition;
 				else
 					local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice =
 						GetItemInfo(id)
-					out = itemType == "Armor" and (data.type ~= nil and data.type == itemSubType)
+					out = itemType == "Armor" and (data.type ~= nil and Tools.multiSearch(itemSubType, data.type))
 				end
 				out = Character:hasInventory(data);
 			end

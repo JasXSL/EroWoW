@@ -93,6 +93,10 @@ function internal.build.npcs()
 	ext:addNPC({id="Gorishi Wasp",tags={"SILITHID", "WASP"}});
 	
 
+	ext:addNPC({id="Thistleleaf Ruffian",tags={"FISTFIGHTER", "SMALL"}});
+	ext:addNPC({id="Thistleleaf Menace",tags={"FISTFIGHTER", "SMALL"}});
+	ext:addNPC({id="Thistleleaf Thorndancer",tags={"FISTFIGHTER", "SMALL"}});
+	
 
 	-- World containers can also use tags
 	
