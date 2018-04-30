@@ -42,7 +42,7 @@ classes/Callback.lua
 classes/Zone.lua
 classes/Loot.lua
 classes/Quest.lua
-
+classes/Talkbox.lua
 
 # Asset database
 db/functions.lua

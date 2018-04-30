@@ -15,7 +15,11 @@ UIParentLoadAddOn("Blizzard_DebugTools")
 	/run ExiWoW.UI.drawLoot("Test", "inv_pants_leather_04")
 
 	TODO:
-	- Rework loot
+	- Show quest rewards in log & when offered
+	- Quest event bindings
+	- Quest user data save
+	- Quest objective event bindings
+
 	- Re-add whispers
 	- Add pagination once you manage to fill up the whole first page and/or underwear page
 	- Character backup

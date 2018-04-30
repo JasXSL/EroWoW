@@ -92,6 +92,8 @@ UI = {}
 		-- Global settings
 		UI.globalSettings.build();
 		
+		UI.talkbox.build();
+
 		UI.setPage(UI.page);
 
 		hooksecurefunc(LootAlertSystem,"setUpFunction",function()
@@ -349,6 +351,140 @@ UI = {}
 	UI.quests.listingFrames = {};
 	UI.quests.left = nil
 	UI.quests.right = nil
+	UI.quests.talkbox = nil
+
+	function UI.quests.build()
+		
+		-- Left side
+			local fr = CreateFrame("ScrollFrame", nil, ExiWoWSettingsFrame_page_quests);
+			UI.quests.left = fr;
+			fr:SetSize(200, 290);
+			fr:SetPoint("TOPLEFT", 15, -25);
+
+			fr:EnableMouse(true)
+			fr:EnableMouseWheel(true)	
+			--local bg = fr:CreateTexture(nil, "BACKGROUND");
+			--bg:SetAllPoints(fr);
+			--bg:SetColorTexture(255,255,255,1);
+
+			local scrollbar = CreateFrame("Slider", nil, fr, "UIPanelScrollBarTemplate");
+			scrollbar:SetPoint("TOPLEFT",fr,"TOPRIGHT",5,-20) 
+			scrollbar:SetPoint("BOTTOMLEFT",fr,"BOTTOMRIGHT",5,20) 
+			scrollbar:SetMinMaxValues(1,10) 
+			scrollbar:SetValueStep(1) 
+			scrollbar:SetStepsPerPage(7)
+			scrollbar.scrollStep = 20
+			scrollbar:SetValue(0) 
+			scrollbar:SetWidth(16)
+			scrollbar:SetScript("OnValueChanged",function(self,value) 
+				self:GetParent():SetVerticalScroll(value) 
+			end) 
+			fr.scroll = scrollbar;
+
+			local scrollchild = CreateFrame("Frame");
+			fr.scrollchild = scrollchild;
+			fr:SetScrollChild(scrollchild);
+			scrollchild:SetWidth(fr:GetWidth());
+
+			fr:SetScript("OnMouseWheel", function(self, delta)
+				local cur_val = scrollbar:GetValue()
+				local min_val, max_val = scrollbar:GetMinMaxValues()
+			
+				if delta < 0 and cur_val < max_val then
+					cur_val = math.min(max_val, cur_val + 10)
+					scrollbar:SetValue(cur_val)
+				elseif delta > 0 and cur_val > min_val then
+					cur_val = math.max(min_val, cur_val - 10)
+					scrollbar:SetValue(cur_val)
+				end
+			end)
+
+
+
+		-- Right side
+			fr = CreateFrame("ScrollFrame", nil, ExiWoWSettingsFrame_page_quests);
+			UI.quests.right = fr;
+			fr:SetSize(205, 290);
+			fr:SetPoint("TOPRIGHT", -15, -25);
+
+			fr:EnableMouse(true)
+			fr:EnableMouseWheel(true)	
+			--local bg = fr:CreateTexture(nil, "BACKGROUND");
+			--bg:SetAllPoints(fr);
+			--bg:SetColorTexture(255,255,255,1);
+			--local bg = fr:CreateTexture(nil, "BACKGROUND", "QuestLogBackground");
+			--bg:SetAllPoints(fr);
+
+
+			scrollbar = CreateFrame("Slider", nil, fr, "UIPanelScrollBarTemplate");
+			scrollbar:SetPoint("TOPRIGHT",fr,"TOPLEFT",-5,-20) 
+			scrollbar:SetPoint("BOTTOMRIGHT",fr,"BOTTOMLEFT",-5,20) 
+			scrollbar:SetMinMaxValues(1,10) 
+			scrollbar:SetValueStep(1) 
+			scrollbar:SetStepsPerPage(7)
+			scrollbar.scrollStep = 20
+			scrollbar:SetValue(0) 
+			scrollbar:SetWidth(16)
+			scrollbar:SetScript("OnValueChanged",function(self,value) 
+				self:GetParent():SetVerticalScroll(value) 
+			end) 
+			fr.scroll = scrollbar;
+
+			scrollchild = CreateFrame("Frame");
+			fr.scrollchild = scrollchild;
+			fr:SetScrollChild(scrollchild);
+			scrollchild:SetWidth(fr:GetWidth());
+			scrollchild:SetHeight(300);
+			
+
+			local header = scrollchild:CreateFontString(nil, "BACKGROUND", "QuestTitleFont");
+			header:SetTextColor(1,1,1,1);
+			header:SetPoint("TOPLEFT", scrollchild);
+			scrollchild.header = header;
+			header:SetText("This is the header");
+
+			local progress = scrollchild:CreateFontString(nil, "BACKGROUND", "QuestFont");
+			progress:SetTextColor(1,1,1,1);
+			progress:SetPoint("TOPLEFT", header, "BOTTOMLEFT", 0, -5);
+			scrollchild.progress = progress;
+			progress:SetText("Progress goes here");
+
+			local description = scrollchild:CreateFontString(nil, "BACKGROUND", "QuestTitleFont");
+			description:SetTextColor(1,1,1,1);
+			description:SetPoint("TOPLEFT", progress, "BOTTOMLEFT", 0, -10);
+			description:SetText("Description");
+
+			local desc = scrollchild:CreateFontString(nil, "BACKGROUND", "QuestFont");
+			desc:SetTextColor(1,1,1,1);
+			desc:SetPoint("TOPLEFT", description, "BOTTOMLEFT", 0, -5);
+			scrollchild.desc = desc;
+			desc:SetText("Quest description");
+
+			local rewards = scrollchild:CreateFontString(nil, "BACKGROUND", "QuestTitleFont");
+			rewards:SetTextColor(1,1,1,1);
+			rewards:SetPoint("TOPLEFT", desc, "BOTTOMLEFT", 0, -10);
+			rewards:SetText("Rewards");
+
+			local reframe = CreateFrame("Frame");
+			reframe:SetPoint("TOPLEFT", rewards, "BOTTOMLEFT", 0, -5);
+			scrollchild.rewards = reframe;
+
+
+			fr:SetScript("OnMouseWheel", function(self, delta)
+				local cur_val = scrollbar:GetValue()
+				local min_val, max_val = scrollbar:GetMinMaxValues()
+			
+				if delta < 0 and cur_val < max_val then
+					cur_val = math.min(max_val, cur_val + 10)
+					scrollbar:SetValue(cur_val)
+				elseif delta > 0 and cur_val > min_val then
+					cur_val = math.max(min_val, cur_val - 10)
+					scrollbar:SetValue(cur_val)
+				end
+			end)
+
+	end
+
 	function UI.quests.getListingFrame(index)
 
 		if not UI.quests.listingFrames[index] then
@@ -361,144 +497,13 @@ UI = {}
 			ab:SetScript("OnEnter", UI.quests.mouseOver);
 			ab:SetScript("OnLeave", UI.quests.mouseOut);
 			ab:SetScript("OnClick", UI.quests.clicked);
-			
-			
+						
 			
 		end
 		return UI.quests.listingFrames[index];
 	end
 
-	function UI.quests.build()
-		
-		-- Left side
-		local fr = CreateFrame("ScrollFrame", nil, ExiWoWSettingsFrame_page_quests);
-		UI.quests.left = fr;
-		fr:SetSize(200, 290);
-		fr:SetPoint("TOPLEFT", 15, -25);
-
-		fr:EnableMouse(true)
-		fr:EnableMouseWheel(true)	
-		--local bg = fr:CreateTexture(nil, "BACKGROUND");
-		--bg:SetAllPoints(fr);
-		--bg:SetColorTexture(255,255,255,1);
-
-		local scrollbar = CreateFrame("Slider", nil, fr, "UIPanelScrollBarTemplate");
-		scrollbar:SetPoint("TOPLEFT",fr,"TOPRIGHT",5,-20) 
-		scrollbar:SetPoint("BOTTOMLEFT",fr,"BOTTOMRIGHT",5,20) 
-		scrollbar:SetMinMaxValues(1,10) 
-		scrollbar:SetValueStep(1) 
-		scrollbar:SetStepsPerPage(7)
-		scrollbar.scrollStep = 20
-		scrollbar:SetValue(0) 
-		scrollbar:SetWidth(16)
-		scrollbar:SetScript("OnValueChanged",function(self,value) 
-      		self:GetParent():SetVerticalScroll(value) 
-		end) 
-		fr.scroll = scrollbar;
-
-		local scrollchild = CreateFrame("Frame");
-		fr.scrollchild = scrollchild;
-		fr:SetScrollChild(scrollchild);
-		scrollchild:SetWidth(fr:GetWidth());
-
-		fr:SetScript("OnMouseWheel", function(self, delta)
-			local cur_val = scrollbar:GetValue()
-			local min_val, max_val = scrollbar:GetMinMaxValues()
-		
-			if delta < 0 and cur_val < max_val then
-				cur_val = math.min(max_val, cur_val + 10)
-				scrollbar:SetValue(cur_val)
-			elseif delta > 0 and cur_val > min_val then
-				cur_val = math.max(min_val, cur_val - 10)
-				scrollbar:SetValue(cur_val)
-			end
-		end)
-
-
-
-		-- Right side
-		fr = CreateFrame("ScrollFrame", nil, ExiWoWSettingsFrame_page_quests);
-		UI.quests.right = fr;
-		fr:SetSize(205, 290);
-		fr:SetPoint("TOPRIGHT", -15, -25);
-
-		fr:EnableMouse(true)
-		fr:EnableMouseWheel(true)	
-		--local bg = fr:CreateTexture(nil, "BACKGROUND");
-		--bg:SetAllPoints(fr);
-		--bg:SetColorTexture(255,255,255,1);
-		--local bg = fr:CreateTexture(nil, "BACKGROUND", "QuestLogBackground");
-		--bg:SetAllPoints(fr);
-
-
-		scrollbar = CreateFrame("Slider", nil, fr, "UIPanelScrollBarTemplate");
-		scrollbar:SetPoint("TOPRIGHT",fr,"TOPLEFT",-5,-20) 
-		scrollbar:SetPoint("BOTTOMRIGHT",fr,"BOTTOMLEFT",-5,20) 
-		scrollbar:SetMinMaxValues(1,10) 
-		scrollbar:SetValueStep(1) 
-		scrollbar:SetStepsPerPage(7)
-		scrollbar.scrollStep = 20
-		scrollbar:SetValue(0) 
-		scrollbar:SetWidth(16)
-		scrollbar:SetScript("OnValueChanged",function(self,value) 
-      		self:GetParent():SetVerticalScroll(value) 
-		end) 
-		fr.scroll = scrollbar;
-
-		scrollchild = CreateFrame("Frame");
-		fr.scrollchild = scrollchild;
-		fr:SetScrollChild(scrollchild);
-		scrollchild:SetWidth(fr:GetWidth());
-		scrollchild:SetHeight(300);
-		
-
-		local header = scrollchild:CreateFontString(nil, "BACKGROUND", "QuestTitleFont");
-		header:SetTextColor(1,1,1,1);
-		header:SetPoint("TOPLEFT", scrollchild);
-		scrollchild.header = header;
-		header:SetText("This is the header");
-
-		local progress = scrollchild:CreateFontString(nil, "BACKGROUND", "QuestFont");
-		progress:SetTextColor(1,1,1,1);
-		progress:SetPoint("TOPLEFT", header, "BOTTOMLEFT", 0, -5);
-		scrollchild.progress = progress;
-		progress:SetText("Progress goes here");
-
-		local description = scrollchild:CreateFontString(nil, "BACKGROUND", "QuestTitleFont");
-		description:SetTextColor(1,1,1,1);
-		description:SetPoint("TOPLEFT", progress, "BOTTOMLEFT", 0, -10);
-		description:SetText("Description");
-
-		local desc = scrollchild:CreateFontString(nil, "BACKGROUND", "QuestFont");
-		desc:SetTextColor(1,1,1,1);
-		desc:SetPoint("TOPLEFT", description, "BOTTOMLEFT", 0, -5);
-		scrollchild.desc = desc;
-		desc:SetText("Quest description");
-
-		local rewards = scrollchild:CreateFontString(nil, "BACKGROUND", "QuestTitleFont");
-		rewards:SetTextColor(1,1,1,1);
-		rewards:SetPoint("TOPLEFT", desc, "BOTTOMLEFT", 0, -10);
-		rewards:SetText("Rewards");
-
-		local reframe = CreateFrame("Frame");
-		reframe:SetPoint("TOPLEFT", rewards, "BOTTOMLEFT", 0, -5);
-		scrollchild.rewards = reframe;
-
-
-		fr:SetScript("OnMouseWheel", function(self, delta)
-			local cur_val = scrollbar:GetValue()
-			local min_val, max_val = scrollbar:GetMinMaxValues()
-		
-			if delta < 0 and cur_val < max_val then
-				cur_val = math.min(max_val, cur_val + 10)
-				scrollbar:SetValue(cur_val)
-			elseif delta > 0 and cur_val > min_val then
-				cur_val = math.max(min_val, cur_val - 10)
-				scrollbar:SetValue(cur_val)
-			end
-		end)
-
-	end
+	
 
 	function UI.quests.mouseOver(frame)
 		
@@ -511,9 +516,6 @@ UI = {}
 	function UI.quests.clicked(frame)
 		print("Todo: Draw quest on righthand side");
 	end
-	
-
-	
 
 	function UI.quests.update()
 		local quests = {
@@ -586,6 +588,193 @@ UI = {}
 		ExiWoWSettingsFrame_page_quests:Show();
 		PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON);
 	end
+
+
+
+
+
+
+
+
+
+
+
+
+	-- UI Talkbox for quests and dialog
+	UI.talkbox = {};
+	UI.talkbox.active = nil;	-- Use Talkbox object
+	function UI.talkbox.build()
+
+		-- Talkbox
+		local talkbox = CreateFrame("Frame", nil, UIParent);
+		UI.talkbox.frame = talkbox;
+		talkbox:SetAllPoints();
+		talkbox:SetMovable(true)
+
+		local function bindForDrag(fr)
+			fr:EnableMouse(true)
+			fr:SetScript("OnMouseDown", function(self, button)
+				if button == "LeftButton" and not talkbox.isMoving then
+					talkbox:StartMoving();
+					talkbox.isMoving = true;
+				end
+			end)
+			fr:SetScript("OnMouseUp", function(self, button)
+				if button == "LeftButton" and talkbox.isMoving then
+					talkbox:StopMovingOrSizing();
+					talkbox.isMoving = false;
+				end
+			end)
+			fr:SetScript("OnHide", function(self)
+				if ( talkbox.isMoving ) then
+					talkbox:StopMovingOrSizing();
+					talkbox.isMoving = false;
+				end
+			end)
+		end
+
+		local fr = CreateFrame("Button", nil, talkbox);
+		talkbox.main = fr;
+		fr:SetSize(550, 200);
+		fr:SetPoint("CENTER", 0, -200);
+		bindForDrag(fr);
+		fr:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+
+		fr:SetScript("OnEnter", function(self, button)
+			self.hover:Show();
+		end)
+		fr:SetScript("OnLeave", function(self, button)
+			self.hover:Hide();
+		end)
+		fr:SetScript("OnClick", function(self, button)
+			if button == "LeftButton" then
+				UI.talkbox.advance();
+			elseif button == "RightButton" then
+				UI.talkbox.back();
+			end
+		end);		
+
+		local bg = fr:CreateTexture(nil, "BACKGROUND");
+		bg:SetAllPoints(fr);
+		bg:SetTexture("Interface/QuestFrame/TalkingHeads");
+		bg:SetTexCoord(0.000976562, 0.557617, 0.00390625, 0.609375);
+
+		-- Portrait bg
+		local ol = fr:CreateTexture(nil, "BACKGROUND");
+		ol:SetSize(145, 145);
+		ol:SetPoint("LEFT", 15, 0);
+		ol:SetTexture("Interface/QuestFrame/TalkingHeads");
+		ol:SetTexCoord(0.701172, 0.813477, 0.00390625, 0.453125);
+
+		-- /run ExiWoW.require("UI").quests.talkbox.model:SetUnit("target")
+		local model = CreateFrame("PlayerModel", nil, fr);
+		fr.model = model;
+		model:SetSize(130,130);
+		model:SetPoint("LEFT", 25, 0);
+		model:SetDisplayInfo(17781); -- Find the NPC on wowhead, edit source and search for ModelViewer.show, that has the displayid
+		model:SetCamera(0);
+
+
+		local border = CreateFrame("Frame", nil, model);
+		border:SetAllPoints();
+		ol = border:CreateTexture(nil, "BORDER");
+		ol:SetSize(160, 160);
+		ol:SetPoint("LEFT", -15, 0);
+		ol:SetTexture("Interface/QuestFrame/TalkingHeads");
+		ol:SetTexCoord(0.55957, 0.699219, 0.00390625, 0.5625);
+		
+		local text = fr:CreateFontString(nil, "BACKGROUND", "Fancy22Font");
+		--text:SetTextColor(1,1,1,1);
+		text:SetPoint("TOPRIGHT", -15, -30);
+		text:SetWidth(365);
+		text:SetJustifyH("LEFT");
+		text:SetText("Quest title");
+		fr.title = text;
+
+		text = fr:CreateFontString(nil, "BACKGROUND", "GameFontHighlightLarge");
+		--text:SetTextColor(1,1,1,1);
+		text:SetPoint("TOPLEFT", fr.title, "BOTTOMLEFT", 0, -5);
+		text:SetJustifyH("LEFT");
+		text:SetWidth(365);
+		fr.description = text;
+		text:SetText("This is the quest description. I'm gonna type out a few lines just to make sure it fits and wraps correctly.");
+
+		
+		text = fr:CreateFontString(nil, "BACKGROUND", "GameFontHighlightLarge");
+		--text:SetTextColor(1,1,1,1);
+		text:SetPoint("BOTTOMRIGHT", fr, "BOTTOMRIGHT", -25, 25);
+		text:SetJustifyH("RIGHT");
+		text:SetTextColor(1,1,1,0.5);
+		text:SetWidth(365);
+		text:SetText("1/1");
+		fr.pagination = text;
+
+		-- Hover
+		local hover = CreateFrame("Frame", nil, fr);
+		hover:SetAllPoints();
+		hover:SetFrameStrata("HIGH");
+		fr.hover = hover;
+
+		-- 0.248047, 0.503906, 0.617188, 0.75
+		ol = hover:CreateTexture(nil, "BACKGROUND");
+		ol:SetAllPoints();
+		ol:SetTexture("Interface/QuestFrame/TalkingHeads");
+		ol:SetTexCoord(0.248047, 0.503906, 0.617188, 0.75);
+		ol:SetAlpha(0.5);
+		hover:Hide();
+
+		UI.talkbox.hide();
+	end
+
+	function UI.talkbox.set(talkbox)
+		UI.talkbox.active = talkbox;
+		UI.talkbox.page = 1;
+		-- Set head and title
+		local fr = UI.talkbox.frame.main;
+		fr.title:SetText(talkbox.title);
+		fr.model:SetDisplayInfo(talkbox.displayInfo);
+		fr.model:SetCamera(0);
+		UI.talkbox.draw();
+		UI.talkbox.frame:Show();
+	end
+
+	function UI.talkbox.advance()
+		if not UI.talkbox.active then 
+			return 
+		end
+		UI.talkbox.page = UI.talkbox.page+1;
+		if UI.talkbox.page > #UI.talkbox.active.lines then
+			if type(UI.talkbox.active.onComplete) == "function" then
+				UI.talkbox.active.onComplete(UI.talkbox.active);
+			end
+			UI.talkbox.hide();
+			UI.talkbox.active = nil;
+		else
+			UI.talkbox.draw();
+		end
+	end
+	function UI.talkbox.back()
+		if not UI.talkbox.active or UI.talkbox.page == 1 then 
+			return 
+		end
+		UI.talkbox.page = UI.talkbox.page-1;
+		UI.talkbox.draw();
+	end
+
+	function UI.talkbox.draw()
+		local tb = UI.talkbox.active;
+		local fr = UI.talkbox.frame.main;
+		fr.description:SetText(tb.lines[UI.talkbox.page]);
+		fr.pagination:SetText(UI.talkbox.page.."/"..#tb.lines);
+	end
+
+	function UI.talkbox.hide()
+		UI.talkbox.frame:Hide();
+	end
+
+
+
+
 
 
 
@@ -1147,7 +1336,9 @@ UI = {}
 
 
 
-export("UI", UI, {}, UI)
+export("UI", UI, {
+	talkbox = UI.talkbox
+}, UI)
 	
 
 	

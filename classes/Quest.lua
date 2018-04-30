@@ -2,7 +2,7 @@ local appName, internal = ...
 local export = internal.Module.export;
 local require = internal.require;
 
-local RPText, Character, Tools, Database, Action, Event;
+local RPText, Character, Tools, Database, Action, Event, Talkbox;
 
 local Quest = {};
 Quest.__index = Quest;
@@ -14,6 +14,7 @@ Quest.__index = Quest;
 		Database = require("Database");
 		Action = require("Action");
 		Event = require("Event");
+		Talkbox = require("Talkbox");
 	end
 
 	function Quest:new(data)
@@ -22,12 +23,18 @@ Quest.__index = Quest;
 
 		self.id = data.id;
 		self.name = data.name;
-		print(type(data.objectives), #data.objectives);
 		self.objectives = data.objectives or {};		-- You can wrap objectives in {} to create packages
 		self.conditions = data.conditions or {};
 		self.completed = data.completed or false;
 		self.rewards = data.rewards or {};
-		self.description = data.description or "";
+		self.start_text = data.start_text or {};		-- Paragraphs for the initializing talkbox
+		self.journal_entry = data.journal_entry or "";
+		self.questgiver = data.questgiver or 0;			-- displayInfo in Talkbox
+
+
+		if type(self.start_text) ~= "table" then
+			self.start_text = {self.start_text};
+		end
 
 		if not self.id then print("Error, a quest is missing id:", self.id); end
 		
@@ -59,6 +66,20 @@ Quest.__index = Quest;
 
 	function Quest:onObjectiveUpdated(objective)
 		print("Objective updated");
+	end
+
+
+	function Quest:offer()
+		local talkbox = Talkbox:new({
+			lines = self.start_text,
+			displayInfo = self.questgiver,
+			title = self.name,
+			onComplete = function(self) end
+		});
+		UI.talkbox.set(talkbox);
+		print("Todo: Mark quest as active");
+		PlaySound(618, "Dialog");
+
 	end
 
 	-- A little bit different to the others in that it returns only the function, not the Func object
@@ -99,14 +120,14 @@ Objective.__index = Objective;
 	end
 
 
-
+-- /run ExiWoW.require("Quest").get("SHOCKTACLE"):offer();
 export(
 	"Quest", 
 	Quest,
 	{
 		get = Quest.get,
 		new = Quest.new,
-		Objective = Objective
+		Objective = Objective,
 	},
 	{}
 )
