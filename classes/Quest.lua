@@ -29,6 +29,9 @@ Quest.__index = Quest;
 		Talkbox = require("Talkbox");
 		Underwear = require("Underwear");
 		UI = require("UI");
+		if not localStorage.quests then
+			localStorage.quests = {};
+		end
 		Quest.progress = localStorage.quests;
 	end
 
