@@ -78,7 +78,9 @@ function internal.build.spells()
 	ext:addSpell({id="Big Bop"});
 	ext:addSpell({id="Dancing Thorns"});
 	ext:addSpell({id="Slitherstrike"});
-
+	
+	ext:addSpell({id="Quill Barb"});
+	
 
 
 end

@@ -69,11 +69,12 @@ function internal.Gateway()
 		local spell = spells[1];
 		if spell and not RPText.getTakehitCD() and math.random() < chance*spell.chanceMod and not UnitInVehicle("player") then
 			eventData.tags = spell:exportTags();
-			local name = event;
+			local name = aura.name;
 			if spell.alias then
 				name = spell.alias;
 			end
-			local rp = RPText.get(name, unit, "player", npc, ExiWoW.ME, eventData, name);
+
+			local rp = RPText.get(name, unit, "player", npc, ExiWoW.ME, eventData, event);
 			if rp then
 				RPText.setTakehitTimer();
 				rp:convertAndReceive(npc, ExiWoW.ME, false, eventData);

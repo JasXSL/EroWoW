@@ -4,7 +4,7 @@ local export = internal.Module.export;
 internal.build = {}							-- Collection of libraries to build
 internal.ext = nil							-- Root extension
 local Tools = require("Tools")
-local Action, Extension, Character, UI, Effect, Timer, Event, Callback, Database;
+local Action, Extension, Character, UI, Effect, Timer, Event, Callback, Database, Quest;
 
 
 UIParentLoadAddOn("Blizzard_DebugTools")
@@ -15,7 +15,11 @@ UIParentLoadAddOn("Blizzard_DebugTools")
 	/run ExiWoW.UI.drawLoot("Test", "inv_pants_leather_04")
 
 	TODO:
-	- Rework loot
+	- Show quest rewards in log & when offered
+	- Quest event bindings
+	- Quest user data save
+	- Quest objective event bindings
+
 	- Re-add whispers
 	- Add pagination once you manage to fill up the whole first page and/or underwear page
 	- Character backup
@@ -67,7 +71,8 @@ local LOCALSTORAGE_DEFAULTS = {
 	intelligence = 5,
 	fat = 5,
 	wisdom = 5,
-	effects = {}
+	effects = {},
+	quests = {},		-- See Quest.lua
 };
 
 
@@ -114,6 +119,7 @@ local Index = {}
 		Callback = require("Callback");
 		Database = require("Database");
 		Effect = require("Effect");
+		Quest = require("Quest");
 		
 
 		ExiWoW.ME = Character:new();
@@ -391,6 +397,7 @@ local Index = {}
 			end
 		end
 
+		Quest.loadFromStorage();
 		Index.onPlayerLogout()
 		
 	end

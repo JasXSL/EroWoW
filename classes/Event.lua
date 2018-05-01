@@ -43,7 +43,6 @@ local Event = {}
 		CONTAINER_OPENED = "CONTAINER_OPENED",						-- {autoloot:1/0, action:"Herb Gathering"/"Open" etc, container:"Starlight Rose" etc} World container opened			
 	}
 
-
 	function Event.ini()
 		RPText = require("RPText");
 		Character = require("Character");
@@ -331,9 +330,14 @@ local Event = {}
 			print("Invalid event raised")
 			print(debugstack())
 		end
+		-- Prevents recursion
+		local splice = {}
 		for _,v in pairs(Event.bindings) do
+			table.insert(splice, v);
+		end
+		for _,v in pairs(splice) do
 			if v.event == evt then
-				v.callback(data)
+				v.callback(data, evt)
 			end
 		end
 	end

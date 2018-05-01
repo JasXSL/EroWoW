@@ -2,6 +2,14 @@
 				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 				   xsi:schemaLocation="http://www.blizzard.com/wow/ui/ 
 				   ..\..\FrameXML\UI.xsd">
+
+
+
+
+
+
+
+
 	<Frame name="ExiWoWSettingsFrame"
 		toplevel="true"
 		frameStrata="DIALOG"
@@ -90,6 +98,15 @@
 				</Layers>
 			</Frame>   
 
+			<!-- Quests page -->
+			<Frame name="$parent_page_quests" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+					<Anchor point="BOTTOMRIGHT"/>
+				</Anchors>
+			</Frame>   
+
+
 			<!-- Underwear page -->
 			<Frame name="$parent_page_underwear" hidden="true">
 			   <Anchors>
@@ -132,7 +149,7 @@
 				   </Anchor>
 			   </Anchors>
 		   </Button>
-		   <Button name="$parentTab2" inherits="CharacterFrameTabButtonTemplate" id="2" text="Underwear">
+		   <Button name="$parentTab2" inherits="CharacterFrameTabButtonTemplate" id="2" text="Quests">
 			   <Anchors>
 				   <Anchor point="LEFT" relativeTo="$parentTab1" relativePoint="RIGHT">
 					   <Offset>
@@ -141,9 +158,18 @@
 				   </Anchor>
 			   </Anchors>
 		   </Button>
-		   <Button name="$parentTab3" inherits="CharacterFrameTabButtonTemplate" id="3" text="Character">
+		   <Button name="$parentTab3" inherits="CharacterFrameTabButtonTemplate" id="3" text="Underwear">
 			   <Anchors>
 				   <Anchor point="LEFT" relativeTo="$parentTab2" relativePoint="RIGHT">
+					   <Offset>
+						   <AbsDimension x="-16" y="0"/>
+					   </Offset>
+				   </Anchor>
+			   </Anchors>
+		   </Button>
+		   <Button name="$parentTab4" inherits="CharacterFrameTabButtonTemplate" id="4" text="Character">
+			   <Anchors>
+				   <Anchor point="LEFT" relativeTo="$parentTab3" relativePoint="RIGHT">
 					   <Offset>
 						   <AbsDimension x="-16" y="0"/>
 					   </Offset>
@@ -154,5 +180,5 @@
 	   </Frames>
 	   
    </Frame>
-
 </Ui>
+

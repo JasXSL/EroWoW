@@ -42,7 +42,11 @@ function internal.build.conditions()
 	ext:addCondition({id="attackerIsOoze", type=ty.RTYPE_TAG, data={"NPC_OOZE"}, sender=true});
 	ext:addCondition({id="attackerIsFeltotem", type=ty.RTYPE_TAG, data={"NPC_FELTOTEM"}, sender=true});
 	ext:addCondition({id="attackerIsBogshambler", type=ty.RTYPE_TAG, data={"NPC_BOG_SHAMBLER"}, sender=true});
+	ext:addCondition({id="attackerNotLarge", type=ty.RTYPE_TAG, data={"NPC_LARGE", "NPC_GIANT"}, sender=true, inverse=true});
+	ext:addCondition({id="attackerIsSmall", type=ty.RTYPE_TAG, data={"NPC_SMALL"}, sender=true});
+	ext:addCondition({id="attackerIsFistfighter", type=ty.RTYPE_TAG, data={"NPC_FISTFIGHTER"}, sender=true});
 	
+
 	ext:addCondition({id="maleWhispers", type=ty.RTYPE_REQUIRE_MALE});
 	ext:addCondition({id="femaleWhispers", type=ty.RTYPE_REQUIRE_FEMALE});
 	ext:addCondition({id="otherWhispers", type=ty.RTYPE_REQUIRE_OTHER});
@@ -51,8 +55,12 @@ function internal.build.conditions()
 	ext:addCondition({id="victimParalyzed", type = ty.RTYPE_HAS_AURA, data={{name="Paralysis"}}});
 	ext:addCondition({id="invFeathers", type=ty.RTYPE_HAS_INVENTORY, data={{name="Light Feather"}}});
 	ext:addCondition({id="chestPlate", type=ty.RTYPE_EQUIPMENT, data={slot=5, type="Plate"}});
+	ext:addCondition({id="chestLightArmor", type=ty.RTYPE_EQUIPMENT, data={slot=5, type={Leather=true, Cloth=true}}});
+	ext:addCondition({id="chestHeavyArmor", type=ty.RTYPE_EQUIPMENT, data={slot=5, type={Plate=true, Mail=true}}});
+	ext:addCondition({id="legsHeavyArmor", type=ty.RTYPE_EQUIPMENT, data={slot=7, type={Plate=true, Mail=true}}});
 	ext:addCondition({id="crotchPlate", type=ty.RTYPE_EQUIPMENT, data={slot=7, type="Plate"}});
 	
+
 	ext:addCondition({id="sender_party_restricted", type=ty.RTYPE_PARTY_RESTRICTED, sender=true});
 	ext:addCondition({id="victim_party_restricted", type=ty.RTYPE_PARTY_RESTRICTED});
 	ext:addCondition({id="is_self", type=ty.RTYPE_SELF_ONLY, sender=true});

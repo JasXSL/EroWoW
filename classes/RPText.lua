@@ -348,9 +348,11 @@ RPText.whisperCD = nil
 
 	end
 
-	function RPText.print(text)
+	function RPText.print(text, ignoreChat)
 		-- 0.95686274509,0.49019607843,0.25490196078
-		ChatFrame1:AddMessage(text, 0.737, 0.6, 0.980);
+		if not ignoreChat then
+			ChatFrame1:AddMessage(text, 0.737, 0.6, 0.980);
+		end
 		--f47d41
 		UIErrorsFrame:AddMessage(text, 1, 0.8, 1, 53, 6);
 	end
