@@ -352,10 +352,22 @@ UI = {}
 	UI.quests.listingFrames = {};
 	UI.quests.left = nil
 	UI.quests.right = nil
-	UI.quests.talkbox = nil
+	UI.quests.empty = nil;
+	UI.quests.selected = nil;		-- ID of selected quest
 
 	function UI.quests.build()
-		
+		-- Empty
+			local empty = CreateFrame("Frame", nil, ExiWoWSettingsFrame_page_quests);
+			empty:SetAllPoints();
+			UI.quests.empty = empty;
+			local etext = empty:CreateFontString(nil, "BACKGROUND", "QuestTitleFont");
+			etext:SetTextColor(1,1,1,1);
+			etext:SetAllPoints();
+			etext:SetText("You have no quests.");
+			etext:SetJustifyH("CENTER");
+			etext:SetJustifyV("CENTER");
+			
+
 		-- Left side
 			local fr = CreateFrame("ScrollFrame", nil, ExiWoWSettingsFrame_page_quests);
 			UI.quests.left = fr;
@@ -435,7 +447,7 @@ UI = {}
 			fr.scrollchild = scrollchild;
 			fr:SetScrollChild(scrollchild);
 			scrollchild:SetWidth(fr:GetWidth());
-			scrollchild:SetHeight(300);
+			scrollchild:SetHeight(fr:GetHeight());
 			
 
 			local header = scrollchild:CreateFontString(nil, "BACKGROUND", "QuestTitleFont");
@@ -445,30 +457,65 @@ UI = {}
 			header:SetText("This is the header");
 
 			local progress = scrollchild:CreateFontString(nil, "BACKGROUND", "QuestFont");
-			progress:SetTextColor(1,1,1,1);
+			progress:SetTextColor(1,1,1,0.75);
 			progress:SetPoint("TOPLEFT", header, "BOTTOMLEFT", 0, -5);
+			progress:SetJustifyH("LEFT");
 			scrollchild.progress = progress;
 			progress:SetText("Progress goes here");
+			progress:SetWidth(scrollchild:GetWidth());
 
 			local description = scrollchild:CreateFontString(nil, "BACKGROUND", "QuestTitleFont");
 			description:SetTextColor(1,1,1,1);
 			description:SetPoint("TOPLEFT", progress, "BOTTOMLEFT", 0, -10);
 			description:SetText("Description");
+			description:SetJustifyH("LEFT");
+			scrollchild.descTitle = description;
 
 			local desc = scrollchild:CreateFontString(nil, "BACKGROUND", "QuestFont");
 			desc:SetTextColor(1,1,1,1);
 			desc:SetPoint("TOPLEFT", description, "BOTTOMLEFT", 0, -5);
 			scrollchild.desc = desc;
 			desc:SetText("Quest description");
+			desc:SetJustifyH("LEFT");
+			desc:SetWidth(scrollchild:GetWidth());
+			
+			local rewardsTitle = scrollchild:CreateFontString(nil, "BACKGROUND", "QuestTitleFont");
+			rewardsTitle:SetTextColor(1,1,1,1);
+			rewardsTitle:SetPoint("TOPLEFT", desc, "BOTTOMLEFT", 0, -10);
+			rewardsTitle:SetText("Rewards");
 
-			local rewards = scrollchild:CreateFontString(nil, "BACKGROUND", "QuestTitleFont");
-			rewards:SetTextColor(1,1,1,1);
-			rewards:SetPoint("TOPLEFT", desc, "BOTTOMLEFT", 0, -10);
-			rewards:SetText("Rewards");
+			scrollchild.rewardFrames = {};
 
-			local reframe = CreateFrame("Frame");
-			reframe:SetPoint("TOPLEFT", rewards, "BOTTOMLEFT", 0, -5);
-			scrollchild.rewards = reframe;
+			for i=1,6 do
+				local rewards = CreateFrame("Button", nil, scrollchild, "QuestItemTemplate");
+				local pointA, pointB = "TOPLEFT", "BOTTOMLEFT";
+				local ofsmul = 1;
+				local multi = math.floor((i-1)/2)*60;
+				rewards.index = i;
+				rewards:SetPoint(pointA, rewardsTitle, pointB, 0, -5-(i-1)*45);
+				--DisplayTableInspectorWindow(rewards)
+				rewards.Name:SetText("Reward Name");
+				rewards.Icon:SetTexture("Interface/Icons/achievement_character_pandaren_female");
+				--rewards:SetSize(200,50);
+				
+				rewards.NameFrame:SetPoint("left", 25, 0);
+				rewards.NameFrame:SetSize(190,60);
+
+				rewards.Icon:SetSize(40,40);
+				rewards.Icon:SetParent(rewards);
+				rewards.Icon:SetPoint("left", rewards, "left", 0, 0);
+				rewards.Name:SetPoint("left", 45,0);
+				table.insert(scrollchild.rewardFrames, rewards);
+				rewards:EnableMouse(true);
+				rewards:SetScript("OnEnter", function(self)
+					local reward = Quest.get(UI.quests.selected).rewards[self.index];
+					UI.quests.tooltip(reward.type, reward.id, self);
+				end);
+				rewards:SetScript("OnLeave", function(self)
+					local reward = Quest.get(UI.quests.selected).rewards[self.index];
+					UI.quests.tooltip(reward.type, reward.id);
+				end);
+			end
 
 
 			fr:SetScript("OnMouseWheel", function(self, delta)
@@ -484,16 +531,23 @@ UI = {}
 				end
 			end)
 
+		
 	end
 
 	function UI.quests.getListingFrame(index)
 
 		if not UI.quests.listingFrames[index] then
 			local ab = CreateFrame("Button", nil, UI.quests.left.scrollchild, "QuestLogTitleTemplate");
-			local sub = CreateFrame("FRAME", nil, ab, "QuestLogObjectiveTemplate");
 			ab.Text:SetWidth(UI.quests.left.scrollchild:GetWidth()-10);
-			sub.Text:SetWidth(UI.quests.left.scrollchild:GetWidth()-10);
-			ab.objectives = sub;
+			local objectives = {};
+
+			for i=1,4 do
+				local sub = CreateFrame("FRAME", nil, ab, "QuestLogObjectiveTemplate");
+				sub.Text:SetWidth(UI.quests.left.scrollchild:GetWidth()-10);
+				table.insert(objectives, sub);
+			end
+			ab.objectives = objectives;
+			
 			UI.quests.listingFrames[index] = ab;
 			ab:SetScript("OnEnter", UI.quests.mouseOver);
 			ab:SetScript("OnLeave", UI.quests.mouseOut);
@@ -504,6 +558,15 @@ UI = {}
 		return UI.quests.listingFrames[index];
 	end
 
+	function UI.quests.tooltip(itemType, itemID, frame)
+		local asset = nil;
+		if itemType == "Charges" then
+			asset = Action.get(itemID);
+		elseif itemType == "Underwear" then
+			asset = Underwear.get(itemID);
+		end
+		asset:onTooltip(frame and frame or nil);
+	end
 	
 
 	function UI.quests.mouseOver(frame)
@@ -515,23 +578,23 @@ UI = {}
 	end
 
 	function UI.quests.clicked(frame)
-		print("Todo: Draw quest on righthand side");
+		UI.quests.selected = frame.questID;
+		UI.quests.update();
 	end
 
 	function UI.quests.update()
-		local quests = {
-			Quest.get("SHOCKTACLE"),
-			Quest.get("SHOCKTACLE"),
-			Quest.get("SHOCKTACLE"),
-			Quest.get("SHOCKTACLE"),
-			Quest.get("SHOCKTACLE"),
-			Quest.get("SHOCKTACLE"),
-			Quest.get("SHOCKTACLE"),
-			Quest.get("SHOCKTACLE"),
-			Quest.get("SHOCKTACLE"),
-			Quest.get("SHOCKTACLE"),
-			Quest.get("SHOCKTACLE"),
-		}
+		local quests = Quest.getActive();
+		if #quests > 0 then
+			UI.quests.selected = quests[1].id;
+			UI.quests.empty:Hide();
+			UI.quests.left:Show();
+			UI.quests.right:Show();
+		else
+			UI.quests.empty:Show();
+			UI.quests.left:Hide();
+			UI.quests.right:Hide();
+			return;
+		end
 
 		-- LISTING
 		local i, y = 0, 0;
@@ -547,10 +610,11 @@ UI = {}
 				f:SetPoint("TOPLEFT", -15, -y);
 				y = y+f:GetHeight();
 				
-				local sub = f.objectives;
+				local obFrames = f.objectives;
 				local objectives = quest:getCurrentObjectives();
 				local n = 0
 				for _,obj in pairs(objectives) do
+					local sub = obFrames[n+1];
 					local text = obj.name;
 					if obj.num > 1 then 
 						text = obj.current_num.."/"..obj.num .. " " .. text;
@@ -561,7 +625,15 @@ UI = {}
 					--sub:SetHeight(height);
 					local base = 8;
 					local h = height+2;
-					sub:SetPoint("TOPLEFT", f.Text, "BOTTOMLEFT", -10, -base-h*n);
+					local point = f.Text;
+					local left = -10;
+					if n > 0 then
+						point = obFrames[n];
+						left = 0;
+						base = 0;
+						h = h-2;
+					end
+					sub:SetPoint("TOPLEFT", point, "BOTTOMLEFT", left, -base-h*n);
 					y = y+base+h;
 					n = n+1;
 				end
@@ -579,9 +651,62 @@ UI = {}
 
 
 		-- ACTIVE QUEST
-		local quest = quests[1];
+		local quest = Quest.get(UI.quests.selected);
+		local right = UI.quests.right.scrollchild;
+		local objectives = quest:getCurrentObjectives();
 		
 
+		right.header:SetText(quest.name);
+		local out = "";
+		for _,obj in pairs(objectives) do
+			local text = obj.name;
+			local sub = right.progress;
+			if obj.num > 1 then 
+				text = obj.current_num.."/"..obj.num .. " " .. text;
+			end
+			text = " - "..text.."\n";
+			out = out..text;
+		end
+		right.progress:SetText(out);
+
+		right.desc:SetText(quest.journal_entry);
+		
+		--rewards
+		for i=1,6 do
+			local f = right.rewardFrames[i];
+			if quest.rewards[i] then
+				f:Show();
+				local data = quest.rewards[i]:getTalkboxData();
+				f.Name:SetText(data.name);
+				f.Icon:SetTexture(data.icon);
+				f.Count:Hide();
+				if data.quant > 1 then
+					f.Count:Show();
+					f.Count:SetText(data.quant);
+				end
+			else
+				f:Hide();
+			end
+		end
+
+
+		local height = 
+			right.header:GetHeight()+
+			right.progress:GetHeight()+
+			right.desc:GetHeight()+
+			right.descTitle:GetHeight()*2+
+			#quest.rewards*50+
+			-250;
+		
+		print(#quest.rewards)
+		right:SetSize(UI.quests.right:GetWidth(), height+300);
+		if height < 1 then 
+			UI.quests.right.scroll:Hide();
+			UI.quests.right.scroll:SetMinMaxValues(1, 1);
+		else
+			UI.quests.right.scroll:Show();
+			UI.quests.right.scroll:SetMinMaxValues(1, height);
+		end
 	end
 	UI.quests.open = function()
 		PanelTemplates_SetTab(UI.FRAME, 2);
@@ -653,7 +778,54 @@ UI = {}
 			elseif button == "RightButton" then
 				UI.talkbox.back();
 			end
-		end);		
+		end);	
+		
+
+		fr.rewards = {};
+		for i=1,6 do
+			local rewards = CreateFrame("Button", nil, talkbox, "QuestItemTemplate");
+			local pointA, pointB = "TOPLEFT", "BOTTOMLEFT";
+			local ofsmul = 1;
+			if i%2 == 0 then
+				pointA = "TOPRIGHT";
+				pointB = "BOTTOMRIGHT";
+				ofsmul = -14;
+			end
+			local multi = math.floor((i-1)/2)*60;
+			rewards:SetPoint(pointA, fr, pointB, 20+10*ofsmul, 10-multi);
+			rewards.index = i;
+			--DisplayTableInspectorWindow(rewards)
+			rewards.Name:SetText("Reward Name");
+			rewards.Icon:SetTexture("Interface/Icons/achievement_character_pandaren_female");
+			--rewards:SetSize(200,50);
+			rewards.NameFrame:SetPoint("left", 43, -10);
+			rewards.NameFrame:SetSize(220,90);
+			rewards.Icon:SetSize(60,60);
+			rewards.Icon:SetPoint("left", rewards, "left", 0, 0);
+			rewards.Name:SetPoint("left", 70,-10);
+
+			rewards:SetScript("OnEnter", function(self)
+				local reward = Quest.get(UI.quests.selected).rewards[self.index];
+				UI.quests.tooltip(reward.type, reward.id, self);
+			end);
+			rewards:SetScript("OnLeave", function(self)
+				local reward = Quest.get(UI.quests.selected).rewards[self.index];
+				UI.quests.tooltip(reward.type, reward.id);
+			end);
+			
+			table.insert(fr.rewards, rewards);
+		end
+
+		local closeButton = CreateFrame("Button", nil, fr, "UIPanelCloseButton");
+		closeButton:SetSize(40,40);
+		closeButton.close = closeButton;
+		closeButton:SetPoint("TOPRIGHT", 0, 0);
+		closeButton:Show();
+		closeButton:RegisterForClicks("LeftButtonUp");
+		closeButton:SetScript("OnClick", function(self, button)
+			UI.talkbox.hide();
+			PlaySound(879, "Dialog");
+		end);
 
 		local bg = fr:CreateTexture(nil, "BACKGROUND");
 		bg:SetAllPoints(fr);
@@ -735,6 +907,23 @@ UI = {}
 		fr.title:SetText(talkbox.title);
 		fr.model:SetDisplayInfo(talkbox.displayInfo);
 		fr.model:SetCamera(0);
+
+		local rewards = fr.rewards;
+		for i=1,6 do
+			local f = rewards[i];
+			f:Hide();
+			f.Count:Hide();
+			if type(talkbox.rewards) == "table" and talkbox.rewards[i] then
+				f:Show();
+				f.Name:SetText(talkbox.rewards[i].name);
+				f.Icon:SetTexture(talkbox.rewards[i].icon);
+				if talkbox.rewards[i].quant > 1 then
+					f.Count:SetText(talkbox.rewards[i].quant);
+					f.Count:Show();
+				end
+			end
+		end
+
 		UI.talkbox.draw();
 		UI.talkbox.frame:Show();
 	end

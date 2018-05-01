@@ -25,6 +25,7 @@ Talkbox.__index = Talkbox;
 		self.displayInfo = data.displayInfo; 	-- Find the NPC on wowhead, edit source and search for ModelViewer.show, that has the displayid
 		self.title = data.title;				-- Title of talkbox
 		self.onComplete = data.onComplete;		-- Function to run when completed
+		self.rewards = data.rewards;			-- {{name = name, icon=icon, quant=quant}...}
 
 		return self
 	end
