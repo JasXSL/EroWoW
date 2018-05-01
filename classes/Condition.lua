@@ -337,7 +337,6 @@ Condition.__index = Condition;
 						GetItemInfo(id)
 					out = itemType == "Armor" and (data.type ~= nil and Tools.multiSearch(itemSubType, data.type))
 				end
-				out = Character:hasInventory(data);
 			end
 		elseif t == ty.RTYPE_UNDIES then
 			local und = targ:getUnderwear();

@@ -185,6 +185,7 @@ UI = {}
 
 	
 	function UI.setPage(tab, playSound)
+		if tab == nil then return end
 		local pages = {"actionPage", "quests", "underwearPage", "localSettings"};
 		if not pages[tab] then print("UI Page not found", tab); return end
 		PanelTemplates_SetTab(UI.FRAME, tab);

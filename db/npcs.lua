@@ -72,6 +72,8 @@ function internal.build.npcs()
 	ext:addNPC({id="Uprooted Lasher",tags={"LASHER", "VINES"}});
 	ext:addNPC({id="Lashvine",tags={"LASHER", "VINES"}});
 	ext:addNPC({id="%Lasher",tags={"LASHER"}});
+	ext:addNPC({id="Mature Deathblossom",tags={"LASHER"}});
+	
 
 	ext:addNPC({id="Nether Maiden",tags={"SUCCUBUS", "LASHER"}, gender=3});
 	ext:addNPC({id="Salia",tags={"SUCCUBUS", "LASHER"}, gender=3});
@@ -96,6 +98,7 @@ function internal.build.npcs()
 	ext:addNPC({id="Thistleleaf Ruffian",tags={"FISTFIGHTER", "SMALL"}});
 	ext:addNPC({id="Thistleleaf Menace",tags={"FISTFIGHTER", "SMALL"}});
 	ext:addNPC({id="Thistleleaf Thorndancer",tags={"FISTFIGHTER", "SMALL"}});
+	ext:addNPC({id="Southsea Sailor",tags={"FISTFIGHTER", "MEDIUM"}});
 	
 
 	-- World containers can also use tags

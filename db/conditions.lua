@@ -43,7 +43,7 @@ function internal.build.conditions()
 	ext:addCondition({id="attackerIsFeltotem", type=ty.RTYPE_TAG, data={"NPC_FELTOTEM"}, sender=true});
 	ext:addCondition({id="attackerIsBogshambler", type=ty.RTYPE_TAG, data={"NPC_BOG_SHAMBLER"}, sender=true});
 	ext:addCondition({id="attackerNotLarge", type=ty.RTYPE_TAG, data={"NPC_LARGE", "NPC_GIANT"}, sender=true, inverse=true});
-	ext:addCondition({id="attackerIsSmall", type=ty.RTYPE_TAG, data={"NPC_SMALL"}, sender=true, inverse=true});
+	ext:addCondition({id="attackerIsSmall", type=ty.RTYPE_TAG, data={"NPC_SMALL"}, sender=true});
 	ext:addCondition({id="attackerIsFistfighter", type=ty.RTYPE_TAG, data={"NPC_FISTFIGHTER"}, sender=true});
 	
 
@@ -56,6 +56,8 @@ function internal.build.conditions()
 	ext:addCondition({id="invFeathers", type=ty.RTYPE_HAS_INVENTORY, data={{name="Light Feather"}}});
 	ext:addCondition({id="chestPlate", type=ty.RTYPE_EQUIPMENT, data={slot=5, type="Plate"}});
 	ext:addCondition({id="chestLightArmor", type=ty.RTYPE_EQUIPMENT, data={slot=5, type={Leather=true, Cloth=true}}});
+	ext:addCondition({id="chestHeavyArmor", type=ty.RTYPE_EQUIPMENT, data={slot=5, type={Plate=true, Mail=true}}});
+	ext:addCondition({id="legsHeavyArmor", type=ty.RTYPE_EQUIPMENT, data={slot=7, type={Plate=true, Mail=true}}});
 	ext:addCondition({id="crotchPlate", type=ty.RTYPE_EQUIPMENT, data={slot=7, type="Plate"}});
 	
 
