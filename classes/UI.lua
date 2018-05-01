@@ -371,7 +371,7 @@ UI = {}
 		-- Left side
 			local fr = CreateFrame("ScrollFrame", nil, ExiWoWSettingsFrame_page_quests);
 			UI.quests.left = fr;
-			fr:SetSize(200, 290);
+			fr:SetSize(160, 290);
 			fr:SetPoint("TOPLEFT", 15, -25);
 
 			fr:EnableMouse(true)
@@ -417,7 +417,7 @@ UI = {}
 		-- Right side
 			fr = CreateFrame("ScrollFrame", nil, ExiWoWSettingsFrame_page_quests);
 			UI.quests.right = fr;
-			fr:SetSize(205, 290);
+			fr:SetSize(245, 290);
 			fr:SetPoint("TOPRIGHT", -15, -25);
 
 			fr:EnableMouse(true)
@@ -463,6 +463,14 @@ UI = {}
 			scrollchild.progress = progress;
 			progress:SetText("Progress goes here");
 			progress:SetWidth(scrollchild:GetWidth());
+
+			local handin = CreateFrame("Button", nil, scrollchild, "UIPanelButtonTemplate");
+			handin:SetSize(120, 25);
+			handin:SetPoint("CENTER", progress, "CENTER", 0, -3);
+			handin:SetText("Finish Quest");
+			handin:SetScript("OnClick", UI.quests.handinClicked);
+			handin:Hide();
+			scrollchild.handin = handin;
 
 			local description = scrollchild:CreateFontString(nil, "BACKGROUND", "QuestTitleFont");
 			description:SetTextColor(1,1,1,1);
@@ -538,12 +546,12 @@ UI = {}
 
 		if not UI.quests.listingFrames[index] then
 			local ab = CreateFrame("Button", nil, UI.quests.left.scrollchild, "QuestLogTitleTemplate");
-			ab.Text:SetWidth(UI.quests.left.scrollchild:GetWidth()-10);
+			ab.Text:SetWidth(UI.quests.left.scrollchild:GetWidth()-15);
 			local objectives = {};
 
 			for i=1,4 do
 				local sub = CreateFrame("FRAME", nil, ab, "QuestLogObjectiveTemplate");
-				sub.Text:SetWidth(UI.quests.left.scrollchild:GetWidth()-10);
+				sub.Text:SetWidth(UI.quests.left.scrollchild:GetWidth()-15);
 				table.insert(objectives, sub);
 			end
 			ab.objectives = objectives;
@@ -556,6 +564,13 @@ UI = {}
 			
 		end
 		return UI.quests.listingFrames[index];
+	end
+
+	function UI.quests.handinClicked()
+		local quest = Quest.get(UI.quests.selected);
+		if quest and quest:isReadyToHandIn() and quest:isDetachedHandin() then
+			quest:handIn();
+		end
 	end
 
 	function UI.quests.tooltip(itemType, itemID, frame)
@@ -596,6 +611,7 @@ UI = {}
 			return;
 		end
 
+
 		-- LISTING
 		local i, y = 0, 0;
 		while i<#UI.quests.listingFrames or i<#quests do
@@ -610,8 +626,24 @@ UI = {}
 				f:SetPoint("TOPLEFT", -15, -y);
 				y = y+f:GetHeight();
 				
+				
 				local obFrames = f.objectives;
+				for _,of in pairs(obFrames) do of:Hide(); end
+
 				local objectives = quest:getCurrentObjectives();
+
+				if not objectives then
+					objectives = {
+						Quest.Objective:new({
+							name = quest.end_journal,
+							num = 1,
+						})
+					};
+					local sub = obFrames[1];
+					sub.Text:SetText("- "..quest.end_journal);
+					sub:Show();
+				end
+
 				local n = 0
 				for _,obj in pairs(objectives) do
 					local sub = obFrames[n+1];
@@ -637,6 +669,8 @@ UI = {}
 					y = y+base+h;
 					n = n+1;
 				end
+
+				
 			end
 		end
 
@@ -658,16 +692,33 @@ UI = {}
 
 		right.header:SetText(quest.name);
 		local out = "";
-		for _,obj in pairs(objectives) do
-			local text = obj.name;
-			local sub = right.progress;
-			if obj.num > 1 then 
-				text = obj.current_num.."/"..obj.num .. " " .. text;
+		if not objectives then
+			if quest:isDetachedHandin() then
+				right.progress:Hide();
+				right.handin:Show();
+			else
+				objectives = {
+					Quest.Objective:new({
+						name = quest.end_journal,
+						num = 1
+					})
+				};
 			end
-			text = " - "..text.."\n";
-			out = out..text;
 		end
-		right.progress:SetText(out);
+
+		if objectives then
+			right.progress:Show();
+			for _,obj in pairs(objectives) do
+				local text = obj.name;
+				local sub = right.progress;
+				if obj.num > 1 then 
+					text = obj.current_num.."/"..obj.num .. " " .. text;
+				end
+				text = " - "..text.."\n";
+				out = out..text;
+			end
+			right.progress:SetText(out);
+		end
 
 		right.desc:SetText(quest.journal_entry);
 		
@@ -680,7 +731,7 @@ UI = {}
 				f.Name:SetText(data.name);
 				f.Icon:SetTexture(data.icon);
 				f.Count:Hide();
-				if data.quant > 1 then
+				if data.quant > 1 and data.quant < math.huge then
 					f.Count:Show();
 					f.Count:SetText(data.quant);
 				end
@@ -698,7 +749,6 @@ UI = {}
 			#quest.rewards*50+
 			-250;
 		
-		print(#quest.rewards)
 		right:SetSize(UI.quests.right:GetWidth(), height+300);
 		if height < 1 then 
 			UI.quests.right.scroll:Hide();
@@ -805,11 +855,11 @@ UI = {}
 			rewards.Name:SetPoint("left", 70,-10);
 
 			rewards:SetScript("OnEnter", function(self)
-				local reward = Quest.get(UI.quests.selected).rewards[self.index];
+				local reward = Quest.get(UI.talkbox.active.id).rewards[self.index];
 				UI.quests.tooltip(reward.type, reward.id, self);
 			end);
 			rewards:SetScript("OnLeave", function(self)
-				local reward = Quest.get(UI.quests.selected).rewards[self.index];
+				local reward = Quest.get(UI.talkbox.active.id).rewards[self.index];
 				UI.quests.tooltip(reward.type, reward.id);
 			end);
 			
@@ -846,7 +896,6 @@ UI = {}
 		model:SetPoint("LEFT", 25, 0);
 		model:SetDisplayInfo(17781); -- Find the NPC on wowhead, edit source and search for ModelViewer.show, that has the displayid
 		model:SetCamera(0);
-
 
 		local border = CreateFrame("Frame", nil, model);
 		border:SetAllPoints();
@@ -907,6 +956,9 @@ UI = {}
 		fr.title:SetText(talkbox.title);
 		fr.model:SetDisplayInfo(talkbox.displayInfo);
 		fr.model:SetCamera(0);
+		Timer.set(function()
+			fr.model:SetCamera(0);
+		end, 0.01);
 
 		local rewards = fr.rewards;
 		for i=1,6 do
@@ -917,7 +969,7 @@ UI = {}
 				f:Show();
 				f.Name:SetText(talkbox.rewards[i].name);
 				f.Icon:SetTexture(talkbox.rewards[i].icon);
-				if talkbox.rewards[i].quant > 1 then
+				if talkbox.rewards[i].quant > 1  and talkbox.rewards[i].quant < math.huge then
 					f.Count:SetText(talkbox.rewards[i].quant);
 					f.Count:Show();
 				end

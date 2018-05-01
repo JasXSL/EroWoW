@@ -68,6 +68,23 @@ function internal.build.rptexts()
 	})
 	
 
+	--SHOCKTACLE
+	ext:addRpText({
+		id = "SHOCKTACLE",
+		text_bystander = "%S lashes %T with a lightning tentacle!",
+		text_sender = "You lash %T with your lightning tentacle!",
+		text_receiver = "%S lashes you with %Shis lightning tentacle!",
+		sound = 3338,
+		requirements = {},
+	})
+	ext:addRpText({
+		id = "SHOCKTACLE",
+		text_bystander = "%S lashes %Shimself with a lightning tentacle!",
+		text_receiver = "You lash yourself with your lightning tentacle!",
+		sound = 3338,
+		requirements = {},
+	})
+
 	-- Insect swarm
 	ext:addRpText({
 		text_receiver = "The insects get into your equipment, skittering across your body!",

@@ -367,8 +367,11 @@ function internal.build.actions()
 		charges = 0,
 		texture = "trade_archaeology_nerubianspiderscepter",
 		cast_sound_success = 5419,
-		rarity = 4,
+		rarity = 3,
 		cooldown = 300, --300
+		conditions = {
+			Condition.get("caster_range"),
+		},
 		fn_send = function(self, sender, target, suppressErrors)
 			return self:sendRPText(sender, target, suppressErrors);
 		end,
@@ -376,6 +379,40 @@ function internal.build.actions()
 			self:receiveRPText(sender, target, args);
 			local ef = Effect.get(self.id);
 			ef:add(1);
+			return true
+		end
+	});
+
+
+	extension:addAction({
+		id = "SHOCKTACLE",
+		name = "Shocktacle",
+		description = "A lightning tentacle taken off a Fen Strider. Use it to lash your target.",
+		charges = 0,
+		texture = "ability_thunderking_lightningwhip",
+		rarity = 3,
+		cooldown = 60,
+		conditions = {
+			Condition.get("melee_range"),
+		},
+		no_defaults = {
+			"party_restricted"
+		},
+		fn_send = function(self, sender, target, suppressErrors)
+			local race = UnitRace(target);
+			local gender = UnitSex(target);
+			return self:sendRPText(sender, target, suppressErrors, function(se, success)
+				if success and not UnitIsUnit(target, "player") then
+					Func.get("painSound")(race, gender)
+					PlaySound(21455, "SFX");
+				end
+			end);
+		end,
+		fn_receive = function(self, sender, target, args)
+			DoEmote("whine", Ambiguate(sender, "all"));
+			self:receiveRPText(sender, target, args);
+			Func.get("addExcitementMasochisticCrit")();
+			PlaySound(21455, "SFX");
 			return true
 		end
 	});

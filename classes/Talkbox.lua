@@ -21,6 +21,7 @@ Talkbox.__index = Talkbox;
 		setmetatable(self, Talkbox);
 
 		-- Lines of text
+		self.id = data.id;
 		self.lines = data.lines;				-- Paragraphs
 		self.displayInfo = data.displayInfo; 	-- Find the NPC on wowhead, edit source and search for ModelViewer.show, that has the displayid
 		self.title = data.title;				-- Title of talkbox
