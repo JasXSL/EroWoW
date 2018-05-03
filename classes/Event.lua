@@ -3,14 +3,16 @@ local export = internal.Module.export;
 local require = internal.require;
 local evtFrame = CreateFrame("Frame");
 
-local RPText, Character, Index, Action;
+local RPText, Character, Index, Action, Timer;
 
 local Event = {}
 	Event.index = 0
-	Event.bindings = {}		-- {id={event:(str)event, callback:(str)callback}...}
+	Event.bindings = {}		-- {id={event:(str)event, callback:(str)callback, data:(obj)data}...}
 	Event.AURAS = {}
 	Event.lootContainer = nil					-- Loot container name when looting a container through the "Open" spell
 	Event.lootSpell = nil
+	Event.pointTimer = nil;						-- Timer checking the POINT_REACHED event
+	Event.pointCheck = {};						-- Events for which to check points
 
 	-- Custom events
 	-- Keep in mind events bound in Event.TYPES will also be raised
@@ -32,6 +34,7 @@ local Event = {}
 		ACTION_UNDERWEAR_UNEQUIP = "ACTION_UNDERWEAR_UNEQUIP",		-- {id=id}
 		ACTION_SETTING_CHANGE = "ACTION_SETTING_CHANGE",			-- void
 
+
 		SWING = "SWING",											-- Melee swing {unit=unit, name=senderName}
 		SPELL_ADD = "SPELL_ADD",									-- Spell added {aura=see buildSpellTrigger, unit=unit, name=NPCName}
 		SPELL_REM = "SPELL_REM",									-- Spell removed --||--
@@ -41,6 +44,9 @@ local Event = {}
 		FORAGE = "FORAGE",											-- void
 
 		CONTAINER_OPENED = "CONTAINER_OPENED",						-- {autoloot:1/0, action:"Herb Gathering"/"Open" etc, container:"Starlight Rose" etc} World container opened			
+		ZONE_CHANGED = "ZONE_CHANGED",
+		POINT_REACHED = "POINT_REACHED",							-- Requires input: {zone=zone, sub=sub, x=x, y=y, dist=distance}, no data output
+		GOSSIP_SHOW = "GOSSIP_SHOW",								-- Blizzard event
 	}
 
 	function Event.ini()
@@ -48,7 +54,7 @@ local Event = {}
 		Character = require("Character");
 		Index = require("Index");
 		Action = require("Action");
-		
+		Timer = require("Timer");
 
 		evtFrame:SetScript("OnEvent", Event.onEvent)
 		evtFrame:RegisterEvent("PLAYER_STARTED_MOVING")
@@ -64,10 +70,43 @@ local Event = {}
 		evtFrame:RegisterEvent("UNIT_SPELLCAST_SENT");
 		evtFrame:RegisterUnitEvent("UNIT_SPELLCAST_FAILED", "player")
 		evtFrame:RegisterUnitEvent("UNIT_SPELLCAST_FAILED_QUIET", "player")
-
+		evtFrame:RegisterEvent("ZONE_CHANGED");
 		evtFrame:RegisterEvent("LOOT_OPENED");
 		evtFrame:RegisterEvent("LOOT_SLOT_CLEARED");
 		evtFrame:RegisterEvent("LOOT_CLOSED");
+		evtFrame:RegisterEvent("GOSSIP_SHOW");
+	end
+
+	function Event.rebindPointReached()
+		Event.pointCheck = {};
+		for id,b in pairs(Event.bindings) do
+			if 
+				b.event == Event.Types.POINT_REACHED and
+				type(b.data) == "table" and
+				(b.data.zone == GetRealZoneText() or not b.data.zone) and
+				(b.data.sub == GetSubZoneText() or not b.data.sub) 
+			then
+				Event.pointCheck[id] = b;
+			end
+		end
+		if next(Event.pointCheck) == nil then
+			Timer.clear(Event.pointTimer);
+		else
+			Event.pointTimer = Timer.set(Event.checkPoints, 1, math.huge);
+		end
+	end
+
+	function Event.checkPoints()
+		SetMapToCurrentZone();
+		local px,py = GetPlayerMapPosition("player");
+		px = px*100; py = py*100;
+		for id,b in pairs(Event.pointCheck) do
+			if not b.data.x or not b.data.y or not b.data.dist or
+				math.sqrt(math.pow(px-b.data.x, 2)+math.pow(py-b.data.y, 2)) <= b.data.dist
+			then
+				Event.trigger(id);
+			end
+		end
 	end
 
 
@@ -208,6 +247,9 @@ local Event = {}
 			--print(event, ...)
 		end
 
+		if event == "ZONE_CHANGED" then
+			Event.rebindPointReached();
+		end
 
 		if event == "PLAYER_TARGET_CHANGED" then
 			UI.portrait.targetHasExiWoWFrame:Hide();
@@ -305,7 +347,7 @@ local Event = {}
 	end
 
 
-	function Event.on(event, callback)
+	function Event.on(event, callback, data, max_triggers)
 		if type(callback) ~= "function" then 
 			print("Callback in event binding is not a function, got", type(callback));
 			print(debugstack());
@@ -316,13 +358,20 @@ local Event = {}
 			print(debugstack())
 		end
 		Event.index = Event.index + 1;
-		Event.bindings[Event.index] = {event=event, callback=callback}
+		Event.bindings[Event.index] = {event=event, callback=callback, data=data, max=max_triggers or math.huge};
+		if event == Event.Types.POINT_REACHED then
+			Event.rebindPointReached();
+		end
 		return Event.index
 	end
 
 	function Event.off(id)
 		if id == nil then return end
-		Event.bindings[id] = nil
+		local evt = Event.bindings[id];
+		Event.bindings[id] = nil;
+		if evt and evt.event == Event.Types.POINT_REACHED then
+			Event.rebindPointReached();
+		end
 	end
 
 	function Event.raise(evt, data)
@@ -332,12 +381,23 @@ local Event = {}
 		end
 		-- Prevents recursion
 		local splice = {}
-		for _,v in pairs(Event.bindings) do
-			table.insert(splice, v);
+		for id,v in pairs(Event.bindings) do
+			splice[id] = v;
 		end
-		for _,v in pairs(splice) do
+		for id,v in pairs(splice) do
 			if v.event == evt then
-				v.callback(data, evt)
+				Event.trigger(id, data);
+			end
+		end
+	end
+
+	function Event.trigger(id, data)
+		
+		local v = Event.bindings[id];
+		if v.callback(data, v.event) ~= false then
+			v.max = v.max-1;
+			if v.max <= 0 then
+				Event.off(id);
 			end
 		end
 	end

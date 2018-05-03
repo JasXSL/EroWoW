@@ -11,9 +11,13 @@ function internal.Gateway()
 	local Action = require("Action");
 	local Database = require("Database");
 	local Timer = require("Timer");
+	local Index = require("Index");
+
 
 	-- Swing
 	local function onSwing(unit, sender, crit)
+		if not Index.checkHardLimits(sender, "player", true) then return end
+
 		local chance = globalStorage.swing_text_freq;
 		if crit ~= "" then 
 			chance = chance*4;
@@ -45,6 +49,7 @@ function internal.Gateway()
 	-- See buildSpellTrigger in Event for aura
 	-- name is the name of the unit
 	local function onSpell(event, aura, unit, name)
+		if not Index.checkHardLimits(unit, "player", true) then return end
 
 		local chance = 1;
 		if event == Event.SPELL_TICK then
@@ -135,7 +140,9 @@ function internal.Gateway()
 		return false
 
 	end
-	Event.on(Event.Types.MONSTER_KILL, function(data) 
+	Event.on(Event.Types.MONSTER_KILL, function(data)
+		if not Index.checkHardLimits("player", "player", true) then return end
+		
 		rollLoot(Event.Types.MONSTER_KILL, data.name); 
 		RPText.trigger(nil, data.name, "player", Character.buildNPC("none", data.name), ExiWoW.ME, {}, Event.Types.MONSTER_KILL);
 	end);
@@ -149,6 +156,8 @@ function internal.Gateway()
 	-- World containers
 	local scanned_containers = {};
 	Event.on(Event.Types.CONTAINER_OPENED, function(data)
+		if not Index.checkHardLimits("player", "player", true) then return end
+
 		--print("Container opened", ExiWoW.json.encode(data));
 		for i=1, GetNumLootItems() do
 			local items = {GetLootSourceInfo(i)};

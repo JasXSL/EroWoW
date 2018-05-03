@@ -2,7 +2,7 @@ local appName, internal = ...
 local export = internal.Module.export;
 local require = internal.require;
 
-local Database, Character, Timer, Event;
+local Database, Character, Timer, Event, Tools;
 
 local Effect = {}
 	Effect.__index = Effect;
@@ -14,6 +14,7 @@ local Effect = {}
 		Character = require("Character");
 		Event = require("Event");
 		Timer = require("Timer");
+		Tools = require("Tools");
 	end
 
 	function Effect:new(data)
@@ -36,6 +37,7 @@ local Effect = {}
 		self.onStackChange = data.onStackChange			-- (obj)activeData, (bool)fromLogin
 		self.onRightClick = data.onRightClick			-- Right click binding
 
+		self.tags = type(data.tags) == "table" and data.tags or {};	-- Not a set, just id, id1, id2...
 
 		-- Automatic
 		self.loopPlaying = nil
@@ -190,6 +192,14 @@ local Effect = {}
 		end)
 	end
 
+	function Effect:hasTag(tag)
+		for _,t in pairs(self.tags) do
+			if Tools.multiSearch(t, tag) then
+				return true;
+			end
+		end
+	end
+
 
 
 	-- Static
@@ -270,6 +280,27 @@ local Effect = {}
 		end
 	end
 
+	function Effect.remByTags(...)
+		local args = {...};
+		for _,tag in pairs(args) do
+			for id,fx in pairs(Effect.applied) do
+				if fx.effect:hasTag(tag) then
+					Effect.rem(id);
+				end
+			end
+		end
+	end
+
+	function Effect.remByTagsNotThis(th, ...)
+		local args = {...};
+		for _,tag in pairs(args) do
+			for id,fx in pairs(Effect.applied) do
+				if fx.effect:hasTag(tag) and fx.effect ~= th then
+					Effect.rem(id);
+				end
+			end
+		end
+	end
 
 	-- Hook for official methods, Don't remove the colon : 
 	function Effect:AuraButtonUpdate(buttonName, index, filter, effect)

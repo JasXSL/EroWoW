@@ -4,6 +4,7 @@ local require = internal.require;
 
 local RPText, Character, Tools, Database, Action, Event, Talkbox, Underwear, UI;
 
+
 local Quest = {};
 Quest.progress = {};		-- Pointer to localStorage, can be modified directly, but don't overwrite it
 --[[ 
@@ -46,19 +47,26 @@ Quest.__index = Quest;
 		self.rewards = data.rewards or {};				-- Use reward object
 		
 		self.journal_entry = data.journal_entry or "";
-		self.questgiver = data.questgiver or 0;			-- displayInfo in Talkbox
+		self.questgiver = data.questgiver or 0;			-- displayInfo in Talkbox. Find the NPC on wowhead, edit source and search for ModelViewer.show, that has the displayid
 		self.questfinisher = data.questfinisher or self.questgiver;
 		self.active = data.active or false;				-- Picked up
 		
 		self.listeners = {};							-- Event listeners, these are added when a quest is loaded and not completed or active, unloaded when a quest is picked up
 
+
 		self.start_text = data.start_text or {};		-- Paragraphs for the initializing talkbox
-		self.start_events = data.start_events or {};	-- Events to listen to {event=function} to start the quest
+		self.start_events = data.start_events or {};	-- Events to listen to {{event=event, data=eventdata, fn = function, max=max_triggers or inf}...} to start the quest
+		
 
 		self.end_journal = data.end_journal or "Claim your reward";
 		self.end_text = data.end_text or {};			-- Paragraphs for the outro talkbox
 		self.end_events = data.end_events or nil;		-- Events to listen to to finish the quest. If nil, it's an auto handin anywhere
-		
+		if data.end_events == true then
+			self.end_events = self.start_events;		-- If end_events are boolean true, then make them the same as start events. Useful for NPCs that start AND end a quest
+		end
+
+		-- Events
+		self.onCompletion = data.onCompletion;			-- Raised when quest is handed in
 	
 		if type(self.start_text) ~= "table" then
 			self.start_text = {self.start_text};
@@ -114,13 +122,15 @@ Quest.__index = Quest;
 	function Quest:rebindObjectives()
 		for k,v in pairs(self.objectives) do
 			for _,o in pairs(v) do
-				o:onObjectiveDisable();
+				o:disable();
 			end
 		end
 		local active = self:getCurrentObjectives();
 		if active then
 			for _,o in pairs(active) do
-				o:onObjectiveEnable();
+				if not o:completed() then
+					o:enable();
+				end
 			end
 		end
 	end
@@ -146,7 +156,7 @@ Quest.__index = Quest;
 					Event.off(evt);
 				end
 				q:initialize();
-				RPText.print("Quest accepted: "..self.name);
+				RPText.print("Quest accepted: "..q.name);
 			end
 		});
 		PlaySound(23404, "Dialog");
@@ -177,6 +187,10 @@ Quest.__index = Quest;
 
 		for _,reward in pairs(self.rewards) do
 			ExiWoW.ME:addItem(reward.type, reward.id, reward.quant);
+		end
+
+		if self.onCompletion then
+			self:onCompletion();
 		end
 
 		PlaySound(878, "Dialog");
@@ -216,20 +230,6 @@ Quest.__index = Quest;
 		end
 	end
 
-	function Quest:onPickupEvt(data, event)
-		if not self.start_events[event] then return end
-		if self.start_events[event](self, data) then
-			self:offer();
-		end
-	end
-
-	function Quest:onHandinEvt(data, event)
-		if not self.end_events[event] then return end
-		if self.end_events[event](self, data) then
-			self:handIn();
-		end
-	end
-
 	function Quest:load(data)
 		if data.completed then
 			self.completed = data.completed;
@@ -258,17 +258,23 @@ Quest.__index = Quest;
 		if not self.completed and not self.active then
 			-- Bind events
 			local se = self;
-			for evt,fn in pairs(self.start_events) do
-				table.insert(self.listeners, Event.on(evt, function(...)
-					se:onPickupEvt(...);
-				end));
+			for _,data in pairs(self.start_events) do
+				table.insert(self.listeners, Event.on(data.event, function(dta, event)
+					if UI.talkbox.getActive() then return end
+					if data.fn(self, dta) then
+						self:offer();
+					end
+				end, data.data, data.max));
 			end
 		elseif not self.completed and self:isReadyToHandIn() then
 			if not self:isDetachedHandin() then
-				for evt,fn in self.end_events do
-					table.insert(self.listeners, Event.on(evt, function(...)
-						se:onHandinEvt(...);
-					end));
+				for _,data in pairs(self.end_events) do
+					table.insert(self.listeners, Event.on(data.event, function(dta, event)
+						if UI.talkbox.getActive() then return end
+						if data.fn(self, dta) then
+							self:handIn();
+						end
+					end, data.data, data.max));
 				end
 			else
 				self:handIn();
@@ -306,8 +312,29 @@ Quest.__index = Quest;
 		return out;
 	end
 
+	function Quest.isCompleted(...)
+		local all = Database.filter("Quest");
+		local args = {...};
+		for _,id in pairs(args) do
+			for _,q in pairs(all) do
+				if q.id == id and q.completed then
+					return true
+				end
+			end
+		end
+	end
 
-
+	function Quest.isActive(...)
+		local all = Database.filter("Quest");
+		local args = {...};
+		for _,id in pairs(args) do
+			for _,q in pairs(all) do
+				if q.id == id and q.active then
+					return true
+				end
+			end
+		end
+	end
 
 
 
@@ -334,7 +361,30 @@ Objective.__index = Objective;
 		self.quest = nil;
 		self.data = data.data or {};							-- Any custom data
 
+		self.events = {};										-- Bound events
+
 		return self;
+	end
+
+	function Objective:enable()
+		if type(self.onObjectiveEnable) == "function" then
+			self:onObjectiveEnable();
+		end
+	end
+
+	function Objective:disable()
+		for _,v in pairs(self.events) do
+			Event.off(v);
+		end
+		if type(self.onObjectiveDisable) == "function" then
+			self:onObjectiveDisable();
+		end
+	end
+
+	function Objective:on(evt, fn, data, max)
+		local bind = Event.on(evt, fn, data, max);
+		table.insert(self.events, bind);
+		return bind;
 	end
 
 	function Objective:export()
@@ -351,15 +401,19 @@ Objective.__index = Objective;
 		self.quest = quest;
 	end
 
+	function Objective:completed()
+		return self.current_num >= self.num;
+	end
+
 	-- Adds to objective
 	function Objective:add(num)
 		num = num or 1;
 		self.current_num = self.current_num+num;
-		if self.current_num > self.num then
+		if self.current_num >= self.num then
 			self.current_num = self.num;
-			RPText.print(self.name.." completed", true);
+			RPText.print(self.name.." completed");
 		else
-			RPText.print(self.name.." "..self.current_num.."/"..self.num, true);
+			RPText.print(self.name.." "..self.current_num.."/"..self.num);
 		end
 		self.quest:onObjectiveUpdated(self);
 	end
@@ -416,6 +470,8 @@ export(
 	{
 		get = Quest.get,
 		new = Quest.new,
+		isCompleted = Quest.isCompleted,
+		isActive = Quest.isActive,
 		Objective = Objective,
 		Reward = Reward,
 		getActive = Quest.getActive

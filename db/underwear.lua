@@ -135,6 +135,17 @@ function internal.build.underwear()
 	});
 
 	ext:addUnderwear({
+		id = "STRIPED_SHORTS",
+		name = "Striped Shorts",
+		icon = "Inv_pants_cloth_03",
+		rarity = 1,
+		description = "A pair of worn off white shorts with black vertical stripes.",
+		tags = {},
+	});
+
+	
+
+	ext:addUnderwear({
 		id = "BLACK_LACE_PANTIES",
 		name = "Black Lace Panties",
 		icon = "inv_cape_cloth_raidpriest_r_01",

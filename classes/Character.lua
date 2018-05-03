@@ -243,7 +243,7 @@ Character.__index = Character;
 				PlaySound(uw.unequip_sound, "Dialog")
 				RPText.print("You take off your "..uw.name)
 				uw:onUnequip();
-				Event.raise(ACTION_UNDERWEAR_UNEQUIP, {id=id})
+				Event.raise(Event.Types.ACTION_UNDERWEAR_UNEQUIP, {id=id})
 			end
 		elseif self:ownsUnderwear(id) and uw then
 			local cur = Underwear.get(self.underwear_worn)
@@ -252,7 +252,7 @@ Character.__index = Character;
 			PlaySound(uw.equip_sound, "Dialog")
 			uw:onEquip();
 			RPText.print("You put on your "..uw.name)
-			Event.raise(ACTION_UNDERWEAR_EQUIP, {id=id})
+			Event.raise(Event.Types.ACTION_UNDERWEAR_EQUIP, {id=id})
 		else return false
 		end
 		UI.underwearPage.update();
@@ -270,7 +270,7 @@ Character.__index = Character;
 		for k,u in pairs(self.underwear_ids) do
 			if id == u.id then 
 				self.underwear_ids[k] = nil
-				print("Underwear removed")
+				UI.underwearPage.update();
 				return true
 			end
 		end
@@ -460,7 +460,7 @@ export(
 	"Character", 
 	Character,
 	{
-		
+		buildNPC = Character.buildNPC
 	},
 	Character
 )

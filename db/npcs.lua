@@ -20,10 +20,8 @@ function internal.build.npcs()
 
 	ext:addNPC({id="%Scorpid",tags={"PINCHY"}});
 	ext:addNPC({id="Desert Crawler",tags={"PINCHY"}});
-	ext:addNPC({id="Duneclaw Burrower",tags={"PINCHY"}});
-	ext:addNPC({id="Duneclaw Lasher",tags={"PINCHY"}});
+	ext:addNPC({id="%Duneclaw",tags={"PINCHY"}});
 	ext:addNPC({id="Duneshore Crab",tags={"PINCHY"}});
-	ext:addNPC({id="Duneclaw Matriarch",tags={"PINCHY"}});
 	ext:addNPC({id="Scorpid Worker",tags={"PINCHY"}});
 	ext:addNPC({id="%Surf Crawler",tags={"PINCHY"}});
 	ext:addNPC({id="Silt Crawler",tags={"PINCHY"}});
@@ -85,6 +83,7 @@ function internal.build.npcs()
 	ext:addNPC({id="%Sludge",tags={"OOZE"}});
 	ext:addNPC({id="Fel Secretion",tags={"OOZE"}});
 	ext:addNPC({id="Boiling Springbubble",tags={"OOZE"}});
+	ext:addNPC({id="Undulating Boneslime",tags={"OOZE"}});
 	
 	ext:addNPC({id="Withervine Creeper",tags={"BOG_SHAMBLER"}});
 	ext:addNPC({id="Withervine Rager",tags={"BOG_SHAMBLER"}});
@@ -93,12 +92,16 @@ function internal.build.npcs()
 
 	ext:addNPC({id="Hazzali Stinger",tags={"SILITHID", "WASP"}});
 	ext:addNPC({id="Gorishi Wasp",tags={"SILITHID", "WASP"}});
+	ext:addNPC({id="Centipaar Wasp",tags={"SILITHID", "WASP"}});
 	
 
 	ext:addNPC({id="Thistleleaf Ruffian",tags={"FISTFIGHTER", "SMALL"}});
 	ext:addNPC({id="Thistleleaf Menace",tags={"FISTFIGHTER", "SMALL"}});
 	ext:addNPC({id="Thistleleaf Thorndancer",tags={"FISTFIGHTER", "SMALL"}});
 	ext:addNPC({id="Southsea Sailor",tags={"FISTFIGHTER", "MEDIUM"}});
+	ext:addNPC({id="Southsea Swabbie",tags={"FISTFIGHTER", "MEDIUM"}});
+	ext:addNPC({id="%Undergrell",tags={"FISTFIGHTER", "SMALL"}});
+	ext:addNPC({id="Mad Henryk",tags={"FISTFIGHTER", "MEDIUM"}});
 	
 
 	-- World containers can also use tags

@@ -245,6 +245,27 @@ function internal.build.loot()
 		}
 	})
 
+
+	--STRIPED_SHORTS
+	ext:addLoot({
+		conditions = {
+			evtIsForage,
+			Condition:new({type=ty.RTYPE_ZONE, data="Thousand Needles", sender=true}),
+			Condition:new({type=ty.RTYPE_HAS_AURA, data={{name="River Boat"}}, sender=true}),
+		},
+		items = {
+			Item:new({
+				type = "Underwear", 
+				id = "STRIPED_SHORTS", 
+				chance = 1,
+				sound = 1185,
+				text = RPText:new({
+					text_receiver = "You find a spare pair of white striped shorts beneath the deck of your boat."
+				})
+			})
+		}
+	});
+
 	ext:addLoot({
 		conditions = {
 			evtIsForage,

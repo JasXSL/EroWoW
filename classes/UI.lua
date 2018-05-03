@@ -648,13 +648,19 @@ UI = {}
 				for _,obj in pairs(objectives) do
 					local sub = obFrames[n+1];
 					local text = obj.name;
-					if obj.num > 1 then 
+					local comp = obj:completed();
+					sub.Text:SetTextColor(0.75,0.75,0.75);
+					if not comp and obj.num > 1 then 
 						text = obj.current_num.."/"..obj.num .. " " .. text;
+					end
+					if comp then
+						text = text.." (Completed)";
+						sub.Text:SetTextColor(0.5,0.5,0.5);
 					end
 					sub.Text:SetText(text);
 					sub:Show();
 					local height = sub.Text:GetHeight();
-					--sub:SetHeight(height);
+					sub:SetHeight(height);
 					local base = 8;
 					local h = height+2;
 					local point = f.Text;
@@ -665,7 +671,7 @@ UI = {}
 						base = 0;
 						h = h-2;
 					end
-					sub:SetPoint("TOPLEFT", point, "BOTTOMLEFT", left, -base-h*n);
+					sub:SetPoint("TOPLEFT", point, "BOTTOMLEFT", left, -base);
 					y = y+base+h;
 					n = n+1;
 				end
@@ -779,6 +785,7 @@ UI = {}
 	-- UI Talkbox for quests and dialog
 	UI.talkbox = {};
 	UI.talkbox.active = nil;	-- Use Talkbox object
+
 	function UI.talkbox.build()
 
 		-- Talkbox
@@ -948,6 +955,10 @@ UI = {}
 		UI.talkbox.hide();
 	end
 
+	function UI.talkbox.getActive()
+		return UI.talkbox.active;
+	end
+
 	function UI.talkbox.set(talkbox)
 		UI.talkbox.active = talkbox;
 		UI.talkbox.page = 1;
@@ -1006,11 +1017,16 @@ UI = {}
 	function UI.talkbox.draw()
 		local tb = UI.talkbox.active;
 		local fr = UI.talkbox.frame.main;
-		fr.description:SetText(tb.lines[UI.talkbox.page]);
+		local line = tb.lines[UI.talkbox.page];
+		if type(line) == "function" then
+			line = line();
+		end
+		fr.description:SetText(line);
 		fr.pagination:SetText(UI.talkbox.page.."/"..#tb.lines);
 	end
 
 	function UI.talkbox.hide()
+		UI.talkbox.active = nil;
 		UI.talkbox.frame:Hide();
 	end
 

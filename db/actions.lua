@@ -309,7 +309,10 @@ function internal.build.actions()
 			Condition.get("only_selfcast"),
 			Condition.get("sender_not_moving"),
 		},
-		not_defaults = {},
+		not_defaults = {
+			"not_in_vehicle",
+			"not_stunned"
+		},
 		fn_cast = function(self, sender, target, suppressErrors)
 			DoEmote("KNEEL", target);
 		end,

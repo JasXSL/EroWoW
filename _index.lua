@@ -38,7 +38,7 @@ ExiWoW.loaded = false;
 
 
 -- Globalstorage and localstorage are persistent variables
-globalStorage = nil
+--globalStorage = nil
 -- GlobalStorage defaults
 local GLOBALSTORAGE_DEFAULTS = {
 	swing_text_freq = 0.15,		-- Percent chance of a swing triggering a special text. Crits are 4x this value
@@ -55,7 +55,7 @@ local GLOBALSTORAGE_DEFAULTS = {
 	tank_mode_perc = 0.05,		-- Tank mode text trigger percentage
 };
 
-localStorage = nil
+--localStorage = nil
 -- LocalStorage defaults
 local LOCALSTORAGE_DEFAULTS = {
 	penis_size = false,
@@ -106,7 +106,8 @@ local Index = {}
 	function Index.onLoad()
 		
 		-- Character must be created before action
-		
+		if type(globalStorage) ~= "table" then globalStorage = {} end
+		if type(localStorage) ~= "table" then localStorage = {} end
 
 		-- Load the required classes here
 		Action = require("Action");
@@ -125,8 +126,7 @@ local Index = {}
 		ExiWoW.ME = Character:new();
 		UI.build();
 
-		if type(globalStorage) ~= "table" then globalStorage = {} end
-		if type(localStorage) ~= "table" then localStorage = {} end
+		
 		
 
 		-- Load defaults into local and globalstorage 
@@ -304,6 +304,7 @@ local Index = {}
 	function Index.onPlayerLogout()
 
 		if Index.blockSave then return false; end
+		if not ExiWoW.loaded then return false; end
 		-- Saving
 		local l = localStorage;
 
@@ -398,6 +399,8 @@ local Index = {}
 		end
 
 		Quest.loadFromStorage();
+
+		ExiWoW.loaded = true;
 		Index.onPlayerLogout()
 		
 	end

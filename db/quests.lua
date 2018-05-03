@@ -18,6 +18,7 @@ function internal.build.quests()
 		journal_entry = "You have found a barely squirming lightning tentacle on a bog strider in Zangarmarsh.\n\nPerhaps if you were to charge it by getting hit by additional lightning tethers, it could make for an interesting toy?",
 		--end_journal = "",
 		end_text = {"Your lightning tentacle is fully charged."},
+		questgiver = 17781,
 		rewards = {
 			Reward:new({
 				id = "SHOCKTACLE",
@@ -45,11 +46,14 @@ function internal.build.quests()
 			}),		
 		},		-- You can wrap objectives in {} to create packages
 		start_events = {
-			[Event.Types.MONSTER_KILL] = function(self, data)
-				if data.name == "Fen Strider" then
-					return true;
+			{
+				event = Event.Types.MONSTER_KILL,
+				fn = function(self, data)
+					if data.name == "Fen Strider" then
+						return true;
+					end
 				end
-			end
+			}
 		}
 	});
 
