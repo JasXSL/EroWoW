@@ -694,6 +694,7 @@ UI = {}
 		local quest = Quest.get(UI.quests.selected);
 		local right = UI.quests.right.scrollchild;
 		local objectives = quest:getCurrentObjectives();
+		local objLevel = quest:getCurrentObjectivesLevel();
 		
 
 		right.header:SetText(quest.name);
@@ -726,7 +727,20 @@ UI = {}
 			right.progress:SetText(out);
 		end
 
-		right.desc:SetText(quest.journal_entry);
+		local journal = quest.journal_entry;
+		local journalOut = "";
+		if type(journal) ~= "table" then
+			journal = {journal};
+		end
+
+		for k,v in pairs(journal) do
+			if objLevel == nil or k <= objLevel then
+				if k > 1 then journalOut = journalOut.."\n\n"; end
+				journalOut = journalOut..v;
+			end
+		end	
+
+		right.desc:SetText(journalOut);
 		
 		--rewards
 		for i=1,6 do
@@ -835,6 +849,7 @@ UI = {}
 			elseif button == "RightButton" then
 				UI.talkbox.back();
 			end
+			PlaySound(806, "DIALOG");
 		end);	
 		
 
@@ -960,12 +975,22 @@ UI = {}
 	end
 
 	function UI.talkbox.set(talkbox)
+
+		if UI.talkbox.active then 
+			return 
+		end
+
 		UI.talkbox.active = talkbox;
 		UI.talkbox.page = 1;
 		-- Set head and title
 		local fr = UI.talkbox.frame.main;
 		fr.title:SetText(talkbox.title);
-		fr.model:SetDisplayInfo(talkbox.displayInfo);
+
+		if type(talkbox.displayInfo) == "string" then
+			fr.model:SetUnit(talkbox.displayInfo);
+		else
+			fr.model:SetDisplayInfo(talkbox.displayInfo);
+		end
 		fr.model:SetCamera(0);
 		Timer.set(function()
 			fr.model:SetCamera(0);

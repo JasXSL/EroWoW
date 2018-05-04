@@ -303,6 +303,14 @@ Character.__index = Character;
 
 	end
 
+	function Character:remAction(name)
+		local action = Action.get(name)
+		if not action then 
+			return false 
+		end
+		action.charges = 0;
+	end
+
 	-- Stats
 	function Character:getStat(unit, stat)
 		local statlist = {Strength=1, Agility=2, Stamina=3, Intellect=4}

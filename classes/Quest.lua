@@ -57,6 +57,7 @@ Quest.__index = Quest;
 		self.start_text = data.start_text or {};		-- Paragraphs for the initializing talkbox
 		self.start_events = data.start_events or {};	-- Events to listen to {{event=event, data=eventdata, fn = function, max=max_triggers or inf}...} to start the quest
 		
+		self.objectiveStage = 1;						-- Used to keep track of what group of objectives is currently active
 
 		self.end_journal = data.end_journal or "Claim your reward";
 		self.end_text = data.end_text or {};			-- Paragraphs for the outro talkbox
@@ -67,7 +68,8 @@ Quest.__index = Quest;
 
 		-- Events
 		self.onCompletion = data.onCompletion;			-- Raised when quest is handed in
-	
+		
+
 		if type(self.start_text) ~= "table" then
 			self.start_text = {self.start_text};
 		end
@@ -90,14 +92,20 @@ Quest.__index = Quest;
 	end
 
 	function Quest:getCurrentObjectives()
-		for _,v in pairs(self.objectives) do
+		local lv = self:getCurrentObjectivesLevel();
+		if lv then
+			return self.objectives[lv];
+		end
+	end
+
+	function Quest:getCurrentObjectivesLevel()
+		for k,v in pairs(self.objectives) do
 			for _,o in pairs(v) do
 				if o.current_num < o.num then
-					return v;
+					return k;
 				end
 			end
 		end
-		return false
 	end
 
 	-- This doesn't require a specific place to hand in
@@ -116,6 +124,10 @@ Quest.__index = Quest;
 			self:initialize();	-- Re-initialize quest with event bindings
 		end
 		self:save();
+		if self.objectiveStage ~= self:getCurrentObjectivesLevel() then
+			PlaySound(43936, "DIALOG");
+			self.objectiveStage = self:getCurrentObjectivesLevel();
+		end
 	end
 
 	-- Rebinds objectives
@@ -220,6 +232,8 @@ Quest.__index = Quest;
 		Quest.progress[self.id] = out;
 	end
 
+
+
 	function Quest:getObjective(id)
 		for _,v in pairs(self.objectives) do
 			for _,o in pairs(v) do
@@ -245,6 +259,7 @@ Quest.__index = Quest;
 				end
 			end
 		end
+		self.objectiveStage = self:getCurrentObjectivesLevel();
 	end
 
 	-- Run whenever a quest is initialized (after load)

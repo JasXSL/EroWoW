@@ -60,10 +60,21 @@ Condition.__index = Condition;
 		RTYPE_SUBZONE = "subzone",						-- subZoneName
 		RTYPE_LOC = "loc",								-- {x = 42.84, y=17.36, rad=0.1}
 
+		RTYPE_ON_QUEST = "on_quest",					-- {quest1, quest2...}
+		RTYPE_COMPLETED_QUEST = "completed_quest",		-- {quest1, quest2...}
+
 	}
 
 	-- Index 1 = noninverted, index 2 = inverted
 	Condition.Errors = {
+		[Condition.Types.RTYPE_ON_QUEST] = {
+			"Target is on a nonallowed quest.",
+			"Target is not on the required quest."
+		},
+		[Condition.Types.RTYPE_COMPLETED_QUEST] = {
+			"Target has completed a nonallowed quest.",
+			"Target has not completed the required quest."
+		},
 		[Condition.Types.RTYPE_HAS_PENIS] = {
 			"Target has no penis.",
 			"Target has a penis."
@@ -296,6 +307,10 @@ Condition.__index = Condition;
 			local radius = data.rad or 1;
 			local dist = math.sqrt((px-x)*(px-x)+(py-y)*(py-y));
 			out = dist <= radius;
+		elseif t == ty.RTYPE_ON_QUEST then
+			out = not targIsme or Quest.isActive(data);
+		elseif t == ty.RTYPE_COMPLETED_QUEST then
+			out = not targIsme or Quest.isCompleted(data);
 		elseif t == ty.RTYPE_CRIT then
 			out = type(eventData) == "table" and eventData.crit;
 		elseif t == ty.RTYPE_DETRIMENTAL then

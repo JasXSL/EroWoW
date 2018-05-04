@@ -15,10 +15,10 @@ UIParentLoadAddOn("Blizzard_DebugTools")
 	/run ExiWoW.UI.drawLoot("Test", "inv_pants_leather_04")
 
 	TODO:
-	- Show quest rewards in log & when offered
-	- Quest event bindings
-	- Quest user data save
-	- Quest objective event bindings
+	- When an objective set is completed, play a sound
+	- Add VINE_THONG vibhub program
+	- Add a quest for more rough play vine thong spell
+
 
 	- Re-add whispers
 	- Add pagination once you manage to fill up the whole first page and/or underwear page
@@ -383,8 +383,9 @@ local Index = {}
 		ExiWoW.ME.underwear_worn = localStorage.underwear_worn
 		ExiWoW.ME.muscle_tone = localStorage.muscle_tone
 		ExiWoW.ME.fat = localStorage.fat
-		ExiWoW.ME.intelligence = localStorage.intelligence
-		ExiWoW.ME.wisdom = localStorage.wisdom
+		ExiWoW.ME.intelligence = localStorage.intelligence;
+		ExiWoW.ME.wisdom = localStorage.wisdom;
+		
 
 		-- Load in abilities
 		for k,v in pairs(localStorage.abilities) do
