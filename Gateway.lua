@@ -16,6 +16,7 @@ function internal.Gateway()
 
 	-- Swing
 	local function onSwing(unit, sender, crit)
+		--print("Checking hardlimits on swing, sender", sender, Index.checkHardLimits(sender, "player", false));
 		if not Index.checkHardLimits(sender, "player", true) then return end
 
 		local chance = globalStorage.swing_text_freq;
@@ -23,13 +24,14 @@ function internal.Gateway()
 			chance = chance*4;
 		end -- Crits have 3x chance for swing text
 
+		
 		local rand = math.random();
+		--print("Swing. Crit: "..crit.." chance "..chance.." rand "..rand);
 		if not RPText.getTakehitCD() and rand < chance and unit and not UnitIsPlayer(unit) and not UnitInVehicle("player") then
 
-			local chance = globalStorage.swing_text_freq;
-			if crit ~= "" then chance = chance*4 end -- Crits have 3x chance for swing text
 			-- id, senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action
 			local npc = Character.buildNPC(unit, sender);
+			print("Outputting successfully: "..Event.Types.SWING..crit);
 			local rp = RPText.get(Event.Types.SWING..crit, unit, "player", npc, ExiWoW.ME, nil, Event.Types.SWING..crit);
 			if rp then
 				RPText.setTakehitTimer();

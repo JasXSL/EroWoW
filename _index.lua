@@ -339,14 +339,15 @@ local Index = {}
 
 		-- Public toggle
 		if not globalStorage.enable_public then
-			local isSelf =
+			local isSelfCast =
 				(not sender or UnitIsUnit(sender, "player")) and
 				(not receiver or UnitIsUnit(receiver, "player"));
 
-			if sender and not UnitInRaid(sender) and not UnitInParty(sender) and not isSelf then
+			if sender and not UnitInRaid(sender) and not UnitInParty(sender) and sender ~= "player" and not isSelf and UnitPlayerControlled(sender) then
 				return Tools.reportError("Sender is not in your party", suppressErrors);
 			end
-			if receiver and not UnitInRaid(receiver) and not UnitInParty(receiver) and not isSelf then
+			if receiver and not UnitInRaid(receiver) and not UnitInParty(receiver) and receiver ~= "player" and not isSelf and UnitPlayerControlled(receiver) then
+				print(receiver);
 				return Tools.reportError("Target is not in your party", suppressErrors);
 			end
 		end

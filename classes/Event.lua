@@ -384,11 +384,14 @@ local Event = {}
 		for id,v in pairs(Event.bindings) do
 			splice[id] = v;
 		end
+		local nrTriggers = 0;
 		for id,v in pairs(splice) do
 			if v.event == evt then
 				Event.trigger(id, data);
+				nrTriggers = nrTriggers+1;
 			end
 		end
+		--print("Event raised: "..evt.." with "..nrTriggers.." triggers");
 	end
 
 	function Event.trigger(id, data)
