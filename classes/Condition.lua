@@ -63,10 +63,15 @@ Condition.__index = Condition;
 		RTYPE_ON_QUEST = "on_quest",					-- {quest1, quest2...}
 		RTYPE_COMPLETED_QUEST = "completed_quest",		-- {quest1, quest2...}
 
+		RTYPE_FAIL_ON_RECEIVE = "FAIL_RECEIVE",			-- Debug task that always fails on the receiver
 	}
 
 	-- Index 1 = noninverted, index 2 = inverted
 	Condition.Errors = {
+		[Condition.Types.RTYPE_FAIL_ON_RECEIVE] = {
+			"Fail on receive.",
+			"Fail on receive."
+		},
 		[Condition.Types.RTYPE_ON_QUEST] = {
 			"Target is on a nonallowed quest.",
 			"Target is not on the required quest."
@@ -274,7 +279,10 @@ Condition.__index = Condition;
 
 		-- Try to find errors
 		local out = false
-		if t == ty.RTYPE_HAS_PENIS then
+
+		if t == ty.RTYPE_FAIL_ON_RECEIVE then
+			out = not targIsMe;
+		elseif t == ty.RTYPE_HAS_PENIS then
 			out = targ:getPenisSize() ~= false;
 		elseif t == ty.RTYPE_HAS_VAGINA then 
 			out = targ:getVaginaSize() ~= false;

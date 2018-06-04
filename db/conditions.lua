@@ -94,6 +94,9 @@ function internal.build.conditions()
 	ext:addCondition({id="is_forage", type=ty.RTYPE_EVENT, data=Event.Types.FORAGE});
 	ext:addCondition({id="is_world_container", type=ty.RTYPE_EVENT, data=Event.Types.CONTAINER_OPENED});
 	
+	ext:addCondition({id="debug_fail_on_receive", type=ty.RTYPE_FAIL_ON_RECEIVE});
+	
+	
 
 	-- Spell tick/add/rem tag conditions
 	ext:addCondition({id="ts_insects", type=ty.RTYPE_TAG, data={"TMPSPELL_INSECTS"}, sender=true});

@@ -805,10 +805,12 @@ Action.__index = Action;
 			if last then first = first.."-"..last end
 			Index.sendAction(Ambiguate(first, "all"), action.id, args, function(...)
 				if type(callback) == "function" then callback(...) end
+				-- Reason on fail is data
 				local self, success, reason = ...
 				Event.raise(Event.Types.ACTION_USED, {id=id, target=target, args=args, success=success})
 				if success then
 					action:consumeCharges(1);
+				elseif reason then
 					Tools.reportError(reason);
 				end
 			end)

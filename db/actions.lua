@@ -63,17 +63,22 @@ function internal.build.actions()
 		id = "TEST_ACTION",
 		name = "Test Item",
 		texture = "achievement_worldevent_littlehelper",
-		conditions = {},
+		conditions = {
+			Condition.get("debug_fail_on_receive")
+		},
 		max_charges = 100,
 		charges = 0,
 		-- Custom sending logic
 		fn_send = function(self, sender, target, suppressErrors)
 			print("TestAction Send")
+			return nil, function(se, success, data)
+				print("Test task was", success);
+			end
 		end,
 		-- Handle the receiving end here
 		fn_receive = function(self, sender, target, data)
 			print("TestAction Receive")
-			return true
+			return false, "An error occurred"
 		end
 
 	})
