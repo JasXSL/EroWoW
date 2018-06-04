@@ -18,7 +18,7 @@ UIParentLoadAddOn("Blizzard_DebugTools")
 	- When an objective set is completed, play a sound
 	- Add VINE_THONG vibhub program
 	- Add slash command to toggle panel
-
+	- Interacting with a target before the ExiWoW icon shows creates a script error
 	- Re-add whispers
 	- Add pagination once you manage to fill up the whole first page and/or underwear page
 	- Character backup
@@ -252,7 +252,7 @@ local Index = {}
 			
 			local da = ExiWoW.json.decode(data); 		-- JSON decode message
 			local aID = da.id								-- Action ID
-			local success, response = Action.receive(aID, sender, da.da);
+			local success, response = Action.receive(aID, sender, da.da, 1);
 			if cb then
 				Index.sendCallback(cb, sname, success, response);
 			end

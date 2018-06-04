@@ -5,9 +5,9 @@ local Tools = {};
 
 	-- Error/notice frame
 	function Tools.reportError(message, ignore)
-		if ignore then return false end
+		if ignore then return false, message end
 		UIErrorsFrame:AddMessage(message, 1.0, 0.0, 0.0, 53, 6);
-		return false;
+		return false, message;
 	end
 
 	function Tools.reportNotice(message)

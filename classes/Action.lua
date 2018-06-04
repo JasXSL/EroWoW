@@ -298,12 +298,13 @@ Action.__index = Action;
 	-- Condition validation
 	-- Validates for both receive and send --
 	-- Returns boolean true on success
+	-- suppressErrors can also be int 1 to return the error
 	function Action:validate(unitCaster, unitTarget, suppressErrors, isSend, isCastComplete)
 
-		if self.suppress_all_errors then 
+		if self.suppress_all_errors and suppressErrors ~= 1 then 
 			suppressErrors = true;
 		end -- Allow actions to suppress errors
-		
+
 		-- Make sure it's not on cooldown
 		if isSend and not isCastComplete and (self.on_cooldown or (self.global_cooldown and Action.GCD)) then
 			return Tools.reportError("Can't do that yet", suppressErrors);
@@ -326,8 +327,9 @@ Action.__index = Action;
 			return Tools.reportError("Target is not a player", suppressErrors);
 		end
 
-		if not Index.checkHardLimits(unitCaster, unitTarget, suppressErrors) then 
-			return false;
+		local hard, reason = Index.checkHardLimits(unitCaster, unitTarget, suppressErrors);
+		if not hard then 
+			return false, reason;
 		end
 
 		local tChar = ExiWoW.TARGET;
@@ -339,8 +341,7 @@ Action.__index = Action;
 		if #self.conditions > 0 then
 			local success, failedCondition = Condition.all(self.conditions, unitCaster, unitTarget, ExiWoW.ME, tChar, nil, nil, self);
 			if not success then
-				failedCondition:reportError();
-				return false;
+				return false, failedCondition:reportError(false, true);
 			end
 		end
 
@@ -784,10 +785,11 @@ Action.__index = Action;
 			if last then first = first.."-"..last end
 			Index.sendAction(Ambiguate(first, "all"), action.id, args, function(...)
 				if type(callback) == "function" then callback(...) end
-				local self, success = ...
+				local self, success, reason = ...
 				Event.raise(Event.Types.ACTION_USED, {id=id, target=target, args=args, success=success})
 				if success then
 					action:consumeCharges(1);
+					Tools.reportError(reason);
 				end
 			end)
 			
@@ -800,14 +802,16 @@ Action.__index = Action;
 
 
 	-- Receive an action
-	function Action.receive(id, sender, args, allowErrors)
-
+	function Action.receive(id, sender, args, suppressErrors)
+		-- Default value is true
+		if suppressErrors == nil then suppressErrors = true end
 		local action = Action.get(id);
 		if not action then return false end			-- Received Action not found
 
 		-- Received action is invalid
-		if not action:validate(sender, "player", not allowErrors, false, false) then 
-			return false 
+		local attempt, err = action:validate(sender, "player", suppressErrors, false, false);
+		if not attempt then 
+			return false, err
 		end
 
 		-- Returns (bool)success, (var)data
