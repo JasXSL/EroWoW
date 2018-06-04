@@ -389,7 +389,9 @@ Condition.__index = Condition;
 		elseif t == ty.RTYPE_DISTANCE then
 			out = (Action.checkRange(senderUnit, data) or Action.checkRange(receiverUnit, data));
 		elseif t == ty.RTYPE_STUNNED then
-			out = HasFullControl() and targIsMe;		-- Target in condition is checked
+			-- Makes it always return true if target is not me, since only I can check if I am stunned
+			if not targIsMe then return not inverse end
+			out = not HasFullControl();		-- Target in condition is checked
 		elseif t == ty.RTYPE_MOVING then
 			out = GetUnitSpeed(targUnit) > 0;
 		elseif t == ty.RTYPE_INSTANCE then	
