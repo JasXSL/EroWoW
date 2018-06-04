@@ -269,7 +269,7 @@ Condition.__index = Condition;
 			(senderUnit == "player" and UnitIsUnit(receiverUnit, "player")) or
 			(receiverUnit == "player" and UnitIsUnit(senderUnit, "player"));
 		local targIsMe = UnitIsUnit(targUnit, "player");
-		local inParty = isSelf or UnitInRaid(unitCaster) or UnitInParty(unitCaster) or UnitInRaid(unitTarget) or UnitInRaid(unitTarget);
+		local inParty = isSelf or UnitInRaid(senderUnit) or UnitInParty(senderUnit) or UnitInRaid(receiverUnit) or UnitInRaid(receiverUnit);
 		local senderIsMe = UnitIsUnit(senderUnit, "player");
 
 		-- Try to find errors
@@ -389,7 +389,7 @@ Condition.__index = Condition;
 		elseif t == ty.RTYPE_DISTANCE then
 			out = (Action.checkRange(senderUnit, data) or Action.checkRange(receiverUnit, data));
 		elseif t == ty.RTYPE_STUNNED then
-			out = not HasFullControl() or not targIsMe;		-- Target in condition is checked
+			out = HasFullControl() and targIsMe;		-- Target in condition is checked
 		elseif t == ty.RTYPE_MOVING then
 			out = GetUnitSpeed(targUnit) > 0;
 		elseif t == ty.RTYPE_INSTANCE then	

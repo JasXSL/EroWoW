@@ -17,8 +17,7 @@ UIParentLoadAddOn("Blizzard_DebugTools")
 	TODO:
 	- When an objective set is completed, play a sound
 	- Add VINE_THONG vibhub program
-	- Add a quest for more rough play vine thong spell
-
+	- Add slash command to toggle panel
 
 	- Re-add whispers
 	- Add pagination once you manage to fill up the whole first page and/or underwear page
@@ -339,15 +338,10 @@ local Index = {}
 
 		-- Public toggle
 		if not globalStorage.enable_public then
-			local isSelfCast =
-				(not sender or UnitIsUnit(sender, "player")) and
-				(not receiver or UnitIsUnit(receiver, "player"));
-
-			if sender and not UnitInRaid(sender) and not UnitInParty(sender) and sender ~= "player" and not isSelf and UnitPlayerControlled(sender) then
+			if sender and not UnitInRaid(sender) and not UnitInParty(sender) and sender and not UnitIsUnit(sender, "player") and UnitPlayerControlled(sender) then
 				return Tools.reportError("Sender is not in your party", suppressErrors);
 			end
-			if receiver and not UnitInRaid(receiver) and not UnitInParty(receiver) and receiver ~= "player" and not isSelf and UnitPlayerControlled(receiver) then
-				print(receiver);
+			if receiver and not UnitInRaid(receiver) and not UnitInParty(receiver) and receiver and not UnitIsUnit(receiver, "player") and UnitPlayerControlled(receiver) then
 				return Tools.reportError("Target is not in your party", suppressErrors);
 			end
 		end

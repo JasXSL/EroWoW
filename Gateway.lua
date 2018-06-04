@@ -31,7 +31,6 @@ function internal.Gateway()
 
 			-- id, senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action
 			local npc = Character.buildNPC(unit, sender);
-			print("Outputting successfully: "..Event.Types.SWING..crit);
 			local rp = RPText.get(Event.Types.SWING..crit, unit, "player", npc, ExiWoW.ME, nil, Event.Types.SWING..crit);
 			if rp then
 				RPText.setTakehitTimer();
