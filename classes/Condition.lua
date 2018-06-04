@@ -387,7 +387,7 @@ Condition.__index = Condition;
 		elseif t == ty.RTYPE_COMBAT then
 			out = UnitAffectingCombat(targUnit);
 		elseif t == ty.RTYPE_DISTANCE then
-			out = (Action.checkRange(senderUnit, data) or Action.checkRange(receiverUnit, data));
+			out = (Action.checkRange(senderUnit, data) and Action.checkRange(receiverUnit, data));
 		elseif t == ty.RTYPE_STUNNED then
 			-- Makes it always return true if target is not me, since only I can check if I am stunned
 			if not targIsMe then out = not inverse
@@ -409,16 +409,17 @@ Condition.__index = Condition;
 		return out; 
 	end
 
-	function Condition:reportError(ignore, ret)
+	-- If suppress is 1, it returns instead
+	function Condition:reportError(suppress)
+		if suppress == true then return false end
 		if not Condition.Errors[self.type] then
-			print("No error text for type", self.type);
-			return false;
+			return false, "Unknown error";
 		end
 		local error = Condition.Errors[self.type][1];
 		if self.inverse then
 			error = Condition.Errors[self.type][2];
 		end
-		if ret then return error.." (Expected: "..ExiWoW.json.encode(self.data)..")" end
+		if suppress == 1 then return false, error.." (Expected: "..ExiWoW.json.encode(self.data)..")" end
 		return Tools.reportError(error, ignore);
 	end
 

@@ -268,7 +268,7 @@ local Index = {}
 			local sname = Ambiguate(sender, "all")
 			local response = ExiWoW.json.decode(data);
 			Callback.trigger(cb, response.su, response.da, sender);
-
+			
 		end
 
 		if prefix == appName.."b" and not UnitIsUnit(Ambiguate(sender, "all"), "player") then

@@ -284,7 +284,7 @@ function internal.build.actions()
 			local gender = UnitSex(target)
 			return self:sendRPText(sender, target, suppressErrors, function(se, success)
 					if success and not UnitIsUnit(target, "player") then
-					Func.get("painSound")(race, gender)
+					Func.get("painSound")(self, race, gender)
 				end
 			end);
 		end,
@@ -406,7 +406,7 @@ function internal.build.actions()
 			local gender = UnitSex(target);
 			return self:sendRPText(sender, target, suppressErrors, function(se, success)
 				if success and not UnitIsUnit(target, "player") then
-					Func.get("painSound")(race, gender)
+					Func.get("painSound")(self, race, gender)
 					PlaySound(21455, "SFX");
 				end
 			end);
@@ -440,7 +440,7 @@ function internal.build.actions()
 			local gender = UnitSex(target)
 			return self:sendRPText(sender, target, suppressErrors, function(se, success)
 				if success and not UnitIsUnit(target, "player") then
-					Func.get("painSound")(race, gender)
+					Func.get("painSound")(self, race, gender)
 				end
 			end);
 		end,
@@ -485,7 +485,7 @@ function internal.build.actions()
 			local gender = UnitSex(target)
 			return self:sendRPText(sender, target, suppressErrors, function(se, success)
 				if success and not UnitIsUnit(target, "player") then
-					Func.get("painSound")(race, gender)
+					Func.get("painSound")(self, race, gender)
 				end
 			end);
 		end,

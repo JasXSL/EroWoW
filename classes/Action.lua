@@ -341,7 +341,7 @@ Action.__index = Action;
 		if #self.conditions > 0 then
 			local success, failedCondition = Condition.all(self.conditions, unitCaster, unitTarget, ExiWoW.ME, tChar, nil, nil, self);
 			if not success then
-				return false, failedCondition:reportError(false, true);
+				return failedCondition:reportError(suppressErrors);
 			end
 		end
 
@@ -398,6 +398,23 @@ Action.__index = Action;
 		end
 	end
 
+	function Action:requiresMeleeRange()
+		local all = self:getAllConditions();
+		for _,cond in pairs(all) do
+			if cond.type == Condition.Types.RTYPE_DISTANCE and not cond.inverse and cond.data == Action.MELEE_RANGE then
+				return true;
+			end
+		end
+	end
+
+	function Action:requiresCastRange()
+		local all = self:getAllConditions();
+		for _,cond in pairs(all) do
+			if cond.type == Condition.Types.RTYPE_DISTANCE and not cond.inverse and cond.data == Action.CASTER_RANGE then
+				return true;
+			end
+		end
+	end
 
 		-- TOOLTIP HANDLING --
 	function Action:onTooltip(frame)
@@ -446,11 +463,11 @@ Action.__index = Action;
 			table.insert(singles, "Instant")
 		end
 
-		if not v.self_only and v.max_distance then
-			if v.max_distance == Action.MELEE_RANGE then
+		if not v.self_only then
+			if v:requiresMeleeRange() then
 				table.insert(singles, "Melee Range");
-			else
-				table.insert(singles, tostring(v:getRangeYards()).." yd range");
+			elseif v:requiresCastRange() then
+				table.insert(singles, "40 yd range");
 			end
 		end
 
@@ -753,7 +770,10 @@ Action.__index = Action;
 		end
 
 		-- Validate conditions
-		if not action:validate("player", target, ignoreErrors, true, castFinish) then return false end
+		local su, re = action:validate("player", target, false, true, castFinish)
+		if not su then 
+			return false 
+		end
 
 		-- Set cooldowns etc
 
