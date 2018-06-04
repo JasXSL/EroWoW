@@ -813,7 +813,8 @@ Action.__index = Action;
 		-- Returns (bool)success, (var)data
 		if type(action.fn_receive) == "function" then
 			return action:fn_receive(sender, "player", args);
-		else return true
+		else 
+			return true
 		end
 	end
 

@@ -176,8 +176,10 @@ RPText.whisperCD = nil
 				if 
 					valid and 
 					(
+						-- Self only
 						(not v.text_sender and isSelfCast) or
-						((v.text_sender or senderUnit.type ~= "player") and not isSelfCast) -- NPC spells don't have text_sender, so they need to be put here
+						((v.text_sender or not UnitIsPlayer(senderUnit)) and not isSelfCast)	-- NPC spell and hits don't have a sender text
+						--((v.text_sender or senderUnit.type ~= "player") and not isSelfCast) -- NPC spells don't have text_sender, so they need to be put here
 					)
 				then
 					table.insert(viable, v)
