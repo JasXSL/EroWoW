@@ -359,6 +359,11 @@ RPText.whisperCD = nil
 		UIErrorsFrame:AddMessage(text, 1, 0.8, 1, 53, 6);
 	end
 
+	function RPText.bystander(text)
+		-- 0.95686274509,0.49019607843,0.25490196078
+		ChatFrame1:AddMessage(text, 0.835, 0.772, 0.686);
+	end
+
 	-- You can either do (sender,text) or (text)
 	function RPText.npcSpeak(sender, text, isWhisper)
 		if text then

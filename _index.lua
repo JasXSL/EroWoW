@@ -4,7 +4,7 @@ local export = internal.Module.export;
 internal.build = {}							-- Collection of libraries to build
 internal.ext = nil							-- Root extension
 local Tools = require("Tools")
-local Action, Extension, Character, UI, Effect, Timer, Event, Callback, Database, Quest;
+local Action, Extension, Character, UI, Effect, Timer, Event, Callback, Database, Quest, RPText;
 
 
 UIParentLoadAddOn("Blizzard_DebugTools")
@@ -120,6 +120,7 @@ local Index = {}
 		Database = require("Database");
 		Effect = require("Effect");
 		Quest = require("Quest");
+		RPText = require("RPText");
 		
 
 		ExiWoW.ME = Character:new();
@@ -288,12 +289,15 @@ local Index = {}
 				RPText.npcSpeak(response.tx);
 			-- Add bystander text to combat log
 			else
+				--[[
 				for i = 1,10 do
 					if GetChatWindowInfo(i)=="Combat Log" then
 						_G['ChatFrame'..i]:AddMessage(response.tx, 1,0.8,1)
 						break
 					end
 				end
+				]]
+				RPText.bystander(response.tx);
 			end
 			
 			
