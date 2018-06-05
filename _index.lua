@@ -274,13 +274,13 @@ local Index = {}
 
 		if prefix == appName.."b" and not UnitIsUnit(Ambiguate(sender, "all"), "player") then
 
-			local data, cb = getChunkedMessage(message)
+			local data, cb = getChunkedMessage(message);
 			if data == false then return end
 			--DebugBox.EditBox:SetText(data)
-			local sname = Ambiguate(sender, "all")
+			local sname = Ambiguate(sender, "all");
 			local response = ExiWoW.json.decode(data);
 
-			if not CheckInteractDistance(sname, 1) or not response or not response.tx then
+			if not CheckInteractDistance(sname, 1) or not response or not response.tx or not response.v or Ambiguate(response.v, "all") == Ambiguate(UnitName("player"), "all") then
 				return;
 			end
 
@@ -377,14 +377,13 @@ local Index = {}
 		ExiWoW.ME.breast_size = localStorage.breast_size;
 		ExiWoW.ME.butt_size = localStorage.butt_size;
 		ExiWoW.ME.masochism = localStorage.masochism;
-		ExiWoW.ME.excitement = localStorage.excitement;
 		ExiWoW.ME.underwear_ids = localStorage.underwear_ids
 		ExiWoW.ME.underwear_worn = localStorage.underwear_worn
 		ExiWoW.ME.muscle_tone = localStorage.muscle_tone
 		ExiWoW.ME.fat = localStorage.fat
 		ExiWoW.ME.intelligence = localStorage.intelligence;
 		ExiWoW.ME.wisdom = localStorage.wisdom;
-		
+		ExiWoW.ME:addExcitement(localStorage.excitement, true);
 
 		-- Load in abilities
 		for k,v in pairs(localStorage.abilities) do
@@ -432,11 +431,12 @@ local Index = {}
 	end
 
 
-	function Index.sendBystanderText(text, isChat)
+	function Index.sendBystanderText(text, isChat, victimName)
 		local out = {
 			tx = text,
-			ch = isChat
-		}
+			ch = isChat,
+			v = victimName
+		};
 		local text = ExiWoW.json.encode(out);
 		local token = Callback.generateToken();
 		--print("Sending bystander", text)

@@ -144,8 +144,9 @@ RPText.whisperCD = nil
 		if bystander then
 			Index.sendBystanderText(
 				RPText.convert(bystander, sender, receiver, spell, self.item),
-				self.is_chat
-			)
+				self.is_chat,
+				receiver:getName()
+			);
 		end
 
 		if type(self.fn) == "function" then
@@ -243,7 +244,7 @@ RPText.whisperCD = nil
 			if size < 1 then 
 				tags = {"tiny", "miniscule", "puny"}
 			elseif size < 2 then 
-				tags = {"lesser", "smallish", "undersize"} 
+				tags = {"lesser", "smallish", "undersized"} 
 			elseif size < 3 then 
 				tags = {}
 			elseif size < 4 then 

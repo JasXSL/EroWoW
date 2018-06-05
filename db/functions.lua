@@ -98,6 +98,50 @@ function internal.build.functions()
 		end
 	});
 
+	-- /run ExiWoW.LibAssets.effects:deathSound()
+	ext:addFunction({
+		id="deathSound",
+		fn = function(self, race, sex)
+			local sounds = {
+				HumanM = 2944,
+				HumanF = 2940,
+				NightElfM = 2959,
+				NightElfF = 2936,
+				DwarfM = 2932,
+				DwarfF = 2928,
+				GnomeM = 3278,
+				GnomeF = 3272,
+				DraeneiM = 8987,
+				DraeneiF = 8991,
+				WorgenM = 22455,
+				WorgenF = 22448,
+				OrcM = 1322,
+				OrcF = 213,
+				TrollM = 3310,
+				TrollF = 3304,
+				ScourgeM = 1318,
+				ScourgeF = 1364,
+				TaurenM = 1356,
+				TaurenF = 229,
+				BloodElfM = 8999,
+				BloodElfF = 8995,
+				GoblinM = 18493,
+				GoblinF = 18498,
+				PandarenM = 28822,
+				PandarenF = 31720,
+				VoidElfM = 0,
+				VoidElfF = 0,
+				LightforgedDraeneiM = 0,
+				LightforgedDraeneiF = 0,
+				HighmountainTaurenM = 0,
+				HighmountainTaurenF = 0,
+				NightborneM = 76806,
+				NightborneF = 76813,
+			}
+			Func.get("playCharSound")(self, sounds, race, sex);
+		end
+	});
+
 	ext:addFunction({
 		id = "playCharSound",
 		fn = function(self, library, race, sex)

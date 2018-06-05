@@ -611,7 +611,7 @@ Action.__index = Action;
 				end
 
 				if rptext.text_bystander then
-					Index.sendBystanderText(RPText.convert(rptext.text_bystander, ts, tt, nil, rptext.item))
+					Index.sendBystanderText(RPText.convert(rptext.text_bystander, ts, tt, nil, rptext.item), false, UnitName(target));
 				end
 			end
 		end

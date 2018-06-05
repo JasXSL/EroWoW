@@ -84,6 +84,7 @@ local Underwear = {}
 
 	function Underwear:export()
 		return {
+			id = self.id,
 			na = self.name,
 			co = self.color
 		}
@@ -95,7 +96,8 @@ local Underwear = {}
 	function Underwear.import(data)
 		return Underwear:new({
 			name = data.na,
-			color = data.co
+			color = data.co,
+			id = data.id
 		});
 	end
 

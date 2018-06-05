@@ -2,7 +2,7 @@ local appName, internal = ...
 local export = internal.Module.export;
 local require = internal.require;
 
-local UI, Timer, Event, Action, Underwear, Index, Tools, RPText, Condition, NPC;
+local UI, Timer, Event, Action, Underwear, Index, Tools, RPText, Condition, NPC, Func;
 local myGUID = UnitGUID("player")
 
 -- Contains info about a character, 
@@ -14,7 +14,6 @@ Character.__index = Character;
 	Character.EXCITEMENT_MAX = 1.25;				-- You can overshoot max excitement and have to wait longer
 	Character.EXCITEMENT_FADE_IDLE = 0.001;
 	
-
 
 
 	-- Static
@@ -30,6 +29,7 @@ Character.__index = Character;
 		RPText = require("RPText");
 		Condition = require("Condition");
 		NPC = require("NPC");
+		Func = require("Func");
 
 		-- Main character timer, ticking once per second
 		Timer.set(function()
@@ -179,6 +179,9 @@ Character.__index = Character;
 		self.muscle_tone = getVar(settings.str, 5);
 		self.fat = getVar(settings.fat, 5);
 		self.wisdom = getVar(settings.wis, 5);
+		self.exSound = nil;					-- Sound when excitement is max
+		-- Timers
+		self.exTimer = nil;					-- Excitement hitting cap timer
 		
 
 		if settings.uw then self.underwear = Underwear.import(settings.uw) end
@@ -338,18 +341,28 @@ Character.__index = Character;
 	-- Raised when you max or drop off max excitement --
 	function Character:onCapChange()
 
-		local maxed = self.excitement >= 1
+		local maxed = self.excitement >= 1;
 
 		Timer.clear(self.capFlashTimer);
-		local se = self
+		local se = self;
 		if maxed then
+			-- Start flashing
 			self.capFlashTimer = Timer.set(function()
 				se.capFlashPow = se.capFlashPow+0.25;
 				if se.capFlashPow >= 2 then se.capFlashPow = 0 end
 				local green = -0.5 * (math.cos(math.pi * se.capFlashPow) - 1)
 				UI.portrait.border:SetVertexColor(1,0.5+green*0.5,1);
 			end, 0.05, math.huge);
+			-- Emote
+			local a, handle = PlaySound(75739, "SFX", true);
+			self.exSound = handle;
+			RPText.trigger("_EX_CAP_", "player", "player", self, self);
+			-- Start heartbeat
 		else
+			-- Stop heartbeat
+			if self.exSound then
+				StopSound(self.exSound, 1000);
+			end
 			UI.portrait.border:SetVertexColor(1,1,1);
 		end
 
@@ -369,13 +382,36 @@ Character.__index = Character;
 
 		Event.raise(Event.Types.EXADD, {amount=amount, set=set, multiplyMasochism=multiplyMasochism})
 
-		self.excitement =max(min(self.excitement, Character.EXCITEMENT_MAX), 0);
+		self.excitement = max(min(self.excitement, Character.EXCITEMENT_MAX), 0);
 		UI.portrait.updateExcitementDisplay();
 
-		if (self.excitement >= 1) ~= pre then
-			self:onCapChange()
+		if self.excitement >= 1 and amount > 0 then
+			Timer.clear(self.exTimer);
+			self.exTimer = Timer.set(function()
+				self:exCapWipe(); 
+			end, 3);
 		end
 
+		if (self.excitement >= 1) ~= pre then
+			self:onCapChange();
+		end
+	end
+
+	function Character:exCapWipe()
+		-- We have meditated below
+		self.exTimer = nil;
+		if self.excitement < 1 then return end
+		local excitement = 0.5;
+		if self:getPenisSize() then
+			excitement = 0;
+		end
+		self:addExcitement(excitement, true);
+		if not UnitAffectingCombat("player") then
+			DoEmote("kneel", "none");
+		end
+		RPText.trigger("_EX_RESET_", "player", "player", self, self);
+		Func.get("deathSound")();
+		
 	end
 
 	function Character:toggleResting(on)

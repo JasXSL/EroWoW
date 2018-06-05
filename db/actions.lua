@@ -213,6 +213,7 @@ function internal.build.actions()
 		},
 		fn_send = function(self, sender, target, suppressErrors)
 			-- We only need a callback for this
+			DoEmote("eye", "target");
 			return nil, function(se, success, data) Action.handleInspectCallback(target, success, data) end
 		end,
 		fn_receive = function()
