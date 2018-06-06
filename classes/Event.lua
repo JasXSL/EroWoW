@@ -397,7 +397,7 @@ local Event = {}
 	function Event.trigger(id, data)
 		
 		local v = Event.bindings[id];
-		if v.callback(data, v.event) ~= false then
+		if v and v.callback(data, v.event) ~= false then
 			v.max = v.max-1;
 			if v.max <= 0 then
 				Event.off(id);

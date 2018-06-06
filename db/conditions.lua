@@ -51,6 +51,8 @@ function internal.build.conditions()
 	ext:addCondition({id="femaleWhispers", type=ty.RTYPE_REQUIRE_FEMALE});
 	ext:addCondition({id="otherWhispers", type=ty.RTYPE_REQUIRE_OTHER});
 	ext:addCondition({id="targetWearsUnderwear", type=ty.RTYPE_UNDIES, data={true}});
+	ext:addCondition({id="targetNoUnderwear", type=ty.RTYPE_UNDIES, data={true}, inverse=true});
+	
 	ext:addCondition({id="victimKnockedDown", type = ty.RTYPE_HAS_AURA, data={{name="lash", caster="Bloodpetal Lasher"}}});
 	ext:addCondition({id="victimParalyzed", type = ty.RTYPE_HAS_AURA, data={{name="Paralysis"}}});
 	ext:addCondition({id="invFeathers", type=ty.RTYPE_HAS_INVENTORY, data={{name="Light Feather"}}});

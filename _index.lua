@@ -7,7 +7,7 @@ local Tools = require("Tools")
 local Action, Extension, Character, UI, Effect, Timer, Event, Callback, Database, Quest, RPText;
 
 
-UIParentLoadAddOn("Blizzard_DebugTools")
+UIParentLoadAddOn("Blizzard_DebugTools");
 
 -- Create base tables that can be accessed immediately without needing to use an extension
 --[[
@@ -15,8 +15,9 @@ UIParentLoadAddOn("Blizzard_DebugTools")
 	/run ExiWoW.UI.drawLoot("Test", "inv_pants_leather_04")
 
 	TODO:
-	- When an objective set is completed, play a sound
+	- Add GROIN_RUMBLE_TOTEM VH program
 	- Add VINE_THONG vibhub program
+	- When an objective set is completed, play a sound
 	- Add slash command to toggle panel
 	- Interacting with a target before the ExiWoW icon shows creates a script error
 	- Re-add whispers

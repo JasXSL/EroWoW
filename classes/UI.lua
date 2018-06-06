@@ -799,6 +799,8 @@ UI = {}
 	-- UI Talkbox for quests and dialog
 	UI.talkbox = {};
 	UI.talkbox.active = nil;	-- Use Talkbox object
+	UI.talkbox.seqtime = 0;
+	UI.talkbox.sequence = nil;
 
 	function UI.talkbox.build()
 
@@ -919,6 +921,14 @@ UI = {}
 		model:SetDisplayInfo(17781); -- Find the NPC on wowhead, edit source and search for ModelViewer.show, that has the displayid
 		model:SetCamera(0);
 
+		--[[
+		model:SetScript("OnUpdate", function(self, e)
+			if UI.talkbox.sequence then
+				self:SetSequenceTime(UI.talkbox.sequence, GetTime()*1000-UI.talkbox.seqtime);
+			end
+		end);
+		]]
+
 		local border = CreateFrame("Frame", nil, model);
 		border:SetAllPoints();
 		ol = border:CreateTexture(nil, "BORDER");
@@ -1018,7 +1028,7 @@ UI = {}
 
 	function UI.talkbox.advance()
 		if not UI.talkbox.active then 
-			return 
+			return;
 		end
 		UI.talkbox.page = UI.talkbox.page+1;
 		if UI.talkbox.page > #UI.talkbox.active.lines then
@@ -1031,6 +1041,7 @@ UI = {}
 			UI.talkbox.draw();
 		end
 	end
+
 	function UI.talkbox.back()
 		if not UI.talkbox.active or UI.talkbox.page == 1 then 
 			return 
@@ -1039,14 +1050,34 @@ UI = {}
 		UI.talkbox.draw();
 	end
 
+
 	function UI.talkbox.draw()
 		local tb = UI.talkbox.active;
 		local fr = UI.talkbox.frame.main;
+		UI.talkbox.sequence = nil;
+		UI.talkbox.seqtime = GetTime()*1000;
 		local line = tb.lines[UI.talkbox.page];
-		if type(line) == "function" then
-			line = line();
+		local text = line.text;
+		if type(text) == "function" then
+			text = text();
 		end
-		fr.description:SetText(line);
+		
+		fr.description:SetText(text);
+		fr.model:SetAnimation(0);
+
+		if line.animation and line.animation > 0 then
+			--UI.talkbox.sequence = line.animation;
+			fr.model:SetAnimation(line.animation);
+			local dur = 1;
+			if line.animLength and line.animLength > 0 then
+				dur = line.animLength;
+			end	
+			Timer.clear(fr.model.animTimer);
+			fr.model.animTimer = Timer.set(function()
+				fr.model:SetAnimation(0);
+			end, dur);
+		end
+
 		fr.pagination:SetText(UI.talkbox.page.."/"..#tb.lines);
 	end
 

@@ -617,7 +617,7 @@ Action.__index = Action;
 		end
 	end
 
-	function Action:receiveRPText( sender, target, args)
+	function Action:receiveRPText( sender, target, args )
 
 		if args.t and args.se then
 			local ts = Character:new(args.se, sender);
