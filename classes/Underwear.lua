@@ -2,7 +2,7 @@ local appName, internal = ...;
 local export = internal.Module.export;
 local require = internal.require;
 
-local Database, Effect;
+local Database, Effect, Event;
 
 local Underwear = {}
 	Underwear.__index = Underwear;
@@ -10,6 +10,7 @@ local Underwear = {}
 	function Underwear.ini()
 		Database = require("Database");
 		Effect = require("Effect");
+		Event = require("Event");
 	end
 
 	-- RPText CLASS
@@ -25,21 +26,29 @@ local Underwear = {}
 		elseif self.rarity > 7 then self.rarity = 7
 		end
 
-		self.description = data.description or "???"
-		self.tags = data.tags or {}
-		self.color = data.color or false
-		self.equip_sound = data.equip_sound or 1202
-		self.unequip_sound = data.equip_sound or 1185
-		self.flavor = data.flavor or false
+		self.description = data.description or "???";
+		self.tags = data.tags or {};
+		self.color = data.color or false;
+		self.equip_sound = data.equip_sound or 1202;
+		self.unequip_sound = data.equip_sound or 1185;
+		self.flavor = data.flavor or false;
+
+		self.on_equip = data.on_equip;
+		self.on_unequip = data.on_unequip;
 
 		-- Allows you to tie passive effects to underwear
 		-- Contains effect IDs
 		self.effects = type(data.effects) == "table" and data.effects or {}
+		self.binds = {};
 
 		return self
 	end
 
 	function Underwear:onEquip()
+		self:unbindAll();
+		if type(self.on_equip) == "function" then
+			self:on_equip();
+		end
 		for _,v in pairs(self.effects) do
 			local effect = Effect.get(v)
 			if effect then
@@ -49,8 +58,25 @@ local Underwear = {}
 	end
 
 	function Underwear:onUnequip()
+		self:unbindAll();
 		for _,v in pairs(self.effects) do
 			Effect.remByID(v)
+		end
+		if type(self.on_unequip) == "function" then
+			self:on_unequip();
+		end
+	end
+
+	-- Lets you bind events, these will be automatically wiped when the underwear is removed
+	function Underwear:bind(event, fn, data, max_triggers)
+		local bind = Event.on(event, fn, data, max_triggers);
+		table.insert(self.binds, bind);
+		return bind;
+	end
+
+	function Underwear:unbindAll()
+		for _,bind in pairs(self.binds) do
+			Event.off(bind);
 		end
 	end
 

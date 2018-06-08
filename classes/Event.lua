@@ -42,11 +42,14 @@ local Event = {}
 		SWING_CRIT = "SWING_CRIT",									-- Same as swing
 		MONSTER_KILL = "MONSTER_KILL",								-- {name=deadNPCName}
 		FORAGE = "FORAGE",											-- void
+		MONSTER_AGGRO = "MONSTER_AGGRO",							-- TODO: Track monster aggro {name=npcAggroed}
 
 		CONTAINER_OPENED = "CONTAINER_OPENED",						-- {autoloot:1/0, action:"Herb Gathering"/"Open" etc, container:"Starlight Rose" etc} World container opened			
 		ZONE_CHANGED = "ZONE_CHANGED",
 		POINT_REACHED = "POINT_REACHED",							-- Requires input: {zone=zone, sub=sub, x=x, y=y, dist=distance}, no data output
 		GOSSIP_SHOW = "GOSSIP_SHOW",								-- Blizzard event
+		ENTER_COMBAT = "ENTER_COMBAT",								-- 
+		EXIT_COMBAT = "EXIT_COMBAT"
 	}
 
 	function Event.ini()
@@ -75,6 +78,9 @@ local Event = {}
 		evtFrame:RegisterEvent("LOOT_SLOT_CLEARED");
 		evtFrame:RegisterEvent("LOOT_CLOSED");
 		evtFrame:RegisterEvent("GOSSIP_SHOW");
+		evtFrame:RegisterEvent("PLAYER_REGEN_DISABLED");
+		evtFrame:RegisterEvent("PLAYER_REGEN_ENABLED");
+		
 	end
 
 	function Event.rebindPointReached()
@@ -137,9 +143,10 @@ local Event = {}
 		-- This needs to go first as it should only handle event bindings on the player
 		if event == "COMBAT_LOG_EVENT_UNFILTERED" and Index.checkHardLimits("player", "player", true) then
 
+			
+
 			local timestamp, combatEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags =  ...; -- Those arguments appear for all combat event variants.
 			local eventPrefix, eventSuffix = combatEvent:match("^(.-)_?([^_]*)$");
-
 			-- See if a viable unit exists
 			local u = "none"
 			if sourceGUID == UnitGUID("target") then u = "target"
@@ -246,6 +253,14 @@ local Event = {}
 			end
 			--print(event, ...)
 		end
+
+		if event == "PLAYER_REGEN_ENABLED" then
+			Event.raise(Event.Types.EXIT_COMBAT);
+		end
+		if event == "PLAYER_REGEN_DISABLED" then
+			Event.raise(Event.Types.ENTER_COMBAT);
+		end
+		
 
 		if event == "ZONE_CHANGED" then
 			Event.rebindPointReached();

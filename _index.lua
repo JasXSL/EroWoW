@@ -17,7 +17,8 @@ UIParentLoadAddOn("Blizzard_DebugTools");
 	TODO:
 	- Add GROIN_RUMBLE_TOTEM VH program
 	- Add VINE_THONG vibhub program
-	- When an objective set is completed, play a sound
+	- Add THONG_OF_VALOR vibhub program
+
 	- Add slash command to toggle panel
 	- Interacting with a target before the ExiWoW icon shows creates a script error
 	- Re-add whispers
@@ -385,6 +386,10 @@ local Index = {}
 		ExiWoW.ME.intelligence = localStorage.intelligence;
 		ExiWoW.ME.wisdom = localStorage.wisdom;
 		ExiWoW.ME:addExcitement(localStorage.excitement, true);
+		local underwear = ExiWoW.ME:getUnderwear();
+		if underwear then
+			underwear:onEquip();
+		end
 
 		-- Load in abilities
 		for k,v in pairs(localStorage.abilities) do

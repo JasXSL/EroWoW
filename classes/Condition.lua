@@ -357,8 +357,8 @@ Condition.__index = Condition;
 					out = false
 				else
 					local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice =
-						GetItemInfo(id)
-					out = itemType == "Armor" and (data.type ~= nil and Tools.multiSearch(itemSubType, data.type))
+						GetItemInfo(id);
+					out = itemType == "Armor" and (data.type == nil or Tools.multiSearch(itemSubType, data.type))
 				end
 			end
 		elseif t == ty.RTYPE_UNDIES then

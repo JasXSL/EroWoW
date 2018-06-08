@@ -60,6 +60,16 @@ function internal.build.conditions()
 	ext:addCondition({id="chestLightArmor", type=ty.RTYPE_EQUIPMENT, data={slot=5, type={Leather=true, Cloth=true}}});
 	ext:addCondition({id="chestHeavyArmor", type=ty.RTYPE_EQUIPMENT, data={slot=5, type={Plate=true, Mail=true}}});
 	ext:addCondition({id="legsHeavyArmor", type=ty.RTYPE_EQUIPMENT, data={slot=7, type={Plate=true, Mail=true}}});
+	ext:addCondition({id="hasChest", type=ty.RTYPE_EQUIPMENT, data={slot=5}});
+	ext:addCondition({id="hasShirt", type=ty.RTYPE_EQUIPMENT, data={slot=4}});
+	ext:addCondition({id="hasTabard", type=ty.RTYPE_EQUIPMENT, data={slot=19}});
+	ext:addCondition({id="noChest", type=ty.RTYPE_EQUIPMENT, data={slot=5}, inverse = true});
+	ext:addCondition({id="noShirt", type=ty.RTYPE_EQUIPMENT, data={slot=4}, inverse = true});
+	ext:addCondition({id="noTabard", type=ty.RTYPE_EQUIPMENT, data={slot=19}, inverse = true});
+	
+	
+	
+	
 	ext:addCondition({id="crotchPlate", type=ty.RTYPE_EQUIPMENT, data={slot=7, type="Plate"}});
 	
 
@@ -116,6 +126,9 @@ function internal.build.conditions()
 	ext:addCondition({id="ts_shards", type=ty.RTYPE_TAG, data={"TMPSPELL_SHARDS"}, sender=true});
 	ext:addCondition({id="ts_roots", type=ty.RTYPE_TAG, data={"TMPSPELL_ROOTS"}, sender=true});
 	
+	
+	-- Spells
+	ext:addCondition({id="hasShadowManacles", type=ty.RTYPE_HAS_AURA, data={{name="Shadow Manacles"}}});
 	
 	
 end
