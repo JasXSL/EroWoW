@@ -900,7 +900,7 @@ Action.__index = Action;
 		Action.CASTING_SPELL_BINDING = Event.on("UNIT_SPELLCAST_START", function(data)
 			if UnitIsUnit(data[1], "PLAYER") then interrupt() end
 		end)
-		Action.FINISHING_SPELL_BINDING = Event.on("UNIT_SPELLCAST_SUCCESS", function(data)
+		Action.FINISHING_SPELL_BINDING = Event.on("UNIT_SPELLCAST_SUCCEEDED", function(data)
 			if UnitIsUnit(data[1], "PLAYER") then interrupt() end
 		end)
 

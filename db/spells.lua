@@ -84,6 +84,10 @@ function internal.build.spells()
 	
 	ext:addSpell({id="Quill Barb"});
 	
+	-- Debugging
+	ext:addSpell({id="Hearthsteed", tags={"HEARTHSTEED"}});
+	
+	
 
 
 end

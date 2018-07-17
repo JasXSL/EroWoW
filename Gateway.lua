@@ -12,7 +12,7 @@ function internal.Gateway()
 	local Database = require("Database");
 	local Timer = require("Timer");
 	local Index = require("Index");
-
+	
 
 	-- Swing
 	local function onSwing(unit, sender, crit)

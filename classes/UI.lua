@@ -333,7 +333,10 @@ UI = {}
 
 	function UI.portrait.updateExcitementDisplay()
 
-		UI.portrait.portraitExcitementBar:SetHeight(UI.portrait.FRAME_HEIGHT*max(ExiWoW.ME:getExcitementPerc(), 0.00001));
+		local n = max(ExiWoW.ME:getExcitementPerc(), 0.00001);
+		UI.portrait.portraitExcitementBar:SetWidth(UI.portrait.FRAME_HEIGHT*n);
+		UI.portrait.portraitExcitementBar:SetPoint("BOTTOM", 0,-UI.portrait.FRAME_HEIGHT+UI.portrait.FRAME_HEIGHT*n);
+		
 
 	end
 

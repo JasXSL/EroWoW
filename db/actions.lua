@@ -346,8 +346,10 @@ function internal.build.actions()
 			return nil;
 		end,
 		fn_receive = function(self, sender, target, args)
-			SetMapToCurrentZone()
-			local px,py = GetPlayerMapPosition("player")
+
+			local mapID = C_Map.GetBestMapForUnit("player");
+			local pos = C_Map.GetPlayerMapPosition(895,"player");
+			local px,py = pos:GetXY();
 			px = px*100
 			py = py*100
 
@@ -364,6 +366,7 @@ function internal.build.actions()
 				RPText.print("You stake a starting point at X:"..(math.floor(px*100)/100)..", Y:"..(math.floor(py*100)/100))
 			end
 			return true
+			
 		end
 	});
 

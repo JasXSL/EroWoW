@@ -8,7 +8,7 @@ local RPText, Character, Index, Action, Timer;
 local Event = {}
 	Event.index = 0
 	Event.bindings = {}		-- {id={event:(str)event, callback:(str)callback, data:(obj)data}...}
-	Event.AURAS = {}
+	Event.AURAS = {}							-- (buildSpellTrigger) { spellId = spellId, name=name, harmful=harmful, unitCaster=unitCaster, count=count, crit=crit, char=char}
 	Event.lootContainer = nil					-- Loot container name when looting a container through the "Open" spell
 	Event.lootSpell = nil
 	Event.pointTimer = nil;						-- Timer checking the POINT_REACHED event
@@ -63,7 +63,7 @@ local Event = {}
 		evtFrame:RegisterEvent("PLAYER_STARTED_MOVING")
 		evtFrame:RegisterEvent("PLAYER_STOPPED_MOVING")
 		evtFrame:RegisterUnitEvent("UNIT_SPELLCAST_START", "player");
-		evtFrame:RegisterUnitEvent("UNIT_SPELLCAST_SUCCESS", "player");
+		evtFrame:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player");
 		
 		evtFrame:RegisterEvent("SOUNDKIT_FINISHED");
 		evtFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -80,6 +80,14 @@ local Event = {}
 		evtFrame:RegisterEvent("GOSSIP_SHOW");
 		evtFrame:RegisterEvent("PLAYER_REGEN_DISABLED");
 		evtFrame:RegisterEvent("PLAYER_REGEN_ENABLED");
+
+		evtFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA");
+		evtFrame:RegisterEvent("ZONE_CHANGED");
+
+		-- Emulate an aura change event on start
+		Timer.set(function()
+			Event.onEvent(self, "UNIT_AURA", "player")
+		end, 0.5, 1)
 		
 	end
 
@@ -103,8 +111,10 @@ local Event = {}
 	end
 
 	function Event.checkPoints()
-		SetMapToCurrentZone();
-		local px,py = GetPlayerMapPosition("player");
+		local mapID = C_Map.GetBestMapForUnit("player");
+		local pos = C_Map.GetPlayerMapPosition(895,"player");
+		local px,py = pos:GetXY();
+		
 		px = px*100; py = py*100;
 		for id,b in pairs(Event.pointCheck) do
 			if not b.data.x or not b.data.y or not b.data.dist or
@@ -113,6 +123,7 @@ local Event = {}
 				Event.trigger(id);
 			end
 		end
+		
 	end
 
 
@@ -139,13 +150,13 @@ local Event = {}
 			
 		end
 
+
 		-- Handle combat log
 		-- This needs to go first as it should only handle event bindings on the player
 		if event == "COMBAT_LOG_EVENT_UNFILTERED" and Index.checkHardLimits("player", "player", true) then
 
-			
-
-			local timestamp, combatEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags =  ...; -- Those arguments appear for all combat event variants.
+			arguments = {CombatLogGetCurrentEventInfo()};
+			local timestamp, combatEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags = CombatLogGetCurrentEventInfo(); -- Those arguments appear for all combat event variants.
 			local eventPrefix, eventSuffix = combatEvent:match("^(.-)_?([^_]*)$");
 			-- See if a viable unit exists
 			local u = "none"
@@ -295,10 +306,12 @@ local Event = {}
 			Event.lootContainer = nil
 		end
 
-		if event == "UNIT_AURA" then
 
+		if event == "UNIT_AURA" then
+			-- Tracks only the PLAYER auras
 			local unit = ...;
 			if unit ~= "player" then return end
+			
 			local active = {} -- spellID = {name=name, count=count}
 
 			local function auraExists(tb, aura)
@@ -329,8 +342,6 @@ local Event = {}
 
 			end
 
-			
-
 			-- Read all buffs
 			for i=1,40 do 
 				local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId = UnitAura(unit, i)
@@ -355,7 +366,8 @@ local Event = {}
 				end
 			end
 
-			Event.AURAS = active
+			Event.AURAS = active;
+			ExiWoW.ME:refreshSpellTags("player");
 
 		end
 
@@ -446,9 +458,12 @@ export(
 		on = Event.on,
 		off = Event.off,
 		Types = Event.Types,
-		hasAura = Event.hasAura
+		hasAura = Event.hasAura,
 	},
 	{
-		raise = Event.raise
+		raise = Event.raise,
+		getAuras = function()
+			return Event.AURAS;
+		end
 	}
 )

@@ -1,4 +1,4 @@
-## Interface: 70300
+## Interface: 80000
 ## Title: ExiWoW
 ## Notes: Improving your RP by adding RP actions and more detailed descriptions of your character!
 ## Version: 0.0.1
@@ -25,7 +25,6 @@ ext/json.lua
 
 # Main classes
 classes/Func.lua
-classes/Settings.lua
 classes/Condition.lua
 classes/NPC.lua
 classes/Spell.lua

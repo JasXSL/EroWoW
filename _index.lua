@@ -175,9 +175,9 @@ local Index = {}
 		internal.Gateway = nil;
 		
 		-- Bind listeners
-		RegisterAddonMessagePrefix(appName.."a")		-- Sends an action	 {cb:cbToken, id:action_id, data:(var)data}
-		RegisterAddonMessagePrefix(appName.."c")		-- Receive a callback {cb:cbToken, success:(bool)success, data:(var)data}
-		RegisterAddonMessagePrefix(appName.."b")		-- Bystander text. {tx:(str)text,ch:(bool)is_chat}
+		C_ChatInfo.RegisterAddonMessagePrefix(appName.."a")		-- Sends an action	 {cb:cbToken, id:action_id, data:(var)data}
+		C_ChatInfo.RegisterAddonMessagePrefix(appName.."c")		-- Receive a callback {cb:cbToken, success:(bool)success, data:(var)data}
+		C_ChatInfo.RegisterAddonMessagePrefix(appName.."b")		-- Bystander text. {tx:(str)text,ch:(bool)is_chat}
 		
 		Timer.set(function()
 			Index.loadFromStorage()
@@ -468,7 +468,7 @@ local Index = {}
 		--DebugBox.EditBox:SetText(ExiWoW.json.encode(out))
 		local total = #chunks
 		for i,ch in ipairs(chunks) do
-			SendAddonMessage(appName..suffix, token.."§"..i.."§"..total.."§"..ch, ctype, unit)
+			C_ChatInfo.SendAddonMessage(appName..suffix, token.."§"..i.."§"..total.."§"..ch, ctype, unit)
 		end	
 
 	end

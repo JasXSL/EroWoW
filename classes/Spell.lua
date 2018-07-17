@@ -57,7 +57,10 @@ Spell.__index = Spell;
 		return Database.getID("Spell", id);
 	end
 
-	
+	-- Get all bindings where ID matches
+	function Spell.getAll(id)
+		return Database.getIDs("Spell", id);
+	end
 
 	-- Returns spells and checks conditions
 	function Spell.filter(id, ...)
@@ -77,7 +80,8 @@ export(
 	{
 		get = Spell.get,
 		new = Spell.new,
-		filter = Spell.filter
+		filter = Spell.filter,
+		getAll = Spell.getAll
 	},
 	{
 	}

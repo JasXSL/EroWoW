@@ -2,7 +2,7 @@ local appName, internal = ...
 local export = internal.Module.export;
 local require = internal.require;
 
-local UI, Timer, Event, Action, Underwear, Index, Tools, RPText, Condition, NPC, Func;
+local UI, Timer, Event, Action, Underwear, Index, Tools, RPText, Condition, NPC, Func, Spell;
 local myGUID = UnitGUID("player")
 
 -- Contains info about a character, 
@@ -30,6 +30,7 @@ Character.__index = Character;
 		Condition = require("Condition");
 		NPC = require("NPC");
 		Func = require("Func");
+		Spell = require("Spell");
 
 		-- Main character timer, ticking once per second
 		Timer.set(function()
@@ -165,6 +166,7 @@ Character.__index = Character;
 		
 		-- 
 		self.tags = {};						-- For now, only used by NPCs
+		self.spell_tags = {};				-- Tags added by active effects
 
 		-- Importable properties
 		-- Use Character:getnSize
@@ -221,8 +223,33 @@ Character.__index = Character;
 	end
 
 	function Character:getTags()
-		-- Todo: Expand with future tags
-		return self.tags;
+		local out = Tools.concat(self.tags, self.spell_tags);
+		print(unpack(out));
+		return out;
+	end
+
+	-- Spell tags are prefixed with TMPSPELL_
+	function Character:refreshSpellTags(unit)
+		self.spell_tags = {};
+		local names = {};
+		-- Read all buffs
+		for i=1,40 do 
+			local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId = UnitAura(unit, i)
+			if name == nil then break end
+			names[name] = true;
+		end
+		-- Read all debuffs
+		for i=1,40 do 
+			local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId = UnitAura(unit, i, "HARMFUL")
+			if name == nil then break end
+			names[name] = true;
+		end
+		for n,_ in pairs(names) do
+			local matches = Spell.getAll(n);
+			for _,sp in pairs(matches) do
+				self.spell_tags = Tools.concat(self.spell_tags, sp:exportTags());
+			end
+		end
 	end
 
 	-- Gets a clamped excitement value

@@ -5,7 +5,7 @@ local require = internal.require;
 local Timer = {}
 	Timer.id = 0;		-- Increased whenever you set a timer
 	Timer.timers = {};	-- {id:int id, started:nr started, duration: nr duration, times:int nr, callback: fn callback}
-	Timer.time = 0;
+	Timer.time = GetTime();
 
 	function Timer.ini()
 

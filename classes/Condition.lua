@@ -2,7 +2,7 @@ local appName, internal = ...
 local export = internal.Module.export;
 local require = internal.require;
 
-local RPText, Character, Tools, Database, Action, Event, Zone;
+local RPText, Character, Tools, Database, Action, Event, Zone, Event;
 
 local Condition = {};
 Condition.__index = Condition;
@@ -235,6 +235,8 @@ Condition.__index = Condition;
 		Action = require("Action");
 		Event = require("Event");
 		Zone = require("Zone");
+		Event = require("Event");
+
 	end
 
 	function Condition:new(data)
@@ -307,8 +309,9 @@ Condition.__index = Condition;
 		elseif t == ty.RTYPE_SUBZONE then
 			out = Tools.multiSearch(GetSubZoneText(), data);
 		elseif t == ty.RTYPE_LOC then
-			SetMapToCurrentZone();
-			local px,py = GetPlayerMapPosition("player");
+			local mapID = C_Map.GetBestMapForUnit("player");
+			local pos = C_Map.GetPlayerMapPosition(895,"player");
+			local px,py = pos:GetXY();
 			px = px*100; py = py*100;
 			local x = data.x;
 			local y = data.y;
