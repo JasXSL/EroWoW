@@ -26,12 +26,13 @@ UI = {}
 
 	-- Local helper functions
 	local function onSettingsChange()
+		--if true then return end
 		Event.raise(Event.Types.ACTION_SETTING_CHANGE)
 	end
 
 	-- Helpful internal build function
 	local function createSlider(id, parent, point, x,y, low, high, label, min,max, step, tooltip, callback, width, height)
-		
+		--if true then return end
 		if not width then width = 200 end
 		if not height then height = 20 end
 		local sl = CreateFrame("Slider", id, parent, "OptionsSliderTemplate")
@@ -60,6 +61,7 @@ UI = {}
 	end
 
 	function UI.build()
+		--if true then return end
 		local f = ExiWoWSettingsFrame;
 		UI.FRAME = f;
 		f:SetMovable(true)
@@ -128,11 +130,34 @@ UI = {}
 			
 		
 		end)
+
+		-- Bind events
+		ExiWoWSettingsFrame_close:SetScript("OnMouseUp", function (self, button)
+			UI:toggle();
+		end)
+
+
+		ExiWoWSettingsFrameTab1:SetScript("OnMouseUp", function (self, button)
+			UI.setPage(1, true)
+		end)
+
+		ExiWoWSettingsFrameTab2:SetScript("OnMouseUp", function (self, button)
+			UI.setPage(2, true)
+		end)
+
+		ExiWoWSettingsFrameTab3:SetScript("OnMouseUp", function (self, button)
+			UI.setPage(3, true)
+		end)
+		ExiWoWSettingsFrameTab4:SetScript("OnMouseUp", function (self, button)
+			UI.setPage(4, true)
+		end)
+
 	end
 
 
 	-- Main UI functions
 	function UI.toggle()
+		--if true then return end
 		UI.open = not UI.open
 		globalStorage.UI_OPEN = UI.open;
 		if UI.open then
@@ -147,6 +172,7 @@ UI = {}
 
 	-- Creates a macro
 	function UI.createMacro(id)
+		--if true then return end
 		local action = Action.get(id)
 		if not action then return false end
 	
@@ -167,6 +193,7 @@ UI = {}
 
 	-- Refresh all--
 	function UI.refreshAll()
+		--if true then return end
 		require("Action"):sort();
 		UI.actionPage.update();
 		UI.underwearPage.update();
@@ -177,6 +204,7 @@ UI = {}
 
 	-- Deactivates all tabs
 	function UI.hideAllTabs()
+		--if true then return end
 		ExiWoWSettingsFrame_page_settings:Hide();
 		ExiWoWSettingsFrame_page_actions:Hide();
 		ExiWoWSettingsFrame_page_underwear:Hide();	
@@ -185,6 +213,7 @@ UI = {}
 
 	
 	function UI.setPage(tab, playSound)
+		--if true then return end
 		if tab == nil then return end
 		local pages = {"actionPage", "quests", "underwearPage", "localSettings"};
 		if not pages[tab] then print("UI Page not found", tab); return end
@@ -221,6 +250,7 @@ UI = {}
 
 	-- Builds the portrait
 	function UI.portrait.build()
+		--if true then return end
 		local frameWidth = UI.portrait.FRAME_WIDTH;
 		local frameHeight = UI.portrait.FRAME_HEIGHT;
 		local padding = UI.portrait.PADDING;
@@ -332,7 +362,7 @@ UI = {}
 	end
 
 	function UI.portrait.updateExcitementDisplay()
-
+		--if true then return end
 		local n = max(ExiWoW.ME:getExcitementPerc(), 0.00001);
 		UI.portrait.portraitExcitementBar:SetWidth(UI.portrait.FRAME_HEIGHT*n);
 		UI.portrait.portraitExcitementBar:SetPoint("BOTTOM", 0,-UI.portrait.FRAME_HEIGHT+UI.portrait.FRAME_HEIGHT*n);
@@ -359,6 +389,7 @@ UI = {}
 	UI.quests.selected = nil;		-- ID of selected quest
 
 	function UI.quests.build()
+		--if true then return end
 		-- Empty
 			local empty = CreateFrame("Frame", nil, ExiWoWSettingsFrame_page_quests);
 			empty:SetAllPoints();
@@ -546,7 +577,7 @@ UI = {}
 	end
 
 	function UI.quests.getListingFrame(index)
-
+		--if true then return end
 		if not UI.quests.listingFrames[index] then
 			local ab = CreateFrame("Button", nil, UI.quests.left.scrollchild, "QuestLogTitleTemplate");
 			ab.Text:SetWidth(UI.quests.left.scrollchild:GetWidth()-15);
@@ -570,6 +601,7 @@ UI = {}
 	end
 
 	function UI.quests.handinClicked()
+		--if true then return end
 		local quest = Quest.get(UI.quests.selected);
 		if quest and quest:isReadyToHandIn() and quest:isDetachedHandin() then
 			quest:handIn();
@@ -577,6 +609,7 @@ UI = {}
 	end
 
 	function UI.quests.tooltip(itemType, itemID, frame)
+		--if true then return end
 		local asset = nil;
 		if itemType == "Charges" then
 			asset = Action.get(itemID);
@@ -596,11 +629,13 @@ UI = {}
 	end
 
 	function UI.quests.clicked(frame)
+		--if true then return end
 		UI.quests.selected = frame.questID;
 		UI.quests.update();
 	end
 
 	function UI.quests.update()
+		--if true then return end
 		local quests = Quest.getActive();
 		if #quests > 0 then
 			UI.quests.selected = quests[1].id;
@@ -782,6 +817,7 @@ UI = {}
 		end
 	end
 	UI.quests.open = function()
+		--if true then return end
 		PanelTemplates_SetTab(UI.FRAME, 2);
 		UI:hideAllTabs();
 		ExiWoWSettingsFrame_page_quests:Show();
@@ -806,7 +842,7 @@ UI = {}
 	UI.talkbox.sequence = nil;
 
 	function UI.talkbox.build()
-
+		--if true then return end
 		-- Talkbox
 		local talkbox = CreateFrame("Frame", nil, UIParent);
 		UI.talkbox.frame = talkbox;
@@ -984,11 +1020,12 @@ UI = {}
 	end
 
 	function UI.talkbox.getActive()
+		--if true then return end
 		return UI.talkbox.active;
 	end
 
 	function UI.talkbox.set(talkbox)
-
+		--if true then return end
 		if UI.talkbox.active then 
 			return 
 		end
@@ -1030,6 +1067,7 @@ UI = {}
 	end
 
 	function UI.talkbox.advance()
+		--if true then return end
 		if not UI.talkbox.active then 
 			return;
 		end
@@ -1046,6 +1084,7 @@ UI = {}
 	end
 
 	function UI.talkbox.back()
+		--if true then return end
 		if not UI.talkbox.active or UI.talkbox.page == 1 then 
 			return 
 		end
@@ -1055,6 +1094,7 @@ UI = {}
 
 
 	function UI.talkbox.draw()
+		--if true then return end
 		local tb = UI.talkbox.active;
 		local fr = UI.talkbox.frame.main;
 		UI.talkbox.sequence = nil;
@@ -1085,6 +1125,7 @@ UI = {}
 	end
 
 	function UI.talkbox.hide()
+		--if true then return end
 		UI.talkbox.active = nil;
 		UI.talkbox.frame:Hide();
 	end
@@ -1104,6 +1145,7 @@ UI = {}
 	-- Build the action page
 	UI.actionPage = {}
 	function UI.actionPage.build()
+		--if true then return end
 		local f = ExiWoWSettingsFrame_page_actions;
 		for row=0,UI.buttonPage.ROWS-1 do
 			for col=0,UI.buttonPage.COLS-1 do
@@ -1149,6 +1191,7 @@ UI = {}
 	end
 
 	function UI.actionPage.getAbilityAt(index)
+		--if true then return end
 		local out = 0;
 		
 		local lib = Database.filter("Action");
@@ -1166,7 +1209,7 @@ UI = {}
 	end
 
 	function UI.actionPage.update()
-
+		--if true then return end
 		for n=1,UI.buttonPage.ROWS*UI.buttonPage.COLS do
 			local f = _G["ExiWoWActionButton_"..(n-1)]
 			local v = UI.actionPage.getAbilityAt(n);
@@ -1228,6 +1271,7 @@ UI = {}
 	end
 
 	function UI.actionPage.open()
+		--if true then return end
 		PanelTemplates_SetTab(UI.FRAME, 1);
 		UI:hideAllTabs();
 		ExiWoWSettingsFrame_page_actions:Show();
@@ -1242,6 +1286,7 @@ UI = {}
 	-- Underwear page
 	UI.underwearPage = {}
 	function UI.underwearPage.build()
+		--if true then return end
 		local f = ExiWoWSettingsFrame_page_underwear;
 		for row=0,UI.buttonPage.ROWS-1 do
 			for col=0,UI.buttonPage.COLS-1 do
@@ -1277,7 +1322,7 @@ UI = {}
 	end
 
 	function UI.underwearPage.update()
-
+		--if true then return end
 		local i = 0;
 		local unlocked = ExiWoW.ME.underwear_ids;
 		local existing = {}
@@ -1363,6 +1408,7 @@ UI = {}
 	end
 
 	UI.underwearPage.open = function()
+		--if true then return end
 		PanelTemplates_SetTab(UI.FRAME, 3);
 		UI:hideAllTabs();
 		ExiWoWSettingsFrame_page_underwear:Show();
@@ -1377,6 +1423,7 @@ UI = {}
 	-- Local settings
 	UI.localSettings = {}
 	function UI.localSettings.build()
+		--if true then return end
 		local f = ExiWoWSettingsFrame_page_settings;
 	
 		local top = -50;
@@ -1468,32 +1515,11 @@ UI = {}
 			localStorage.wisdom = ExiWoW.ME.wisdom;
 		end)
 		
-		
-		
-		-- Bind events
-		ExiWoWSettingsFrame_close:SetScript("OnMouseUp", function (self, button)
-			UI:toggle();
-		end)
-
-
-		ExiWoWSettingsFrameTab1:SetScript("OnMouseUp", function (self, button)
-			UI.setPage(1, true)
-		end)
-
-		ExiWoWSettingsFrameTab2:SetScript("OnMouseUp", function (self, button)
-			UI.setPage(2, true)
-		end)
-
-		ExiWoWSettingsFrameTab3:SetScript("OnMouseUp", function (self, button)
-			UI.setPage(3, true)
-		end)
-		ExiWoWSettingsFrameTab4:SetScript("OnMouseUp", function (self, button)
-			UI.setPage(4, true)
-		end)
 
 	end
 	
 	function UI.localSettings.update()
+		--if true then return end
 		local psize = ExiWoW.ME:getPenisSize();
 		local tsize = ExiWoW.ME:getBreastSize();
 		local bsize = ExiWoW.ME:getButtSize();
@@ -1522,6 +1548,7 @@ UI = {}
 	end
 
 	function UI.localSettings.open()
+		--if true then return end
 		PanelTemplates_SetTab(UI.FRAME, 4);
 		UI:hideAllTabs();
 		ExiWoWSettingsFrame_page_settings:Show();
@@ -1536,6 +1563,7 @@ UI = {}
 	-- Rarity starts at 1 which is grey
 	-- Rarity starts at 1 which is grey
 	function UI.drawLoot(name, icon, rarity)
+		--if true then return end
 		if not rarity then rarity = 2 end
 
 		table.insert(UI.lootQueue, {name=name, icon=icon})
@@ -1565,6 +1593,7 @@ UI = {}
 	-- Global settings
 	UI.globalSettings = {}
 	function UI.globalSettings.build()
+		--if true then return end
 		local panel = CreateFrame("Frame", appName.."_globalConf", UIParent)
 		panel.name = "ExiWoW"
 		InterfaceOptions_AddCategory(panel)
@@ -1592,7 +1621,6 @@ UI = {}
 		n = n+1;
 		createCheckbutton("taunt_other", panel, "TOPLEFT", gPadding,-gPadding-gBottom*n, "Enable Other Actions", "Turn off to prevent certain actions by other genders to be used against you.");
 		
-
 		local prefix = appName.."_globalConf_";
 		n = 0
 		createSlider(prefix.."takehit_rp_rate", panel, "TOPRIGHT", -gPadding,-gPadding-gBottom*n, "1", "60", "Hit Text Limit", 1, 60, 1, "Sets minimum time in seconds between RP texts received from being affected by an attack or spell.", function(self, val)
@@ -1636,7 +1664,9 @@ UI = {}
 		end;
 		panel.cancel = function (self)  UI.drawGlobalSettings(); end;
 	end
+
 	function UI.globalSettings.update()
+		--if true then return end
 		local gs = globalStorage;
 		local prefix = appName.."_globalConf_";
 		getglobal(prefix.."takehit_rp_rate"):SetValue(gs.takehit_rp_rate);

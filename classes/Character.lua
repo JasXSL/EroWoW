@@ -224,7 +224,6 @@ Character.__index = Character;
 
 	function Character:getTags()
 		local out = Tools.concat(self.tags, self.spell_tags);
-		print(unpack(out));
 		return out;
 	end
 

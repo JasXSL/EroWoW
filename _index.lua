@@ -289,16 +289,7 @@ local Index = {}
 			-- Add to chat log
 			if response.ch then
 				RPText.npcSpeak(response.tx);
-			-- Add bystander text to combat log
 			else
-				--[[
-				for i = 1,10 do
-					if GetChatWindowInfo(i)=="Combat Log" then
-						_G['ChatFrame'..i]:AddMessage(response.tx, 1,0.8,1)
-						break
-					end
-				end
-				]]
 				RPText.bystander(response.tx);
 			end
 			
