@@ -310,7 +310,7 @@ Condition.__index = Condition;
 			out = Tools.multiSearch(GetSubZoneText(), data);
 		elseif t == ty.RTYPE_LOC then
 			local mapID = C_Map.GetBestMapForUnit("player");
-			local pos = C_Map.GetPlayerMapPosition(895,"player");
+			local pos = C_Map.GetPlayerMapPosition(mapID,"player");
 			local px,py = pos:GetXY();
 			px = px*100; py = py*100;
 			local x = data.x;

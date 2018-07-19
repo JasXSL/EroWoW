@@ -97,8 +97,7 @@ local Event = {}
 			if 
 				b.event == Event.Types.POINT_REACHED and
 				type(b.data) == "table" and
-				(b.data.zone == GetRealZoneText() or not b.data.zone) and
-				(b.data.sub == GetSubZoneText() or not b.data.sub) 
+				(b.data.zone == GetRealZoneText() or not b.data.zone)
 			then
 				Event.pointCheck[id] = b;
 			end
@@ -112,13 +111,16 @@ local Event = {}
 
 	function Event.checkPoints()
 		local mapID = C_Map.GetBestMapForUnit("player");
-		local pos = C_Map.GetPlayerMapPosition(895,"player");
+		local pos = C_Map.GetPlayerMapPosition(mapID,"player");
 		local px,py = pos:GetXY();
-		
 		px = px*100; py = py*100;
 		for id,b in pairs(Event.pointCheck) do
-			if not b.data.x or not b.data.y or not b.data.dist or
-				math.sqrt(math.pow(px-b.data.x, 2)+math.pow(py-b.data.y, 2)) <= b.data.dist
+
+			if (b.data.sub == GetSubZoneText() or not b.data.sub) and
+				(
+					not b.data.x or not b.data.y or not b.data.dist or
+					math.sqrt(math.pow(px-b.data.x, 2)+math.pow(py-b.data.y, 2)) <= b.data.dist
+				)
 			then
 				Event.trigger(id);
 			end

@@ -123,7 +123,10 @@ Talkbox.__index = Talkbox;
 		self.title = data.title;				-- Title of talkbox
 		self.onComplete = data.onComplete;		-- Function to run when completed
 		self.rewards = data.rewards;			-- {{name = name, icon=icon, quant=quant}...}
-
+		self.x = data.x;											-- X/Y where the talkbox orginated from in the zone where it's popped
+		self.y = data.y;
+		self.rad = data.rad;										-- Radius from where to close the talkbox
+		
 		if type(self.lines) ~= "table" then
 			self.lines = {};
 		end

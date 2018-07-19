@@ -354,7 +354,6 @@ RPText.whisperCD = nil
 	function RPText.print(text, ignoreChat)
 		-- 0.95686274509,0.49019607843,0.25490196078
 		if not ignoreChat then
-			print("Adding a message");
 			ChatFrame1:AddMessage(text, 0.737, 0.6, 0.980);
 		end
 		--f47d41
@@ -363,7 +362,6 @@ RPText.whisperCD = nil
 
 	function RPText.bystander(text)
 		-- 0.95686274509,0.49019607843,0.25490196078
-		print("Adding a message");
 		ChatFrame1:AddMessage(text, 0.835, 0.772, 0.686);
 	end
 
@@ -376,7 +374,6 @@ RPText.whisperCD = nil
 		if isWhisper then
 			color = {1.0,0.49,1.0}
 		end
-		print("Adding a message");
 		ChatFrame1:AddMessage(sender, color[1], color[2], color[3]);
 		UIErrorsFrame:AddMessage(sender, color[1], color[2], color[3], 53, 6);
 	end

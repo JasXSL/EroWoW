@@ -348,7 +348,7 @@ function internal.build.actions()
 		fn_receive = function(self, sender, target, args)
 
 			local mapID = C_Map.GetBestMapForUnit("player");
-			local pos = C_Map.GetPlayerMapPosition(895,"player");
+			local pos = C_Map.GetPlayerMapPosition(mapID,"player");
 			local px,py = pos:GetXY();
 			px = px*100
 			py = py*100

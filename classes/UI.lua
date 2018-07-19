@@ -2,7 +2,7 @@ local appName, internal = ...
 local export = internal.Module.export;
 local require = internal.require;
 
-local Action, Underwear, Database, Event, Timer, Quest;
+local Action, Underwear, Database, Event, Timer, Quest, Condition;
 
 UI = {}
 	UI.FRAME = false 					-- Page browser for ExiWoW
@@ -20,7 +20,7 @@ UI = {}
 		Event = require("Event");
 		Timer = require("Timer");
 		Quest = require("Quest");		
-
+		Condition = require("Condition");
 	end
 
 
@@ -288,15 +288,16 @@ UI = {}
 
 		-- Status bar
 		local bar = CreateFrame("Frame", nil, bg);
-		bar:SetPoint("TOPLEFT")
-		bar:SetSize(frameWidth,frameHeight)
+		bar:SetPoint("TOPLEFT");
+		bar:SetSize(frameWidth,frameHeight);
+		--bar:SetRotation(math.pi/2);
 
 		t = bar:CreateTexture(nil, "BORDER");
 		t:SetPoint("BOTTOM");
 		t:SetSize(frameWidth,frameHeight);
 		t:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
 		--t:SetHeight(frameHeight*max(self.excitement, 0.00001)); -- Setting to 0 doesn't work
-		t:SetRotation(-math.pi/2);
+		SetClampedTextureRotation(t, 90);
 		t:SetVertexColor(1,0.75,1)
 		t:AddMaskTexture(mask);
 		UI.portrait.portraitExcitementBar = t;
@@ -364,8 +365,8 @@ UI = {}
 	function UI.portrait.updateExcitementDisplay()
 		--if true then return end
 		local n = max(ExiWoW.ME:getExcitementPerc(), 0.00001);
-		UI.portrait.portraitExcitementBar:SetWidth(UI.portrait.FRAME_HEIGHT*n);
-		UI.portrait.portraitExcitementBar:SetPoint("BOTTOM", 0,-UI.portrait.FRAME_HEIGHT+UI.portrait.FRAME_HEIGHT*n);
+		UI.portrait.portraitExcitementBar:SetHeight(UI.portrait.FRAME_WIDTH*n);	
+		UI.portrait.portraitExcitementBar:SetPoint("BOTTOM", 0,0);---UI.portrait.FRAME_HEIGHT+UI.portrait.FRAME_HEIGHT*n
 		
 
 	end
@@ -840,6 +841,8 @@ UI = {}
 	UI.talkbox.active = nil;	-- Use Talkbox object
 	UI.talkbox.seqtime = 0;
 	UI.talkbox.sequence = nil;
+	UI.talkbox.radcheck = nil;	-- Timer for checking radius
+
 
 	function UI.talkbox.build()
 		--if true then return end
@@ -943,14 +946,14 @@ UI = {}
 		local bg = fr:CreateTexture(nil, "BACKGROUND");
 		bg:SetAllPoints(fr);
 		bg:SetTexture("Interface/QuestFrame/TalkingHeads");
-		bg:SetTexCoord(0.000976562, 0.557617, 0.00390625, 0.609375);
+		bg:SetTexCoord(0.000976562, 0.557617, 0.00390625, 0.1543);
 
-		-- Portrait bg
+		-- Portrait black bg
 		local ol = fr:CreateTexture(nil, "BACKGROUND");
-		ol:SetSize(145, 145);
+		ol:SetSize(140,140);
 		ol:SetPoint("LEFT", 15, 0);
 		ol:SetTexture("Interface/QuestFrame/TalkingHeads");
-		ol:SetTexCoord(0.701172, 0.813477, 0.00390625, 0.453125);
+		ol:SetTexCoord(0.5586, 0.67, 0.306, 0.42);
 
 		-- /run ExiWoW.require("UI").quests.talkbox.model:SetUnit("target")
 		local model = CreateFrame("PlayerModel", nil, fr);
@@ -959,7 +962,6 @@ UI = {}
 		model:SetPoint("LEFT", 25, 0);
 		model:SetDisplayInfo(17781); -- Find the NPC on wowhead, edit source and search for ModelViewer.show, that has the displayid
 		model:SetCamera(0);
-
 		--[[
 		model:SetScript("OnUpdate", function(self, e)
 			if UI.talkbox.sequence then
@@ -967,15 +969,16 @@ UI = {}
 			end
 		end);
 		]]
-
+		-- Portrait border
 		local border = CreateFrame("Frame", nil, model);
 		border:SetAllPoints();
 		ol = border:CreateTexture(nil, "BORDER");
-		ol:SetSize(160, 160);
-		ol:SetPoint("LEFT", -15, 0);
+		ol:SetSize(145, 145);
+		ol:SetPoint("LEFT", -5, 0);
 		ol:SetTexture("Interface/QuestFrame/TalkingHeads");
-		ol:SetTexCoord(0.55957, 0.699219, 0.00390625, 0.5625);
+		ol:SetTexCoord(0.5664, 0.693, 0.007, 0.1357);
 		
+		-- Quest title text
 		local text = fr:CreateFontString(nil, "BACKGROUND", "Fancy22Font");
 		--text:SetTextColor(1,1,1,1);
 		text:SetPoint("TOPRIGHT", -15, -30);
@@ -984,6 +987,7 @@ UI = {}
 		text:SetText("Quest title");
 		fr.title = text;
 
+		-- Quest desc
 		text = fr:CreateFontString(nil, "BACKGROUND", "GameFontHighlightLarge");
 		--text:SetTextColor(1,1,1,1);
 		text:SetPoint("TOPLEFT", fr.title, "BOTTOMLEFT", 0, -5);
@@ -992,7 +996,7 @@ UI = {}
 		fr.description = text;
 		text:SetText("This is the quest description. I'm gonna type out a few lines just to make sure it fits and wraps correctly.");
 
-		
+		-- Page out of page
 		text = fr:CreateFontString(nil, "BACKGROUND", "GameFontHighlightLarge");
 		--text:SetTextColor(1,1,1,1);
 		text:SetPoint("BOTTOMRIGHT", fr, "BOTTOMRIGHT", -25, 25);
@@ -1002,7 +1006,7 @@ UI = {}
 		text:SetText("1/1");
 		fr.pagination = text;
 
-		-- Hover
+		-- Hover Hover frame
 		local hover = CreateFrame("Frame", nil, fr);
 		hover:SetAllPoints();
 		hover:SetFrameStrata("HIGH");
@@ -1012,7 +1016,7 @@ UI = {}
 		ol = hover:CreateTexture(nil, "BACKGROUND");
 		ol:SetAllPoints();
 		ol:SetTexture("Interface/QuestFrame/TalkingHeads");
-		ol:SetTexCoord(0.248047, 0.503906, 0.617188, 0.75);
+		ol:SetTexCoord(0.565, 0.805, 0.15, 0.227);
 		ol:SetAlpha(0.5);
 		hover:Hide();
 
@@ -1028,6 +1032,17 @@ UI = {}
 		--if true then return end
 		if UI.talkbox.active then 
 			return 
+		end
+
+		Timer.clear(UI.talkbox.radcheck);
+		if talkbox.x and talkbox.y and talkbox.rad then
+			UI.talkbox.radcheck = Timer.set(function()
+				local cond = Condition:new({type=Condition.Types.RTYPE_LOC, data={x=talkbox.x, y=talkbox.y, rad=talkbox.rad}});
+				local valid = cond:validate("player", "player", ExiWoW.ME, ExiWoW.ME);
+				if not valid then
+					UI.talkbox.hide();
+				end
+			end, 0.25, math.huge);
 		end
 
 		UI.talkbox.active = talkbox;
@@ -1125,6 +1140,7 @@ UI = {}
 	end
 
 	function UI.talkbox.hide()
+		Timer.clear(UI.talkbox.radcheck);
 		--if true then return end
 		UI.talkbox.active = nil;
 		UI.talkbox.frame:Hide();
