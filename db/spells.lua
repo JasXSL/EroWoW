@@ -32,6 +32,7 @@ function internal.build.spells()
 	ext:addSpell({id="Shock", tags={"ELECTRIC"}});
 	ext:addSpell({id="Zap", tags={"ELECTRIC"}});
 	ext:addSpell({id="Lizard Bolt", tags={"ELECTRIC"}});
+	ext:addSpell({id="Charged Bolt", tags={"ELECTRIC"}});
 	
 	ext:addSpell({id="Crystal Gaze", tags={"PETRIFY"}});
 	ext:addSpell({id="Petrifying Blast", tags={"PETRIFY"}});

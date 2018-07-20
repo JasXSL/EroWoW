@@ -139,10 +139,12 @@ local Event = {}
 		end
 
 		local function triggerWhisper(senderUnit, sender, spelldata, spellType)
-			if math.random() > globalStorage.taunt_freq then return end 
+			if math.random() > globalStorage.taunt_freq then return end -- 
 			if RPText.whisperCD then return end
 
-			if RPText.trigger("_WHISPER_", senderUnit, "player", sender, ExiWoW.ME, spelldata, spellType) then
+			print("Triggering Speech");
+			--id, senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action, debug
+			if RPText.trigger("_WHISPER_", senderUnit, "player", sender, ExiWoW.ME, spelldata, spellType, nil, false) then
 				if globalStorage.taunt_rp_rate > 0 then
 					RPText.whisperCD = Timer.set(function()
 						RPText.whisperCD = nil
@@ -222,6 +224,11 @@ local Event = {}
 				local crit = ""
 				if arguments[18] or (localStorage.tank_mode and math.random() < globalStorage.tank_mode_perc) then crit = "_CRIT" end
 
+				local npc = Character:new({}, sourceName);
+				if u then 
+					npc = Character.buildNPC(u, sourceName);
+				end
+
 				local damage = 0	
 				damage = arguments[12]
 
@@ -230,15 +237,12 @@ local Event = {}
 					name = sourceName
 				});
 
-				--print("Todo, whispers")
-				--[[
 				triggerWhisper(
-					u,
+					u, 
 					npc, 
 					buildSpellTrigger("ATTACK", "ATTACK", true, sourceName, 1, crit, npc), 
 					Condition.Types.RTYPE_MELEE
-				)
-				]]
+				);
 
 			end
 		end

@@ -45,7 +45,11 @@ function internal.build.conditions()
 	ext:addCondition({id="attackerNotLarge", type=ty.RTYPE_TAG, data={"NPC_LARGE", "NPC_GIANT"}, sender=true, inverse=true});
 	ext:addCondition({id="attackerIsSmall", type=ty.RTYPE_TAG, data={"NPC_SMALL"}, sender=true});
 	ext:addCondition({id="attackerIsFistfighter", type=ty.RTYPE_TAG, data={"NPC_FISTFIGHTER"}, sender=true});
+	ext:addCondition({id="attackerIsMogu", type=ty.RTYPE_TAG, data={"NPC_MOGU"}, sender=true});
 	
+	ext:addCondition({id="victimIsPandaren", type=ty.RTYPE_RACE, data={Pandaren=true}});
+	
+
 
 	ext:addCondition({id="maleWhispers", type=ty.RTYPE_REQUIRE_MALE});
 	ext:addCondition({id="femaleWhispers", type=ty.RTYPE_REQUIRE_FEMALE});

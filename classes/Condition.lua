@@ -17,7 +17,7 @@ Condition.__index = Condition;
 		RTYPE_PENIS_GREATER = "penis_greater",		-- (int)size :: Penis greater than size.
 		RTYPE_BREASTS_GREATER = "breasts_greater",	-- (int)size :: Breasts greater than size.
 		RTYPE_BUTT_GREATER = "butt_greater",			-- (int)size :: Butt greater than size.
-		RTYPE_RACE = "race",							-- {raceEN=true, raceEn=true...} Table of races that are accepted. Example: {Gnome=true, HighmountainTauren=true}
+		RTYPE_RACE = "race",							-- {raceEN=true, raceEn=true...} Table of races that are accepted. Example: {Gnome=true, HighmountainTauren=true}, use UnitRace
 		RTYPE_CLASS = "class",							-- {englishClass=true, englishClass=true...} Table of classes that are accepted. Example: {DEATHKNIGHT=true, MONK=true}
 		RTYPE_TYPE = "type",							-- {typeOne=true, typeTwo=true...} For players this is always "player", otherwise refer to the type of NPC, such as "Humanoid"
 		RTYPE_NAME = "name",							-- {nameOne=true, nameTwo=true...} Name of targ. If used with NPCs, consider using a tag instead
@@ -256,7 +256,7 @@ Condition.__index = Condition;
 
 	
 
-	function Condition:validate(senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action)
+	function Condition:validate(senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action, debug)
 
 		local t = self.type;
 		local targ = receiverChar;
@@ -414,7 +414,7 @@ Condition.__index = Condition;
 			out = UnitInVehicle(targUnit);
 		end
 
-		if Condition.DEBUG and not out then print("Failed on", t, ExiWoW.json.encode(data)) end
+		if (Condition.DEBUG or debug) and not out then print("Failed on", t, ExiWoW.json.encode(data)) end
 
 		if inverse then out = not out end
 		return out; 
@@ -450,7 +450,7 @@ Condition.__index = Condition;
 	end
 
 	-- Validate all conditions
-	function Condition.all(conditions, senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action)
+	function Condition.all(conditions, senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action, debug)
 
 		local se = self;
 		local function validateThese(input, noOr)
@@ -467,7 +467,7 @@ Condition.__index = Condition;
 					if not v or type(v.validate) ~= "function" then
 						print("Invalid condition in ", self.text_receiver);
 					end
-					success = v:validate(senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action) -- This entry was a condition
+					success = v:validate(senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action, debug) -- This entry was a condition
 					if v.type == Condition.Types.RTYPE_HAS_INVENTORY and success then
 						se.item = success;
 					end

@@ -27,17 +27,27 @@ local Tools = {};
 	-- Searches name in acceptable {name=true, name2=true...}, if acceptable is nil, then it's a wildcard
 	-- If name is not a string, then it's false
 	function Tools.multiSearch(name, acceptable)
-		if acceptable == nil then return true end
-		if type(name) ~= "string" then return false end
+		if acceptable == nil then 
+			return true; 
+		end
+		if type(name) ~= "string" then 
+			return false;
+		end
 		local itm = {}
-		if type(acceptable) ~= "table" then itm[acceptable] = true
-		else itm = acceptable
+		if type(acceptable) ~= "table" then 
+			itm[acceptable] = true;
+		else 
+			itm = acceptable;
 		end
 		for v,_ in pairs(itm) do
 			if type(v) ~= "string" then 
-				for vv, vk in pairs(itm) do print(vv, vk) end
+				for vv, vk in pairs(itm) do 
+					print(vv, vk) 
+				end
 			end
-			if name == v or (v:sub(1,1) == "%" and name:find(v:sub(2))) then return true end				
+			if name == v or (v:sub(1,1) == "%" and name:find(v:sub(2))) then 
+				return true;
+			end				
 		end
 		return false
 	end

@@ -50,8 +50,12 @@ Character.__index = Character;
 	-- Builds an NPC from a unit
 	function Character.buildNPC(u, name)
 
-		if not name then name = "???" end
-		if not u then u = "none" end
+		if not name then 
+			name = "???";
+		end
+		if not u then 
+			u = "none"; 
+		end
 
 		local npc = Character:new({}, name);
 
