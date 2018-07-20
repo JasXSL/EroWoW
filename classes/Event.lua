@@ -142,7 +142,6 @@ local Event = {}
 			if math.random() > globalStorage.taunt_freq then return end -- 
 			if RPText.whisperCD then return end
 
-			print("Triggering Speech");
 			--id, senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action, debug
 			if RPText.trigger("_WHISPER_", senderUnit, "player", sender, ExiWoW.ME, spelldata, spellType, nil, false) then
 				if globalStorage.taunt_rp_rate > 0 then
