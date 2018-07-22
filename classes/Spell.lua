@@ -28,7 +28,7 @@ Spell.__index = Spell;
 		setmetatable(self, Spell);
 		
 		self.id = data.id;				-- Id is the name of the spell. Can contain a % or table (not set, ex) {"id1", "id2"}
-		self.tags = type(data.tags) == "table" and data.tags or {};						-- Text tags of your choosing
+		self.tags = type(data.tags) == "table" and data.tags or {};						-- Text tags of your choosing. Prefixed with TMPSPELL_
 		self.conditions = type(data.conditions) == "table" and data.conditions or {};	-- Conditions to run this
 		self.onTrigger = data.onTrigger;				-- Function. Raised with args: self, event, casterUnit, victimUnit, casterChar, victimChar
 														-- This function is ALWAYS, no RNG involved, and no conditions are checked

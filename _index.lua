@@ -77,6 +77,15 @@ local LOCALSTORAGE_DEFAULTS = {
 };
 
 
+-- ExiWoW global functions
+	-- Returns a full sound path
+	function ExiWoW.getSound(name)
+		return "Interface\\Addons\\ExiWoW\\media\\sfx\\"..name..".ogg";
+	end
+
+
+
+
 
 -- Static class definition for INDEX
 local Index = {}
@@ -464,6 +473,7 @@ local Index = {}
 
 	end
 
+	
 
 	
 

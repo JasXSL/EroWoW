@@ -155,7 +155,11 @@ RPText.whisperCD = nil
 		end
 
 		if self.sound and not noSound then
-			PlaySound(self.sound, "SFX");
+			if type(self.sound) == "number" then
+				PlaySound(self.sound, "SFX");
+			else
+				PlaySoundFile(self.sound, "SFX");
+			end
 		end
 
 	end

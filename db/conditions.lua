@@ -46,6 +46,7 @@ function internal.build.conditions()
 	ext:addCondition({id="attackerIsSmall", type=ty.RTYPE_TAG, data={"NPC_SMALL"}, sender=true});
 	ext:addCondition({id="attackerIsFistfighter", type=ty.RTYPE_TAG, data={"NPC_FISTFIGHTER"}, sender=true});
 	ext:addCondition({id="attackerIsMogu", type=ty.RTYPE_TAG, data={"NPC_MOGU"}, sender=true});
+	ext:addCondition({id="attackerIsPaleOrc", type=ty.RTYPE_TAG, data={"NPC_PALE_ORC"}, sender=true});
 	
 	ext:addCondition({id="victimIsPandaren", type=ty.RTYPE_RACE, data={Pandaren=true}});
 	
@@ -57,9 +58,10 @@ function internal.build.conditions()
 	ext:addCondition({id="targetWearsUnderwear", type=ty.RTYPE_UNDIES, data={true}});
 	ext:addCondition({id="targetNoUnderwear", type=ty.RTYPE_UNDIES, data={true}, inverse=true});
 	
-	ext:addCondition({id="victimKnockedDown", type = ty.RTYPE_HAS_AURA, data={{name="lash", caster="Bloodpetal Lasher"}}});
+	ext:addCondition({id="victimKnockedDown", type = ty.RTYPE_TAG, data={"TMPSPELL_KNOCKDOWN"}});
 	ext:addCondition({id="victimParalyzed", type = ty.RTYPE_HAS_AURA, data={{name="Paralysis"}}});
 	ext:addCondition({id="invFeathers", type=ty.RTYPE_HAS_INVENTORY, data={{name="Light Feather"}}});
+	ext:addCondition({id="victimHeadJumped", type=ty.RTYPE_TAG, data={"TMPSPELL_HEADJUMP"}});
 	ext:addCondition({id="chestPlate", type=ty.RTYPE_EQUIPMENT, data={slot=5, type="Plate"}});
 	ext:addCondition({id="chestLightArmor", type=ty.RTYPE_EQUIPMENT, data={slot=5, type={Leather=true, Cloth=true}}});
 	ext:addCondition({id="chestHeavyArmor", type=ty.RTYPE_EQUIPMENT, data={slot=5, type={Plate=true, Mail=true}}});

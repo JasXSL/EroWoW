@@ -21,6 +21,7 @@ function internal.build.spells()
 	ext:addSpell({id="Ice Blast", tags={"COLD"}});
 	ext:addSpell({id="Frost Breath", tags={"COLD"}});
 	ext:addSpell({id="Frost Cleave", tags={"COLD"}});
+	ext:addSpell({id="Sleet", tags={"COLD"}});
 	
 	ext:addSpell({id="Entangling Roots", tags={"ROOTS"}});
 	ext:addSpell({id="Strangling Roots", tags={"ROOTS"}});
@@ -72,6 +73,11 @@ function internal.build.spells()
 	ext:addSpell({id="Headbutt"});
 	ext:addSpell({id="Lashing Flurry", alias="SWING"});
 	ext:addSpell({id="Flaying Vine", alias="SWING"});
+	ext:addSpell({id="Lash", conditions={Condition:new({
+		type=Condition.Types.RTYPE_NAME,
+		data={["Bloodpetal Lasher"]=true},
+		tags={"KNOCKDOWN"}
+	})}});
 	ext:addSpell({id="Bonk"});
 	ext:addSpell({id="Shoot"});
 	ext:addSpell({id="Lash of Pain"});
@@ -81,7 +87,8 @@ function internal.build.spells()
 	ext:addSpell({id="Slitherstrike"});
 	ext:addSpell({id="Icky Ink"});
 	ext:addSpell({id="Willbreaker"});
-	
+
+	ext:addSpell({id="Face Bite", tags={"HEADJUMP"}});
 	
 	ext:addSpell({id="Quill Barb"});
 	
