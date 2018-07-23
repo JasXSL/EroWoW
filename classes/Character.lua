@@ -273,10 +273,9 @@ Character.__index = Character;
 		if self.underwear_worn == id then
 			self.underwear_worn = false
 			if uw then 
-				PlaySound(uw.unequip_sound, "Dialog")
-				RPText.print("You take off your "..uw.name)
-				uw:onUnequip();
-				Event.raise(Event.Types.ACTION_UNDERWEAR_UNEQUIP, {id=id})
+				PlaySound(uw.unequip_sound, "Dialog");
+				RPText.print("You take off your "..uw.name);
+				self:unequipActiveUnderwear();
 			end
 		elseif self:ownsUnderwear(id) and uw then
 			local cur = Underwear.get(self.underwear_worn)
@@ -289,7 +288,19 @@ Character.__index = Character;
 		else return false
 		end
 		UI.underwearPage.update();
-		return true
+		return true;
+	end
+
+	function Character:unequipActiveUnderwear()
+		local uw = Underwear.get(self.underwear_worn);
+		print(self.underwear_worn);
+		print(uw);
+		if not uw then return false end
+		self.underwear_worn = false;
+		uw:onUnequip();
+		Event.raise(Event.Types.ACTION_UNDERWEAR_UNEQUIP, {id=uw.id});
+		UI.underwearPage.update();
+		return true;
 	end
 
 	function Character:ownsUnderwear(id)

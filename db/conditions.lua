@@ -106,6 +106,8 @@ function internal.build.conditions()
 	ext:addCondition({id="is_spell_add", type=ty.RTYPE_EVENT, data=Event.Types.SPELL_ADD});
 	ext:addCondition({id="is_spell_tick", type=ty.RTYPE_EVENT, data=Event.Types.SPELL_TICK});
 	ext:addCondition({id="is_spell_rem", type=ty.RTYPE_EVENT, data=Event.Types.SPELL_REM});
+	ext:addCondition({id="is_spell_ran", type=ty.RTYPE_EVENT, data=Event.Types.SPELL_RAN});
+	
 	ext:addCondition({id="is_melee_attack", type=ty.RTYPE_EVENT, data=Event.Types.SWING});
 	ext:addCondition({id="is_melee_crit", type=ty.RTYPE_EVENT, data=Event.Types.SWING_CRIT});
 	ext:addCondition({id="is_monster_kill", type=ty.RTYPE_EVENT, data=Event.Types.MONSTER_KILL});

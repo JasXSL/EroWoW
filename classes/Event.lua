@@ -39,6 +39,7 @@ local Event = {}
 		SPELL_ADD = "SPELL_ADD",									-- Spell added {aura=see buildSpellTrigger, unit=unit, name=NPCName}
 		SPELL_REM = "SPELL_REM",									-- Spell removed --||--
 		SPELL_TICK = "SPELL_TICK",									-- Spell ticked --||--
+		SPELL_RAN = "SPELL_RAN",									-- NPC used a spell successfully against you (doesn't matter if it was instant or duration, only raised when sent against you)
 		SWING_CRIT = "SWING_CRIT",									-- Same as swing
 		MONSTER_KILL = "MONSTER_KILL",								-- {name=deadNPCName}
 		FORAGE = "FORAGE",											-- void
@@ -157,10 +158,10 @@ local Event = {}
 		-- Handle combat log
 		-- This needs to go first as it should only handle event bindings on the player
 		if event == "COMBAT_LOG_EVENT_UNFILTERED" and Index.checkHardLimits("player", "player", true) then
-
 			arguments = {CombatLogGetCurrentEventInfo()};
 			local timestamp, combatEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags = CombatLogGetCurrentEventInfo(); -- Those arguments appear for all combat event variants.
 			local eventPrefix, eventSuffix = combatEvent:match("^(.-)_?([^_]*)$");
+
 			-- See if a viable unit exists
 			local u = "none"
 			if sourceGUID == UnitGUID("target") then u = "target"
@@ -182,9 +183,8 @@ local Event = {}
 			-- Only player themselves after this point
 			if destGUID ~= UnitGUID("player") then return end 
 
-			
 			-- These only work for healing or damage
-			if (eventPrefix == "SPELL" or eventPrefix == "SPELL_PERIODIC") and (eventSuffix == "DAMAGE" or eventSuffix=="HEAL") then
+			if ((eventPrefix == "SPELL" or eventPrefix == "SPELL_PERIODIC") and (eventSuffix == "DAMAGE" or eventSuffix=="HEAL")) or combatEvent == "SPELL_CAST_SUCCESS" then
 				
 				local npc = Character:new({}, sourceName);
 				if u then npc = Character.buildNPC(u, sourceName) end
@@ -197,6 +197,7 @@ local Event = {}
 				local harmful = true
 				if eventSuffix ~= "DAMAGE" then harmful = false end
 
+
 				--spellId, name, harmful, unitCaster, count, crit, char
 				local trig = buildSpellTrigger(
 					arguments[12], -- Spell ID
@@ -207,8 +208,13 @@ local Event = {}
 					crit, -- Crit
 					npc
 				)
+
+				local evt = Event.Types.SPELL_TICK;
+				if combatEvent == "SPELL_CAST_SUCCESS" then
+					evt = Event.Types.SPELL_RAN;
+				end
 				--SpellBinding.onTick(u, npc, trig)
-				Event.raise(Event.Types.SPELL_TICK, {
+				Event.raise(evt, {
 					aura = trig,
 					unit = u,
 					name = sourceName

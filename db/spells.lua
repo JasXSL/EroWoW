@@ -22,6 +22,9 @@ function internal.build.spells()
 	ext:addSpell({id="Frost Breath", tags={"COLD"}});
 	ext:addSpell({id="Frost Cleave", tags={"COLD"}});
 	ext:addSpell({id="Sleet", tags={"COLD"}});
+	ext:addSpell({id="Icy Gust", tags={"COLD"}});
+	ext:addSpell({id="Frost Breath", tags={"COLD"}});
+	
 	
 	ext:addSpell({id="Entangling Roots", tags={"ROOTS"}});
 	ext:addSpell({id="Strangling Roots", tags={"ROOTS"}});
@@ -91,6 +94,7 @@ function internal.build.spells()
 	ext:addSpell({id="Face Bite", tags={"HEADJUMP"}});
 	
 	ext:addSpell({id="Quill Barb"});
+	ext:addSpell({id="Grappling Hook"});
 	
 	-- Debugging
 	ext:addSpell({id="Hearthsteed", tags={"HEARTHSTEED"}});

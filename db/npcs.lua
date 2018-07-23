@@ -103,6 +103,8 @@ function internal.build.npcs()
 	ext:addNPC({id="%Undergrell",tags={"FISTFIGHTER", "SMALL"}});
 	ext:addNPC({id="Mad Henryk",tags={"FISTFIGHTER", "MEDIUM"}});
 	ext:addNPC({id="Pale Gloomstalker",tags={"PALE_ORC", "FISTFIGHTER","MEDIUM"},gender=2});
+	ext:addNPC({id="Pale Skinslicer",tags={"PALE_ORC", "FISTFIGHTER","MEDIUM"},gender=2});
+	ext:addNPC({id="Pale Tormentor",tags={"PALE_ORC", "FISTFIGHTER","MEDIUM"},gender=2});
 	
 	-- Mogu
 	-- Can't have dashes in pattern search, use % to escape

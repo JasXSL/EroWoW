@@ -91,6 +91,7 @@ function internal.Gateway()
 	Event.on(Event.Types.SPELL_ADD, function(data) onSpell(Event.Types.SPELL_ADD, data.aura, data.unit, data.name); end);
 	Event.on(Event.Types.SPELL_REM, function(data) onSpell(Event.Types.SPELL_REM, data.aura, data.unit, data.name); end);
 	Event.on(Event.Types.SPELL_TICK, function(data) onSpell(Event.Types.SPELL_TICK, data.aura, data.unit, data.name); end);
+	Event.on(Event.Types.SPELL_RAN, function(data) onSpell(Event.Types.SPELL_RAN, data.aura, data.unit, data.name); end);
 	
 
 
