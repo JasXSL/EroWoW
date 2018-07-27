@@ -268,10 +268,12 @@ local Event = {}
 				Mining = true,
 				Disenchanting = true,
 			}
+
+			local spellName = GetSpellInfo(arguments[3]);
 			--print(arguments[2], lootableSpells[arguments[2]], arguments[3], arguments[4]);
-			if lootableSpells[arguments[2]] then
-				Event.lootSpell = arguments[2];
-				Event.lootContainer = arguments[4];
+			if lootableSpells[spellName] then
+				Event.lootSpell = spellName;
+				Event.lootContainer = arguments[2];
 			end
 			--print(event, ...)
 		end

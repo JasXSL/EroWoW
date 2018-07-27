@@ -901,7 +901,9 @@ Action.__index = Action;
 			if UnitIsUnit(data[1], "PLAYER") then interrupt() end
 		end)
 		Action.FINISHING_SPELL_BINDING = Event.on("UNIT_SPELLCAST_SUCCEEDED", function(data)
-			if UnitIsUnit(data[1], "PLAYER") then interrupt() end
+			if data[3] ~= 240022 then
+				if UnitIsUnit(data[1], "PLAYER") then interrupt() end
+			end
 		end)
 
 		
