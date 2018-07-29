@@ -113,6 +113,7 @@ local Event = {}
 	function Event.checkPoints()
 		local mapID = C_Map.GetBestMapForUnit("player");
 		local pos = C_Map.GetPlayerMapPosition(mapID,"player");
+		if not pos then return end
 		local px,py = pos:GetXY();
 		px = px*100; py = py*100;
 		for id,b in pairs(Event.pointCheck) do
