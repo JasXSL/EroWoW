@@ -38,6 +38,9 @@ function internal.build.npcs()
 	ext:addNPC({id="Deepwater Spikeback",tags={"PINCHY"}});
 	ext:addNPC({id="Coastal Spikeback",tags={"PINCHY"}});
 	ext:addNPC({id="Leyscar Scuttler",tags={"PINCHY"}});
+	ext:addNPC({id="Derelict Hexapod",tags={"PINCHY", "MEDIUM"}});
+	ext:addNPC({id="Dazarian Snapper",tags={"PINCHY", "MEDIUM"}});
+	ext:addNPC({id="Hardshell Pincher",tags={"PINCHY", "MEDIUM"}});
 	
 	
 	ext:addNPC({id="Feltotem Warmonger",tags={"FELTOTEM"}, gender=2});
@@ -106,6 +109,12 @@ function internal.build.npcs()
 	ext:addNPC({id="Pale Skinslicer",tags={"PALE_ORC", "FISTFIGHTER","MEDIUM"},gender=2});
 	ext:addNPC({id="Pale Tormentor",tags={"PALE_ORC", "FISTFIGHTER","MEDIUM"},gender=2});
 	
+	ext:addNPC({id="Pale Tormentor",tags={"PALE_ORC", "FISTFIGHTER","MEDIUM"},gender=2});
+	
+	ext:addNPC({id="Feathered Viper",tags={"CLOUD_SERPENT","LARGE"}});
+	ext:addNPC({id="Feathered Viper Hatchling",tags={"CLOUD_SERPENT","MEDIUM"}});
+	
+
 	-- Mogu
 	-- Can't have dashes in pattern search, use % to escape
 	ext:addNPC({id="%Kao%-Tien",tags={"MOGU"}, gender=2});

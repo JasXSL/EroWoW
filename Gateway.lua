@@ -61,9 +61,10 @@ function internal.Gateway()
 		local npc = Character.buildNPC(unit, name);
 		local eventData = RPText.buildSpellData(aura.spellId, aura.name, aura.harmful, npc.name, aura.count, aura.crit);
 
+		
+
 		-- See if this spell was bound at all
 		local spells = Spell.filter(aura.name, unit, "player", npc, ExiWoW.ME, eventData, event);
-		
 		local all = Database.getIDs("Spell", aura.name);
 		for _,sp in pairs(all) do
 			if type(sp.onTrigger) == "function" then

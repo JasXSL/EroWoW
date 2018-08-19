@@ -70,7 +70,7 @@ local Event = {}
 		evtFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 		evtFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
 		evtFrame:RegisterUnitEvent("UNIT_AURA", "player")
-		evtFrame:RegisterEvent("UNIT_AURA", "player")
+		--evtFrame:RegisterEvent("UNIT_AURA", "player")
 		evtFrame:RegisterEvent("UNIT_SPELLCAST_SENT");
 		evtFrame:RegisterUnitEvent("UNIT_SPELLCAST_FAILED", "player")
 		evtFrame:RegisterUnitEvent("UNIT_SPELLCAST_FAILED_QUIET", "player")
@@ -112,6 +112,7 @@ local Event = {}
 
 	function Event.checkPoints()
 		local mapID = C_Map.GetBestMapForUnit("player");
+		if not mapID then return end
 		local pos = C_Map.GetPlayerMapPosition(mapID,"player");
 		if not pos then return end
 		local px,py = pos:GetXY();
@@ -184,8 +185,9 @@ local Event = {}
 			-- Only player themselves after this point
 			if destGUID ~= UnitGUID("player") then return end 
 
+
 			-- These only work for healing or damage
-			if ((eventPrefix == "SPELL" or eventPrefix == "SPELL_PERIODIC") and (eventSuffix == "DAMAGE" or eventSuffix=="HEAL")) or combatEvent == "SPELL_CAST_SUCCESS" then
+			if ((eventPrefix == "SPELL" or eventPrefix == "SPELL_PERIODIC") and (eventSuffix == "DAMAGE" or eventSuffix=="HEAL" or eventSuffix == "AURA_APPLIED")) or combatEvent == "SPELL_CAST_SUCCESS" then
 				
 				local npc = Character:new({}, sourceName);
 				if u then npc = Character.buildNPC(u, sourceName) end
@@ -322,6 +324,7 @@ local Event = {}
 
 
 		if event == "UNIT_AURA" then
+
 			-- Tracks only the PLAYER auras
 			local unit = ...;
 			if unit ~= "player" then return end
@@ -358,13 +361,13 @@ local Event = {}
 
 			-- Read all buffs
 			for i=1,40 do 
-				local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId = UnitAura(unit, i)
+				local name, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId = UnitAura(unit, i, "HELPFUL")
 				if name == nil then break end
 				addAura(spellId, name, false, unitCaster, count)
 			end
 			-- Read all debuffs
 			for i=1,40 do 
-				local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId = UnitAura(unit, i, "HARMFUL")
+				local name, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId = UnitAura(unit, i, "HARMFUL")
 				if name == nil then break end
 				addAura(spellId, name, true, unitCaster, count)
 			end

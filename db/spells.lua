@@ -46,6 +46,8 @@ function internal.build.spells()
 	ext:addSpell({id="Insect Swarm", tags={"INSECTS"}});
 	
 	ext:addSpell({id="Void Whip", tags={"MAGIC_WHIP"}});
+	ext:addSpell({id="Pinch", tags={"PINCH"}});
+	
 	
 	ext:addSpell({id="Crimson Vial", tags={"SPILLABLE"}, conditions={addCond}});
 	ext:addSpell({id="Bottle of Grog", tags={"SPILLABLE"}});

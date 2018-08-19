@@ -162,6 +162,7 @@ function internal.build.functions()
 
 	
 -- Reusable functions
+	-- When sent from RP texts, the args are self, sender, target
 	ext:addFunction({
 		id="addExcitementMasochisticDefault",
 		fn = function(self, ignoreVhProgram)
@@ -185,10 +186,15 @@ function internal.build.functions()
 				(	-- It is a table, but
 					not (self.id.SWING or self.id.SWING_CRIT) or -- It's not a melee swing
 					localStorage.tank_mode -- Or tank mode is on
-				) then 
-					Func.get("critSound")(); 
-				end
-			Event.raise(Event.Types.EXADD_M_CRIT, {vh = not ignoreVhProgram})
+				) 
+			then 
+				Func.get("critSound")(); 
+			end
+			
+			if type(ignoreVhProgram) ~= "boolean" then
+				ignoreVhProgram = false
+			end
+			Event.raise(Event.Types.EXADD_M_CRIT, {vh = not ignoreVhProgram});
 			ExiWoW.ME:addExcitement(0.3, false, true);
 		end
 	});

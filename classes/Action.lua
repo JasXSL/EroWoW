@@ -13,7 +13,7 @@ Action.__index = Action;
 	-- Consts
 	Action.MELEE_RANGE = {37727};				-- These are itemIDs, used with 
 	Action.CASTER_RANGE = {34471,28767};
-	Action.tooltipTimer = 0;					-- Interval for refreshing the tooltip
+	Action.tooltipTimer = nil;					-- Interval for refreshing the tooltip
 
 	-- Cast timer
 	Action.CASTING_SPELL = nil;				-- Spell being cast
