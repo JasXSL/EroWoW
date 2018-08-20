@@ -97,9 +97,12 @@ function internal.build.spells()
 	
 	ext:addSpell({id="Quill Barb"});
 	ext:addSpell({id="Grappling Hook"});
+	ext:addSpell({id="Cleaving Smack"});
+	ext:addSpell({id="Lick"});
 	
 	-- Debugging
 	ext:addSpell({id="Hearthsteed", tags={"HEARTHSTEED"}});
+
 	
 	
 

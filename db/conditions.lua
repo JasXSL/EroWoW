@@ -48,6 +48,7 @@ function internal.build.conditions()
 	ext:addCondition({id="attackerIsMogu", type=ty.RTYPE_TAG, data={"NPC_MOGU"}, sender=true});
 	ext:addCondition({id="attackerIsPaleOrc", type=ty.RTYPE_TAG, data={"NPC_PALE_ORC"}, sender=true});
 	ext:addCondition({id="attackerIsCloudSerpent", type=ty.RTYPE_TAG, data={"NPC_CLOUD_SERPENT"}, sender=true});
+	ext:addCondition({id="attackerIsSaurolisk", type=ty.RTYPE_TAG, data={"NPC_SAUROLISK"}, sender=true});
 	
 	ext:addCondition({id="victimIsPandaren", type=ty.RTYPE_RACE, data={Pandaren=true}});
 	
@@ -67,6 +68,9 @@ function internal.build.conditions()
 	ext:addCondition({id="chestLightArmor", type=ty.RTYPE_EQUIPMENT, data={slot=5, type={Leather=true, Cloth=true}}});
 	ext:addCondition({id="chestHeavyArmor", type=ty.RTYPE_EQUIPMENT, data={slot=5, type={Plate=true, Mail=true}}});
 	ext:addCondition({id="legsHeavyArmor", type=ty.RTYPE_EQUIPMENT, data={slot=7, type={Plate=true, Mail=true}}});
+	ext:addCondition({id="victimChestNotPlate", type=ty.RTYPE_EQUIPMENT, data={slot=7, type={Plate=true}}, inverse=true});
+	ext:addCondition({id="victimChestPlate", type=ty.RTYPE_EQUIPMENT, data={slot=7, type={Plate=true}}});
+	
 	ext:addCondition({id="hasChest", type=ty.RTYPE_EQUIPMENT, data={slot=5}});
 	ext:addCondition({id="hasShirt", type=ty.RTYPE_EQUIPMENT, data={slot=4}});
 	ext:addCondition({id="hasTabard", type=ty.RTYPE_EQUIPMENT, data={slot=19}});
@@ -74,6 +78,8 @@ function internal.build.conditions()
 	ext:addCondition({id="noShirt", type=ty.RTYPE_EQUIPMENT, data={slot=4}, inverse = true});
 	ext:addCondition({id="noTabard", type=ty.RTYPE_EQUIPMENT, data={slot=19}, inverse = true});
 	
+	ext:addCondition({id="spellDetrimental", type=ty.RTYPE_DETRIMENTAL});
+	ext:addCondition({id="spellBeneficial", type=ty.RTYPE_DETRIMENTAL, inverse = true});
 	
 	
 	

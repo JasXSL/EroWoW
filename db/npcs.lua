@@ -41,6 +41,8 @@ function internal.build.npcs()
 	ext:addNPC({id="Derelict Hexapod",tags={"PINCHY", "MEDIUM"}});
 	ext:addNPC({id="Dazarian Snapper",tags={"PINCHY", "MEDIUM"}});
 	ext:addNPC({id="Hardshell Pincher",tags={"PINCHY", "MEDIUM"}});
+	ext:addNPC({id="Hardshell Sand Shifter",tags={"PINCHY", "SMALL"}});
+	ext:addNPC({id="Spiny Kelp Clicker",tags={"PINCHY", "MEDIUM"}});
 	
 	
 	ext:addNPC({id="Feltotem Warmonger",tags={"FELTOTEM"}, gender=2});
@@ -96,6 +98,12 @@ function internal.build.npcs()
 	ext:addNPC({id="Hazzali Stinger",tags={"SILITHID", "WASP"}});
 	ext:addNPC({id="Gorishi Wasp",tags={"SILITHID", "WASP"}});
 	ext:addNPC({id="Centipaar Wasp",tags={"SILITHID", "WASP"}});
+	
+	ext:addNPC({id="Bonegnasher Skullcrusher",tags={"TROGG", "FISTFIGHTER", "MEDIUM"}});
+	ext:addNPC({id="Bonegnasher Earthcaller",tags={"TROGG", "FISTFIGHTER", "MEDIUM"}});
+	
+	ext:addNPC({id="%Saurolisk",tags={"SAUROLISK"}});
+	
 	
 
 	ext:addNPC({id="Thistleleaf Ruffian",tags={"FISTFIGHTER", "SMALL"}});
