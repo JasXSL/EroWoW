@@ -161,12 +161,14 @@ local Event = {}
 
 		if event == "GET_ITEM_INFO_RECEIVED" then
 			Timer.clear(Event.invCacheTimer);
-			Event.invCacheTimer = Timer.set(function() 
+			Event.invCacheTimer = Timer.set(function()
+				Character.recacheInventory();
 				UI.refreshAll();
 			end, 0.25);
 		end
 
 		if event == "BAG_UPDATE" then 
+			Character.recacheInventory();
 			require("Action"):sort();
 			UI.actionPage.update();
 		end

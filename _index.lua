@@ -155,7 +155,9 @@ local Index = {}
 		function SlashCmdList.EWACT(msg, editbox) Action.useOnTarget(msg, "target") end
 		SLASH_EWRESET1 = '/ewreset'
 		function SlashCmdList.EWRESET(msg, editbox) Index.resetSettings() end
-
+		SLASH_EWTOGGLE1 = '/ewtoggle'
+		function SlashCmdList.EWTOGGLE(msg, editbox) UI.toggle(); end
+		
 		-- Initialize actions
 		Action.ini();
 

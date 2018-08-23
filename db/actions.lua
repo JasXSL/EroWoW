@@ -117,7 +117,7 @@ function internal.build.actions()
 					self:resetCooldown();
 				else
 					PlaySound(1202, "SFX");
-					Tools.reportError(
+					RPText.print(
 						Tools.unitRpName(sender) .. " successfully removed "..
 						Ambiguate(UnitName(target), "all").."'s "..
 						Tools.itemSlotToname(data.slot).."!"
@@ -154,7 +154,7 @@ function internal.build.actions()
 
 			local slot = equipped_slots[ math.random( #equipped_slots ) ];
 			Character:removeEquipped(slot);
-			Tools.reportError(Tools.unitRpName(sender) .. " tugged off your "..Tools.itemSlotToname(slot).."!");
+			RPText.print(Tools.unitRpName(sender) .. " tugged off your "..Tools.itemSlotToname(slot).."!");
 			if not UnitIsUnit(Ambiguate(sender, "ALL"), "player") then 
 				PlaySound(1202, "SFX");
 			end

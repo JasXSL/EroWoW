@@ -6,7 +6,7 @@ local UI, Timer, Event, Action, Underwear, Index, Tools, RPText, Condition, NPC,
 local myGUID = UnitGUID("player")
 
 -- Contains info about a character, 
-local Character = {}
+local Character = {};
 Character.__index = Character;
 
 	-- Consts
@@ -14,6 +14,7 @@ Character.__index = Character;
 	Character.EXCITEMENT_MAX = 1.25;				-- You can overshoot max excitement and have to wait longer
 	Character.EXCITEMENT_FADE_IDLE = 0.001;
 	
+	Character.INVCACHE = {};	-- id={name=name, quant=quant}
 
 
 	-- Static
@@ -83,6 +84,27 @@ Character.__index = Character;
 	end
 
 
+	function Character.recacheInventory()
+		
+		Character.INVCACHE = {};
+		for i=0,4 do
+			local slots = GetContainerNumSlots(i);
+			for slot=1,slots do
+				local id = GetContainerItemID(i, slot)
+				if id then
+					local quant = GetItemCount(id, false);
+					local name = GetItemInfo(id);
+					Character.INVCACHE[id] = {
+						quant = quant,
+						name = name
+					};
+				end
+			end
+		end
+
+	end
+
+
 	-- See RPText RTYPE_HAS_INVENTORY
 	function Character:hasInventory(names)
 
@@ -91,18 +113,10 @@ Character.__index = Character;
 			return false;
 		end 
 
-		for i=0,4 do
-			local slots = GetContainerNumSlots(i);
-			for slot=1,slots do
-				local id = GetContainerItemID(i, slot)
-				if id then
-					local quant = GetItemCount(id, false);
-					local name = GetItemInfo(id);
-					for _,cond in pairs(names) do
-						if (cond.name == name or cond.name == nil) and (cond.quant == quant or cond.quant == nil) then
-							return name;
-						end
-					end
+		for _,item in pairs(Character.INVCACHE) do
+			for _,cond in pairs(names) do
+				if (cond.name == item.name or cond.name == nil) and (cond.quant == item.quant or cond.quant == nil) then
+					return name;
 				end
 			end
 		end
