@@ -26,8 +26,8 @@ function internal.build.rptexts()
 		})
 		ext:addRpText({
 			id = "TICKLE",
-			text_sender = "You tickle %T with your %item!",
-			text_receiver = "%S tickles you with %Shis %item!",
+			text_sender = "You tickle %T with your feather!",
+			text_receiver = "%S tickles you with %Shis feather!",
 			requirements = {getCondition("invFeathers")},
 		})
 
@@ -41,11 +41,10 @@ function internal.build.rptexts()
 		})
 		ext:addRpText({
 			id = "TICKLE",
-			text_bystander = "%T tickles %Thimself with %This %item!",
-			text_receiver = "You use your %item to tickle yourself!",
+			text_bystander = "%T tickles %Thimself with %This feather!",
+			text_receiver = "You use your feather to tickle yourself!",
 			requirements = {getCondition("invFeathers")},
-			
-		})
+		});
 
 	-- Wedgie
 		ext:addRpText({

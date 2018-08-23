@@ -16,6 +16,7 @@ function internal.build.npcs()
 	ext:addNPC({id="Nightmare Terror",tags={"TENTACLE_FIEND", "LASHER"}});
 	ext:addNPC({id="Shadowfiend",tags={"TENTACLE_FIEND", "LASHER"}});
 	ext:addNPC({id="Slumbering Nightmare",tags={"TENTACLE_FIEND", "LASHER"}});
+	ext:addNPC({id="Blighted Manifestation",tags={"TENTACLE_FIEND", "LASHER", "SMALL"}});
 	
 
 	ext:addNPC({id="%Scorpid",tags={"PINCHY"}});
@@ -93,6 +94,7 @@ function internal.build.npcs()
 	ext:addNPC({id="Withervine Creeper",tags={"BOG_SHAMBLER"}});
 	ext:addNPC({id="Withervine Rager",tags={"BOG_SHAMBLER"}});
 	
+	ext:addNPC({id="Bloodbough Fungalmancer",tags={"MUSHROOM_MAN", "TENTACLE_STAFF", "MEDIUM"}});
 	
 
 	ext:addNPC({id="Hazzali Stinger",tags={"SILITHID", "WASP"}});

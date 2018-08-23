@@ -3,7 +3,7 @@ local export = internal.Module.export;
 local require = internal.require;
 local evtFrame = CreateFrame("Frame");
 
-local RPText, Character, Index, Action, Timer;
+local RPText, Character, Index, Action, Timer, UI;
 
 local Event = {}
 	Event.index = 0
@@ -13,7 +13,7 @@ local Event = {}
 	Event.lootSpell = nil
 	Event.pointTimer = nil;						-- Timer checking the POINT_REACHED event
 	Event.pointCheck = {};						-- Events for which to check points
-
+	Event.invCacheTimer = nil;					-- Inventory caching timer
 	-- Custom events
 	-- Keep in mind events bound in Event.TYPES will also be raised
 	Event.Types = {
@@ -59,6 +59,7 @@ local Event = {}
 		Index = require("Index");
 		Action = require("Action");
 		Timer = require("Timer");
+		UI = require("UI");
 
 		evtFrame:SetScript("OnEvent", Event.onEvent)
 		evtFrame:RegisterEvent("PLAYER_STARTED_MOVING")
@@ -84,6 +85,8 @@ local Event = {}
 
 		evtFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA");
 		evtFrame:RegisterEvent("ZONE_CHANGED");
+		evtFrame:RegisterEvent("GET_ITEM_INFO_RECEIVED");
+		evtFrame:RegisterEvent("BAG_UPDATE");
 
 		-- Emulate an aura change event on start
 		Timer.set(function()
@@ -154,6 +157,18 @@ local Event = {}
 				end
 			end
 			
+		end
+
+		if event == "GET_ITEM_INFO_RECEIVED" then
+			Timer.clear(Event.invCacheTimer);
+			Event.invCacheTimer = Timer.set(function() 
+				UI.refreshAll();
+			end, 0.25);
+		end
+
+		if event == "BAG_UPDATE" then 
+			require("Action"):sort();
+			UI.actionPage.update();
 		end
 
 

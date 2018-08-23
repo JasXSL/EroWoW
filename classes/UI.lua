@@ -1700,7 +1700,8 @@ UI = {}
 
 
 export("UI", UI, {
-	talkbox = UI.talkbox
+	talkbox = UI.talkbox,
+	refreshAll = UI.refreshAll
 }, UI)
 	
 

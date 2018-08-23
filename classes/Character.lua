@@ -85,7 +85,11 @@ Character.__index = Character;
 
 	-- See RPText RTYPE_HAS_INVENTORY
 	function Character:hasInventory(names)
-		if type(names) ~= "table" then print("Invalid name var for inventory check, type was", type(names)); return false end 
+
+		if type(names) ~= "table" then 
+			print("Invalid name var for inventory check, type was", type(names)); 
+			return false;
+		end 
 
 		for i=0,4 do
 			local slots = GetContainerNumSlots(i);
@@ -96,13 +100,14 @@ Character.__index = Character;
 					local name = GetItemInfo(id);
 					for _,cond in pairs(names) do
 						if (cond.name == name or cond.name == nil) and (cond.quant == quant or cond.quant == nil) then
-							return name
+							return name;
 						end
 					end
 				end
 			end
 		end
 		return false;
+
 	end
 
 	-- Removes an equipped item and puts it into inventory if possible

@@ -452,7 +452,6 @@ Condition.__index = Condition;
 	-- Validate all conditions
 	function Condition.all(conditions, senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action, debug)
 
-		local se = self;
 		local function validateThese(input, noOr)
 
 			for k,v in pairs(input) do
@@ -468,9 +467,6 @@ Condition.__index = Condition;
 						print("Invalid condition in ", self.text_receiver);
 					end
 					success = v:validate(senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action, debug) -- This entry was a condition
-					if v.type == Condition.Types.RTYPE_HAS_INVENTORY and success then
-						se.item = success;
-					end
 				end
 
 				if success and not noOr then 

@@ -49,7 +49,10 @@ function internal.build.conditions()
 	ext:addCondition({id="attackerIsPaleOrc", type=ty.RTYPE_TAG, data={"NPC_PALE_ORC"}, sender=true});
 	ext:addCondition({id="attackerIsCloudSerpent", type=ty.RTYPE_TAG, data={"NPC_CLOUD_SERPENT"}, sender=true});
 	ext:addCondition({id="attackerIsSaurolisk", type=ty.RTYPE_TAG, data={"NPC_SAUROLISK"}, sender=true});
+	ext:addCondition({id="attackerHasTentacleStaff", type=ty.RTYPE_TAG, data={"TENTACLE_STAFF"}, sender=true});
 	
+	
+
 	ext:addCondition({id="victimIsPandaren", type=ty.RTYPE_RACE, data={Pandaren=true}});
 	
 

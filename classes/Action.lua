@@ -272,7 +272,8 @@ Action.__index = Action;
 		local _, _, cls = UnitClass(caster);
 		local _, rname = UnitRace(caster);
 
-		local success, cond = Condition.all(self.filters, caster, nil, ExiWoW.ME);
+		-- conditions, senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action, debug
+		local success, cond = Condition.all(self.filters, caster, caster, ExiWoW.ME, ExiWoW.ME, nil, nil, self);
 		if not success then
 			return cond:reportError(suppressErrors);
 		end

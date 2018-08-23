@@ -87,7 +87,7 @@ local LOCALSTORAGE_DEFAULTS = {
 
 
 
--- Static class definition for INDEX
+	-- Static class definition for INDEX
 local Index = {}
 	Index["INPUT_BUFFER"] = {};				-- cbid = {parts:[part1,part2...], timeout:(int)timer}
 	Index["FRAME"] = CreateFrame("Frame");
@@ -197,6 +197,11 @@ local Index = {}
 			Effect.onLoad();
 			print("ExiWoW initialized")
 		end, 1)
+
+		-- Wait 5 sec for inventory to load
+		Timer.set(function()
+			UI.refreshAll();
+		end, 5)
 
 		-- If you need a big box for debug
 		--[[
