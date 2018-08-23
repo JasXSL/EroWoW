@@ -274,6 +274,7 @@ Action.__index = Action;
 
 		-- conditions, senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action, debug
 		local success, cond = Condition.all(self.filters, caster, caster, ExiWoW.ME, ExiWoW.ME, nil, nil, self);
+
 		if not success then
 			return cond:reportError(suppressErrors);
 		end
@@ -290,6 +291,7 @@ Action.__index = Action;
 			end
 
 		end
+
 
 		return true;
 

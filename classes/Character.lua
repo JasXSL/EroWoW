@@ -94,9 +94,10 @@ Character.__index = Character;
 				if id then
 					local quant = GetItemCount(id, false);
 					local name = GetItemInfo(id);
+					--print(id, quant, name);
 					Character.INVCACHE[id] = {
-						quant = quant,
-						name = name
+						["quant"] = quant,
+						["name"] = name
 					};
 				end
 			end
@@ -116,7 +117,7 @@ Character.__index = Character;
 		for _,item in pairs(Character.INVCACHE) do
 			for _,cond in pairs(names) do
 				if (cond.name == item.name or cond.name == nil) and (cond.quant == item.quant or cond.quant == nil) then
-					return name;
+					return item.name;
 				end
 			end
 		end
