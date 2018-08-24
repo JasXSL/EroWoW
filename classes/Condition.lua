@@ -339,7 +339,7 @@ Condition.__index = Condition;
 		elseif t == ty.RTYPE_HAS_AURA then
 			out = Event.hasAura(data);
 		elseif t == ty.RTYPE_HAS_INVENTORY then
-			out = not senderIsme or Character:hasInventory(data);
+			out = not senderIsMe or Character:hasInventory(data);
 		elseif t == ty.RTYPE_REQUIRE_MALE then
 			out = globalStorage.taunt_male == true
 		elseif t == ty.RTYPE_REQUIRE_FEMALE then
