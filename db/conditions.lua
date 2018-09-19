@@ -71,8 +71,9 @@ function internal.build.conditions()
 	ext:addCondition({id="chestLightArmor", type=ty.RTYPE_EQUIPMENT, data={slot=5, type={Leather=true, Cloth=true}}});
 	ext:addCondition({id="chestHeavyArmor", type=ty.RTYPE_EQUIPMENT, data={slot=5, type={Plate=true, Mail=true}}});
 	ext:addCondition({id="legsHeavyArmor", type=ty.RTYPE_EQUIPMENT, data={slot=7, type={Plate=true, Mail=true}}});
-	ext:addCondition({id="victimChestNotPlate", type=ty.RTYPE_EQUIPMENT, data={slot=7, type={Plate=true}}, inverse=true});
-	ext:addCondition({id="victimChestPlate", type=ty.RTYPE_EQUIPMENT, data={slot=7, type={Plate=true}}});
+	ext:addCondition({id="victimChestNotPlate", type=ty.RTYPE_EQUIPMENT, data={slot=5, type={Plate=true}}, inverse=true});
+	ext:addCondition({id="victimChestPlate", type=ty.RTYPE_EQUIPMENT, data={slot=5, type={Plate=true}}});
+	ext:addCondition({id="victimCrotchPlate", type=ty.RTYPE_EQUIPMENT, data={slot=7, type={Plate=true}}});
 	
 	ext:addCondition({id="hasChest", type=ty.RTYPE_EQUIPMENT, data={slot=5}});
 	ext:addCondition({id="hasShirt", type=ty.RTYPE_EQUIPMENT, data={slot=4}});

@@ -77,6 +77,9 @@ function internal.build.npcs()
 	ext:addNPC({id="Lashvine",tags={"LASHER", "VINES"}});
 	ext:addNPC({id="%Lasher",tags={"LASHER"}});
 	ext:addNPC({id="Mature Deathblossom",tags={"LASHER"}});
+	ext:addNPC({id="Carnivorous Seedling",tags={"LASHER", "MEDIUM"}});
+	ext:addNPC({id="Carnivorous Thistlevine",tags={"LASHER", "LARGE"}});
+	ext:addNPC({id="Withered Lashling",tags={"LASHER", "LARGE"}});
 	
 
 	ext:addNPC({id="Nether Maiden",tags={"SUCCUBUS", "LASHER"}, gender=3});
@@ -106,7 +109,9 @@ function internal.build.npcs()
 	
 	ext:addNPC({id="%Saurolisk",tags={"SAUROLISK"}});
 	
-	
+	ext:addNPC({id="Bilgewater Hauler",tags={"GOBLIN", "SMALL", "FISTFIGHTER", "HUMANOID"}});
+	ext:addNPC({id="Venture Co. Mechanic",tags={"SMALL", "HUMANOID"}});
+	ext:addNPC({id="Venture Co. Muscle",tags={"LARGE", "HUMANOID"}});
 
 	ext:addNPC({id="Thistleleaf Ruffian",tags={"FISTFIGHTER", "SMALL"}});
 	ext:addNPC({id="Thistleleaf Menace",tags={"FISTFIGHTER", "SMALL"}});

@@ -51,6 +51,7 @@ function internal.build.spells()
 	
 	ext:addSpell({id="Crimson Vial", tags={"SPILLABLE"}, conditions={addCond}});
 	ext:addSpell({id="Bottle of Grog", tags={"SPILLABLE"}});
+	
 
 	ext:addSpell({id="%Sand", tags={"SAND"}});
 
@@ -64,9 +65,16 @@ function internal.build.spells()
 	ext:addSpell({id="Slime Spray", tags={"SLOSH"}});
 	ext:addSpell({id="Water Spout", tags={"SLOSH"}});
 	ext:addSpell({id="Water Blast", tags={"SLOSH"}});
+	ext:addSpell({id="Mead Blast", tags={"SLOSH"}, conditions={addCond}});
 
 	ext:addSpell({id="Crystal Shards", tags={"SHARDS"}});
 	ext:addSpell({id="Crystal Shard", tags={"SHARDS"}});
+
+	ext:addSpell({id="Covered in Oil", tags={"OILY"}});
+
+
+	ext:addSpell({id="Wrenching Smack"});
+	ext:addSpell({id="Coin Toss"});
 
 	-- Ground spikes
 	ext:addSpell({id="Earth Spike", tags={"GROUND_SPIKE"}});
@@ -99,6 +107,9 @@ function internal.build.spells()
 	ext:addSpell({id="Grappling Hook"});
 	ext:addSpell({id="Cleaving Smack"});
 	ext:addSpell({id="Lick"});
+	ext:addSpell({id="Jab"});
+	
+	
 	
 	-- Debugging
 	ext:addSpell({id="Hearthsteed", tags={"HEARTHSTEED"}});
