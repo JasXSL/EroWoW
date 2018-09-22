@@ -63,8 +63,8 @@ function internal.build.rptexts()
 			text_receiver = "You grab a hold of your %Tundies and give yourself a wedgie!",
 			sound = 25626,
 			requirements = {getCondition("targetWearsUnderwear")},
-			
-		})
+			visual = "heavyPain"
+		});
 	
 
 	--SHOCKTACLE

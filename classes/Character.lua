@@ -2,7 +2,7 @@ local appName, internal = ...
 local export = internal.Module.export;
 local require = internal.require;
 
-local UI, Timer, Event, Action, Underwear, Index, Tools, RPText, Condition, NPC, Func, Spell;
+local UI, Timer, Event, Action, Underwear, Index, Tools, RPText, Condition, NPC, Func, Spell, Visual;
 local myGUID = UnitGUID("player")
 
 -- Contains info about a character, 
@@ -32,6 +32,7 @@ Character.__index = Character;
 		NPC = require("NPC");
 		Func = require("Func");
 		Spell = require("Spell");
+		Visual = require("Visual");
 
 		-- Main character timer, ticking once per second
 		Timer.set(function()
@@ -418,13 +419,18 @@ Character.__index = Character;
 			local a, handle = PlaySound(75739, "SFX", true);
 			self.exSound = handle;
 			RPText.trigger("_EX_CAP_", "player", "player", self, self);
+			Visual.get("heavyExcitementPermanent"):trigger();
+
 			-- Start heartbeat
 		else
 			-- Stop heartbeat
 			if self.exSound then
 				StopSound(self.exSound, 1000);
 			end
+			Visual.get("heavyExcitementPermanent"):stop();
+
 			UI.portrait.border:SetVertexColor(1,1,1);
+
 		end
 
 	end

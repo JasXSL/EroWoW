@@ -4,6 +4,8 @@ local require = internal.require;
 function internal.build.effects()
 
 	local Func = require("Func");
+	local Effect = require("Effect");
+	local Passive = Effect.EffectPassive;
 	local ext = internal.ext;
 	
 	--
@@ -16,6 +18,7 @@ function internal.build.effects()
 		texture = "Interface/Icons/trade_archaeology_nerubianspiderscepter",
 		name = "Spider Hex",
 		description = "You feel as if hundreds of little spiders are skittering across your body!",
+
 		onAdd = function()
 			Func.get("toggleVibHubProgram")("SMALL_TICKLE_RANDOM", 15);
 			PlaySound(5694, "SFX");
@@ -27,6 +30,29 @@ function internal.build.effects()
 		onTick = function()
 			ExiWoW.ME:addExcitement(0.025);
 		end
+	});
+
+	-- /run ExiWoW.require("Effect").run("TEST_VISUAL");
+	ext:addEffect({
+		id = "TEST_VISUAL",
+		detrimental = false,
+		duration = 3,
+		max_stacks = 1,
+		texture = "Interface/Icons/trade_archaeology_nerubianspiderscepter",
+		name = "Test",
+		description = "This is a visual effect test!",
+		passives = {
+			Passive:new({
+				type = Passive.Types.Visual,
+				data = {id="heavyExcitement"}
+			})
+		},
+		onAdd = function()
+			print("OnAdd");
+		end,
+		onRemove = function()
+			print("OnRemove");
+		end,
 	});
 
 

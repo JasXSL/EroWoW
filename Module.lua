@@ -42,6 +42,7 @@ function Module.require(cName)
 		end
 		if not Module.modules[cName].required then
 			Module.modules[cName].required = true;
+
 			if 
 				Module.modules[cName].private and 
 				type(Module.modules[cName].private.ini) == "function" 

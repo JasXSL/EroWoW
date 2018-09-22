@@ -27,6 +27,7 @@ Visual.__index = Visual;
 		self.timeTriggered = GetTime();
 		self.timer = nil;
 		self.blend = data.blend;
+		self.hold = true;
 
 		if type(self.onFrameUpdate) ~= "function" then
 			self.onFrameUpdate = function()
@@ -59,11 +60,15 @@ Visual.__index = Visual;
 		end
 	end
 
-	function Visual:trigger()
+	-- Note: USE THE EFFECT SYSTEM, NOT THIS DIRECTLY
+	-- Otherwise you might bork effects
+	-- Effect.triggerVisual()
+	function Visual:trigger(hold)
 		self:build();
 
 		self.frame:SetAlpha(0);
 		self.frame:Show();
+		self.hold = hold;
 
 		if type(self.onStart) == "function" then 
 			self:onStart();
@@ -84,6 +89,11 @@ Visual.__index = Visual;
 	function Visual:stop()
 		self.frame:SetScript("OnUpdate", nil);
 		self.frame:Hide();
+	end
+
+	function Visual:fade()
+		self.hold = false;
+		self.timeTriggered = GetTime();
 	end
 
 	-- Request from database

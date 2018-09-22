@@ -24,6 +24,7 @@ local RPText, Action, Effect, Underwear, Database, Func, NPC, Zone, Spell, Loot,
 		Loot = require("Loot");
 		Quest = require("Quest");
 		Visual = require("Visual");
+
 	end
 
 	function Extension:new(data, isRoot)

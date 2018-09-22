@@ -581,56 +581,62 @@ Action.__index = Action;
 
 		local id = self.id;
 		if self.alias then id = self.alias end
-		-- id, senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action
-		local rptext = RPText.get(id, sender, target, ts, tt, nil, nil, self);
-
-		if not rptext then return false end
-		-- Send the text
+		-- Request your target to generate a text
 		return {
-			t=rptext.text_receiver,
-			se=ts:export(true),
-			so=rptext.sound,
-			i=rptext.item
+			id = id,
+			sender=ts:export(true),
 		}, 
 		-- Callback
 		function(se, success, data) 
-			if success then
+			if success and type(data) == "table" then
+
+				if data.t then
+					RPText.print(RPText.convert(data.t, ExiWoW.ME, tt))
+				end
+
+				-- Play receiving sound if not self cast
+				if data.so then 
+					PlaySound(data.so, "SFX");
+				end
 
 				if type(callback) == "function" then
 					callback(se, success, data);
 				end
-
-				if rptext.sound then
-					PlaySound(rptext.sound, "SFX");
-				end
-				local tx = rptext.text_sender
 				
-				if type(data) == "table" and data.receiver then 
-					tx = rptext.text_receiver 
-				end
-
-				if tx then 
-					RPText.print(RPText.convert(tx, ts, tt, nil, rptext.item))
-				end
-
-				if rptext.text_bystander then
-					Index.sendBystanderText(RPText.convert(rptext.text_bystander, ts, tt, nil, rptext.item), false, UnitName(target));
-				end
 			end
 		end
 	end
 
 	function Action:receiveRPText( sender, target, args )
 
-		if args.t and args.se then
-			local ts = Character:new(args.se, sender);
-			RPText.print(RPText.convert(args.t, ts, ExiWoW.ME, nil, args.i))
+		if 
+			type(args) ~= "table" or 
+			type(args.id) ~= "string" or 
+			type(args.sender) ~= "table" then
+			return;
 		end
-		
-		-- Play receiving sound if not self cast
-		if not UnitIsUnit(Ambiguate(sender, "ALL"), "player") and args.so then 
-			PlaySound(args.so, "SFX");
+		id = args.id;
+		senderPlayer = Character:new(args.sender);
+
+		-- id, senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action
+		local rptext = RPText.get(id, sender, "player", senderPlayer, ExiWoW.ME, nil, nil, Action.get(id));
+
+		if not rptext then return false end
+
+		local out = {
+			t=rptext.text_sender,
+			so=rptext.sound,
+			vis=rptext.visual,
+		};
+		-- Self cast doesn't need to send any data
+		if UnitIsUnit(Ambiguate(sender, "ALL"), "player") then 
+			out = nil;
 		end
+
+		rptext:convertAndReceive(senderPlayer, ExiWoW.ME);
+
+		return true, out;
+
 	end
 
 	function Action:allowCasterMoving()

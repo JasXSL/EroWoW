@@ -4,10 +4,30 @@ local require = internal.require;
 
 local Database, Character, Timer, Event, Tools;
 
+-- Effect PASSIVES
+local EffectPassive = {}
+	EffectPassive.__index = EffectPassive;
+	function EffectPassive:new(data)
+		local self = {};
+		setmetatable(self, EffectPassive); 
+
+		self.type = data.type;
+		self.data = data.data;
+		
+		return self;
+	end
+
+	EffectPassive.Types = {
+		Visual = "Visual",				-- {id=id}
+	};
+
+
 local Effect = {}
 	Effect.__index = Effect;
 	Effect.applied = {}					-- {index = {effect:Effect:new(), expires:(float)expires, ticks:(int)ticks, stacks:(int)stacks, id:(int)index}...}
 	Effect.index = 0
+	Effect.passives = {};
+
 
 	function Effect.ini()
 		Database = require("Database");
@@ -15,6 +35,8 @@ local Effect = {}
 		Event = require("Event");
 		Timer = require("Timer");
 		Tools = require("Tools");
+		Visual = require("Visual");
+		print("INI Effect");
 	end
 
 	function Effect:new(data)
@@ -23,19 +45,20 @@ local Effect = {}
 
 		self.id = data.id
 		self.detrimental = data.detrimental or false	-- 
-		self.duration = data.duration or 0				-- Total duration of effect, use 0 for passive
-		self.ticking = data.ticking or 0				-- Sec between ticks
-		self.max_stacks = data.max_stacks or 1
-		self.texture = data.texture
-		self.name = data.name
-		self.description = data.description
-		self.sound_loop = data.sound_loop
+		self.duration = data.duration or 0;				-- Total duration of effect, use 0 for passive
+		self.ticking = data.ticking or 0;				-- Sec between ticks
+		self.max_stacks = data.max_stacks or 1;
+		self.texture = data.texture;
+		self.name = data.name;
+		self.description = data.description;
+		self.sound_loop = data.sound_loop;
+		self.passives = type(data.passives) == "table" and data.passives or {};			-- Use EffectPassive
 
-		self.onAdd = data.onAdd							-- (obj)activeData, (bool)fromLogin
-		self.onRemove = data.onRemove
-		self.onTick = data.onTick
-		self.onStackChange = data.onStackChange			-- (obj)activeData, (bool)fromLogin
-		self.onRightClick = data.onRightClick			-- Right click binding
+		self.onAdd = data.onAdd;							-- (obj)activeData, (bool)fromLogin
+		self.onRemove = data.onRemove;
+		self.onTick = data.onTick;
+		self.onStackChange = data.onStackChange;			-- (obj)activeData, (bool)fromLogin
+		self.onRightClick = data.onRightClick;				-- Right click binding
 
 		self.tags = type(data.tags) == "table" and data.tags or {};	-- Not a set, just id, id1, id2...
 
@@ -253,7 +276,8 @@ local Effect = {}
 	function Effect.run(id, stacks, fromLogin)
 		local effect = Effect.get(id)
 		if not effect then print("Effect not found", id); return false end
-		effect:add(stacks, fromLogin)
+		effect:add(stacks, fromLogin);
+		Effect.updatePassives();
 	end
 
 	function Effect.rem(index)
@@ -270,8 +294,9 @@ local Effect = {}
 		end
 		Timer.clear(effect.timerExpire);
 		Timer.clear(effect.timerTick);
-		Effect.applied[index] = nil
-		Effect:UpdateAllBuffAnchors()
+		Effect.applied[index] = nil;
+		Effect:UpdateAllBuffAnchors();
+		Effect.updatePassives();
 	end
 
 	function Effect.remByID(id)
@@ -536,10 +561,52 @@ local Effect = {}
 		end)
 	end
 
+	-- Passives
+	function Effect.updatePassives()
+		-- Start with visuals
+		local preVisuals = Effect.passives[EffectPassive.Types.Visual];
+		if not preVisuals then preVisuals = {} end
+		local postVisuals = {};
+
+		-- Stack the effects
+		for _,effect in pairs(Effect.applied) do
+			for _,passive in pairs(effect.effect.passives) do
+				if passive.type == EffectPassive.Types.Visual then
+					postVisuals[passive.data.id] = true;
+				end
+			end
+		end
+
+		local added, removed = Tools.tableCompare(postVisuals, preVisuals);
+		for k,_ in pairs(added) do
+			Visual.get(k):trigger(true);
+		end
+		for k,_ in pairs(removed) do
+			Visual.get(k):fade();
+		end
+
+		Effect.passives[EffectPassive.Types.Visual] = postVisuals;
+	end
+
+	-- Triggers a visual unless it's already in a duration effect
+	function Effect.triggerVisual(id)
+		-- This effect is already active through a long term effect
+		if Effect.passives[EffectPassive.Types.Visual] and Effect.passives[EffectPassive.Types.Visual][id] then
+			return;
+		end
+		Visual.get(id):trigger();
+	end
+
 
 
 
 export(
-	"Effect", 
+	"Effect",
+	Effect,
+	{
+		EffectPassive = EffectPassive,
+		run = Effect.run,
+		triggerVisual = Effect.triggerVisual,
+	},
 	Effect
 )

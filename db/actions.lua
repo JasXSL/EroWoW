@@ -266,8 +266,7 @@ function internal.build.actions()
 		end,
 		fn_receive = function(self, sender, target, args)
 			DoEmote("GIGGLE", target);
-			self:receiveRPText(sender, target, args)
-			return true
+			return self:receiveRPText(sender, target, args);
 		end
 	});
 
@@ -297,8 +296,7 @@ function internal.build.actions()
 		fn_receive = function(self, sender, target, args)
 			DoEmote("GASP");
 			Func.get("addExcitementMasochistic")();
-			self:receiveRPText(sender, target, args);
-			return true
+			return self:receiveRPText(sender, target, args);
 		end
 	});
 
@@ -388,10 +386,9 @@ function internal.build.actions()
 			return self:sendRPText(sender, target, suppressErrors);
 		end,
 		fn_receive = function(self, sender, target, args)
-			self:receiveRPText(sender, target, args);
 			local ef = Effect.get(self.id);
 			ef:add(1);
-			return true
+			return self:receiveRPText(sender, target, args);
 		end
 	});
 
@@ -422,10 +419,9 @@ function internal.build.actions()
 		end,
 		fn_receive = function(self, sender, target, args)
 			DoEmote("whine", Ambiguate(sender, "all"));
-			self:receiveRPText(sender, target, args);
 			Func.get("addExcitementMasochisticCrit")();
 			PlaySound(21455, "SFX");
-			return true
+			return self:receiveRPText(sender, target, args);
 		end
 	});
 
@@ -454,9 +450,8 @@ function internal.build.actions()
 			end);
 		end,
 		fn_receive = function(self, sender, target, args)
-			self:receiveRPText(sender, target, args)
 			Func.get("addExcitementMasochistic")();
-			return true
+			return self:receiveRPText(sender, target, args)
 		end
 	});
 
@@ -499,9 +494,8 @@ function internal.build.actions()
 			end);
 		end,
 		fn_receive = function(self, sender, target, args)
-			self:receiveRPText(sender, target, args)
 			Func.get("addExcitementMasochistic")();
-			return true
+			return self:receiveRPText(sender, target, args);
 		end
 	});
 	

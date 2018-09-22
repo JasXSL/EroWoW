@@ -99,5 +99,27 @@ local Tools = {};
 		return out;
 	end
 
+	-- Compares the root keys of a table, returning two tables: addedKeys, removedKeys
+	function Tools.tableCompare(post, pre)
+		local addedValues = {};
+		local removedValues = {};
+
+		-- Find added values
+		for k,_ in pairs(post) do
+			if not pre[k] then
+				addedValues[k] = true;
+			end
+		end
+		-- Get removed values
+		for k,_ in pairs(pre) do
+			if not post[k] then
+				removedValues[k] = true;
+			end
+		end
+		
+		return addedValues, removedValues;
+
+	end
+
 
 export("Tools", Tools)

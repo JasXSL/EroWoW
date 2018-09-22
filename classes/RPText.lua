@@ -1,7 +1,7 @@
 local appName, internal = ...
 local export = internal.Module.export;
 local require = internal.require;
-local Condition, Database, Tools, Index, Timer;
+local Condition, Database, Tools, Index, Timer, Effect;
 
 local RPText = {};
 RPText.__index = RPText;
@@ -15,6 +15,7 @@ RPText.whisperCD = nil
 		Tools = require("Tools");
 		Index = require("Index");
 		Timer = require("Timer");
+		Effect = require("Effect");
 	end
 
 	function RPText.getTakehitCD() return RPText.takehitCD end
@@ -75,7 +76,8 @@ RPText.whisperCD = nil
 		self.sound = data.sound;					-- Play this sound when sending or receiving this
 		self.fn = data.fn or nil;					-- Only supported for NPC/Spell events. Actions should use the action system instead
 		self.is_chat = data.is_chat or false		-- Makes the RP text display with chat colors instead. Set text_bystander to any non-false value to make it a say. Otherwise it's a whisper
-		
+		self.visual = data.visual;					-- Triggers a visual from the visuals library
+
 		-- Automatic
 		self.item = ""								-- Populated automatically when you use an item condition, contains the last valid item name
 
@@ -154,6 +156,10 @@ RPText.whisperCD = nil
 			self:fn(sender, receiver);
 		end
 
+		if type(self.visual) == "string" then
+			Effect.triggerVisual(self.visual);
+		end
+
 		if self.sound and not noSound then
 			if type(self.sound) == "number" then
 				PlaySound(self.sound, "SFX");
@@ -171,8 +177,7 @@ RPText.whisperCD = nil
 	function RPText.get(id, senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action, debug)
 
 		local viable = {};
-		local isSelfCast = UnitIsUnit(senderUnit, receiverUnit)
-		
+		local isSelfCast = UnitIsUnit(Ambiguate(senderUnit, "all"), receiverUnit);		
 		local lib = Database.filter("RPText");
 		for k,v in pairs(lib) do
 
@@ -261,6 +266,7 @@ RPText.whisperCD = nil
 			if next(tags) == nil or math.random() < 0.5 then 
 				return "" 
 			end	
+			
 			return tags[math.random(#tags)].." "
 			
 		end
@@ -290,7 +296,9 @@ RPText.whisperCD = nil
 			if math.random() < 0.5 then return "left" end
 			return "right"
 		elseif tag == TAG_GENERIC.SPELL then
-			if type(spelldata) == "table" and spelldata.spellName then return spelldata.spellName end
+			if type(spelldata) == "table" and spelldata.spellName then 
+				return spelldata.spellName 
+			end
 			return "spell"
 		elseif tag == TAG_GENERIC.HARDEN then
 			return getRandom("harden", "stiffen")
