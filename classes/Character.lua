@@ -84,7 +84,6 @@ Character.__index = Character;
 		return npc;
 	end
 
-
 	function Character.recacheInventory()
 		
 		Character.INVCACHE = {};

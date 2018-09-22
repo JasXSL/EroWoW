@@ -314,7 +314,7 @@ Action.__index = Action;
 		end
 
 		-- Validate filtering. Filtering is also used in if a spell should show up whatsoever
-		if not self:validateFiltering(unitCaster, suppressErrors) then return false end
+		if isSend and not self:validateFiltering(unitCaster, suppressErrors) then return false end
 
 		-- Make sure target and caster are actual units
 		unitCaster = Ambiguate(unitCaster, "all")
@@ -803,8 +803,6 @@ Action.__index = Action;
 				args, callback = action:fn_send("player", target, suppressErrors);
 				if args == false then return false end -- Return false from your custom function to prevent a send
 			end
-
-			
 
 			-- Finish cast
 			action:setCooldown(false, true);

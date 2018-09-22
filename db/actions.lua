@@ -206,7 +206,7 @@ function internal.build.actions()
 		texture = "inv_darkmoon_eye",
 		cooldown = 0,
 		conditions = {
-			Condition.get("melee_range"),
+			Condition.get("caster_range"),
 		},
 		not_defaults = {
 			"party_restricted"
@@ -228,9 +228,6 @@ function internal.build.actions()
 		description = "Sniff out some information about your target from a distance.",
 		texture = "inv_wolfdraenormountshadow",
 		cooldown = 0,
-		conditions = {
-			Condition.get("caster_range"),
-		},
 		filters = {
 			Condition:new({type=Condition.Types.RTYPE_RACE, data={Worgen=true}, sender=true})
 		},
