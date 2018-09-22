@@ -148,7 +148,7 @@ RPText.whisperCD = nil
 			Index.sendBystanderText(
 				RPText.convert(bystander, sender, receiver, spell, self.item),
 				self.is_chat,
-				receiver:getName()
+				sender:getName()
 			);
 		end
 
