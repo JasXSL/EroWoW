@@ -177,19 +177,21 @@ RPText.whisperCD = nil
 	function RPText.get(id, senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action, debug)
 
 		local viable = {};
-		local isSelfCast = UnitIsUnit(Ambiguate(senderUnit, "all"), receiverUnit);		
+		senderUnit = Ambiguate(senderUnit, "all");
+		local isSelfCast = UnitIsUnit(senderUnit, receiverUnit);		
 		local lib = Database.filter("RPText");
+
 		for k,v in pairs(lib) do
 
 			if v.id == "" or Tools.multiSearch(id, v.id) then
-				
 				
 				local valid = v:validate(senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action, debug);
 				if 
 					valid and 
 					(
-						-- Self only
+						-- This is a self cast and there's no sender text, allow it
 						(not v.text_sender and isSelfCast) or
+						-- Not a self cast and there's a text_sender or the sender is not a player
 						((v.text_sender or not UnitIsPlayer(senderUnit)) and not isSelfCast)	-- NPC spell and hits don't have a sender text
 						--((v.text_sender or senderUnit.type ~= "player") and not isSelfCast) -- NPC spells don't have text_sender, so they need to be put here
 					)

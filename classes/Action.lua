@@ -584,7 +584,7 @@ Action.__index = Action;
 		-- Request your target to generate a text
 		return {
 			id = id,
-			sender=ts:export(true),
+			sender=ExiWoW.ME:export(true),
 		}, 
 		-- Callback
 		function(se, success, data) 
@@ -617,6 +617,7 @@ Action.__index = Action;
 		end
 		id = args.id;
 		senderPlayer = Character:new(args.sender);
+		senderPlayer.name = Ambiguate(sender, "all");
 
 		-- id, senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action
 		local rptext = RPText.get(id, sender, "player", senderPlayer, ExiWoW.ME, nil, nil, Action.get(id));
