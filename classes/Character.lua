@@ -419,7 +419,7 @@ Character.__index = Character;
 			local a, handle = PlaySound(75739, "SFX", true);
 			self.exSound = handle;
 			RPText.trigger("_EX_CAP_", "player", "player", self, self);
-			Visual.get("heavyExcitementPermanent"):trigger();
+			Visual.get("heavyExcitement"):trigger(true);
 
 			-- Start heartbeat
 		else
@@ -427,7 +427,7 @@ Character.__index = Character;
 			if self.exSound then
 				StopSound(self.exSound, 1000);
 			end
-			Visual.get("heavyExcitementPermanent"):stop();
+			Visual.get("heavyExcitement"):fade();
 
 			UI.portrait.border:SetVertexColor(1,1,1);
 

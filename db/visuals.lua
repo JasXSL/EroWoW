@@ -26,6 +26,24 @@ function internal.build.visuals()
 		end
 	});
 
+	-- Pain
+	ext:addVisual({
+		id="pain",
+		image="red_border.tga",
+		update = function(self)
+			local delta = GetTime()-self.timeTriggered;
+			local duration = 0.5;
+			if delta > duration then
+				return true;
+			end
+			local alpha = ((sin(GetTime()*1000)+1)/8+0.75)*min(1,delta*5);
+			if self.hold then
+				return alpha;
+			end
+			return alpha*ExiWoW.Easing.outQuad(delta, 1, -1, duration)*0.5;
+		end
+	});
+
 	-- /dump ExiWoW.require("Visual").get("frost"):trigger()
 	ext:addVisual({
 		id="frost",
@@ -120,6 +138,31 @@ function internal.build.visuals()
 			end
 
 			local alpha = (sin(GetTime()*1000)+1)/4+0.25;
+			if self.hold then
+				return alpha;
+			end
+
+			if delta > duration then
+				return true;
+			end
+
+			return alpha*ExiWoW.Easing.outQuad(delta, 1, -1, duration);
+
+		end
+	});
+
+
+	ext:addVisual({
+		id="excitement",
+		image="cloudy_fade_border.tga",
+		create = function(self)
+			self.frame.bg:SetVertexColor(1,0.5,1);
+		end,
+		update = function(self, elapsed)
+			local delta = GetTime()-self.timeTriggered;
+			local duration = 1;
+			
+			local alpha = 0.25*min(1,delta*2);
 			if self.hold then
 				return alpha;
 			end

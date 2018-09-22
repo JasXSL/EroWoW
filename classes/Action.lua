@@ -620,13 +620,11 @@ Action.__index = Action;
 
 		-- id, senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action
 		local rptext = RPText.get(id, sender, "player", senderPlayer, ExiWoW.ME, nil, nil, Action.get(id));
-
 		if not rptext then return false end
 
 		local out = {
 			t=rptext.text_sender,
 			so=rptext.sound,
-			vis=rptext.visual,
 		};
 		-- Self cast doesn't need to send any data
 		if UnitIsUnit(Ambiguate(sender, "ALL"), "player") then 
@@ -894,6 +892,7 @@ Action.__index = Action;
 			Action.CASTING_SOUND_LOOP = handle;
 			Action.CASTING_SOUND_FINISH_EVENT = Event.on("SOUNDKIT_FINISHED", function(data)
 				if data[1] == Action.CASTING_SOUND_LOOP then 
+					StopSound(Action.CASTING_SOUND_LOOP);
 					local _, handle = PlaySound(action.cast_sound_loop, "SFX", false, true);
 					Action.CASTING_SOUND_LOOP = handle;
 				end
@@ -935,6 +934,7 @@ Action.__index = Action;
 			Event.raise(Event.Types.ACTION_INTERRUPTED, {id=Action.CASTING_SPELL.id, target=Action.CASTING_TARGET})
 			Action:toggleCastBar(false);
 		end
+
 
 		if Action.CASTING_SOUND_LOOP then
 			StopSound(Action.CASTING_SOUND_LOOP);

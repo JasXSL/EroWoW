@@ -54,7 +54,7 @@ function internal.build.rptexts()
 			text_receiver = "%S grabs a hold of your %Tundies, giving you a wedgie!",
 			sound = 25626,
 			requirements = {getCondition("targetWearsUnderwear")},
-			
+			visual = "heavyPain",
 		})
 
 		ext:addRpText({
@@ -75,12 +75,14 @@ function internal.build.rptexts()
 			text_receiver = "%S lashes you with %Shis lightning tentacle!",
 			sound = 3338,
 			requirements = {},
+			visual = "lightning",
 		})
 		ext:addRpText({
 			id = "SHOCKTACLE",
 			text_bystander = "%S lashes %Shimself with a lightning tentacle!",
 			text_receiver = "You lash yourself with your lightning tentacle!",
 			sound = 3338,
+			visual = "lightning",
 			requirements = {},
 		})
 

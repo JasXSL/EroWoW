@@ -36,7 +36,6 @@ local Effect = {}
 		Timer = require("Timer");
 		Tools = require("Tools");
 		Visual = require("Visual");
-		print("INI Effect");
 	end
 
 	function Effect:new(data)
@@ -607,6 +606,11 @@ export(
 		EffectPassive = EffectPassive,
 		run = Effect.run,
 		triggerVisual = Effect.triggerVisual,
+		rem = Effect.rem,
+		get = Effect.get,
+		remByID = Effect.remByID,
+		remByTags = Effect.remByTags,
+		remByTagsNotThis = Effect.remByTagsNotThis,
 	},
 	Effect
 )
