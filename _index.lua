@@ -14,17 +14,6 @@ UIParentLoadAddOn("Blizzard_DebugTools");
 	/console scriptErrors 1
 	/run ExiWoW.UI.drawLoot("Test", "inv_pants_leather_04")
 
-	TODO:
-	- Add GROIN_RUMBLE_TOTEM VH program
-	- Add VINE_THONG vibhub program
-	- Add THONG_OF_VALOR vibhub program
-
-	- Add slash command to toggle panel
-	- Interacting with a target before the ExiWoW icon shows creates a script error
-	- Re-add whispers
-	- Add pagination once you manage to fill up the whole first page and/or underwear page
-	- Character backup
-	 
 ]]
 ExiWoW = {};
 ExiWoW.require = internal.Module.require;
@@ -129,10 +118,9 @@ local Index = {}
 		Event = require("Event");
 		Callback = require("Callback");
 		Database = require("Database");
-		Effect = require("Effect");
 		Quest = require("Quest");
 		RPText = require("RPText");
-		
+		Visual = require("Visual");
 
 		ExiWoW.ME = Character:new();
 		UI.build();
@@ -176,6 +164,7 @@ local Index = {}
 		internal.build.spells();
 		internal.build.spells = nil;
 		Extension.index();
+		-- The rest can be in any order
 		for k,fn in pairs(internal.build) do
 			fn();
 		end

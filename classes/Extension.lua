@@ -7,7 +7,7 @@ Extension = {}
 Extension.LIB = {}
 Extension.__index = Extension;
 
-local RPText, Action, Effect, Underwear, Database, Func, NPC, Zone, Spell, Loot;
+local RPText, Action, Effect, Underwear, Database, Func, NPC, Zone, Spell, Loot, Visual;
 
 
 	function Extension:ini()
@@ -23,6 +23,7 @@ local RPText, Action, Effect, Underwear, Database, Func, NPC, Zone, Spell, Loot;
 		Spell = require("Spell");
 		Loot = require("Loot");
 		Quest = require("Quest");
+		Visual = require("Visual");
 	end
 
 	function Extension:new(data, isRoot)
@@ -73,6 +74,8 @@ local RPText, Action, Effect, Underwear, Database, Func, NPC, Zone, Spell, Loot;
 		-- Quests
 		self.quests = importTable(data.quests);
 
+		-- Visuals
+		self.visuals = importTable(data.visuals);
 
 		return self
 	end
@@ -120,6 +123,9 @@ local RPText, Action, Effect, Underwear, Database, Func, NPC, Zone, Spell, Loot;
 	function Extension:addQuest(data)
 		table.insert(self.quests, Quest:new(data));
 	end
+	function Extension:addVisual(data)
+		table.insert(self.visuals, Visual:new(data));
+	end
 
 
 	-- STATIC --
@@ -142,6 +148,7 @@ local RPText, Action, Effect, Underwear, Database, Func, NPC, Zone, Spell, Loot;
 			Database.add("Zone", v.zones);
 			Database.add("Loot", v.loot);
 			Database.add("Quest", v.quests);
+			Database.add("Visual", v.visuals);
 		end
 		
 

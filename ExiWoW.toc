@@ -22,6 +22,7 @@ Gateway.lua
 
 # External Libraries
 ext/json.lua
+ext/easing.lua
 
 # Main classes
 classes/Func.lua
@@ -42,6 +43,7 @@ classes/Zone.lua
 classes/Loot.lua
 classes/Quest.lua
 classes/Talkbox.lua
+classes/Visual.lua
 
 # Asset database
 db/functions.lua
@@ -55,4 +57,5 @@ db/actions.lua
 db/underwear.lua
 db/loot.lua
 db/quests.lua
+db/visuals.lua
 
