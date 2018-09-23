@@ -184,6 +184,7 @@ Character.__index = Character;
 		-- They still need to be fetched from settings though when received by a unit for an RP text
 		self.class = settings.cl or UnitClass("player");
 		self.race = settings.ra or UnitRace("player");
+		self.spec = type(settings.sp) == "number" and settings.sp or GetInspectSpecialization("player");
 		
 		-- These are not sent on export, but can be used locally for NPC events
 		self.type = "player";				-- Can be overridden like humanoid etc. 
@@ -242,6 +243,7 @@ Character.__index = Character;
 		if full then
 			out.cl = UnitClass("player");
 			out.ra = UnitRace("player");
+			out.sp = GetInspectSpecialization("player");
 		end
 		return out;
 	end

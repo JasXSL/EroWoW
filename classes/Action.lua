@@ -79,6 +79,11 @@ Action.__index = Action;
 		if self.rarity < 1 then self.rarity = 1
 		elseif self.rarity > 7 then self.rarity = 7
 		end
+		self.passive = data.passive;								-- Passive effect
+		self.passive_on = false;
+		self.passive_on_enabled = data.passive_on_enabled;			-- REQUIRED PASSIVE Function when passive enabled (if this is passive). First argument is bool fromUserAction
+		self.passive_on_disabled = data.passive_on_disabled;		-- Function when passive disabled (if this is passive). This is always triggered through a user action
+		self.passive_event_bindings = {};
 
 		self.suppress_all_errors = data.suppress_all_errors or false
 
@@ -164,6 +169,12 @@ Action.__index = Action;
 		else
 			self.cooldown_started = 0;
 		end
+		if data.passive_on then 
+			if not self.passive_on then
+				self:passive_on_enabled(false);
+			end
+			self.passive_on = true;
+		end
 		if data.charges then self.charges = data.charges end
 		if self.charges == "INF" then self.charges = math.huge end
 
@@ -178,11 +189,25 @@ Action.__index = Action;
 			learned = self.learned,
 			favorite = self.favorite,
 			cooldown_started = self.cooldown_started,
-			charges = charges
+			charges = charges,
+			passive_on = self.passive_on
 		};
 
 	end
 
+
+	-- Passives
+	function Action:passiveOn(event, callback)
+		local handle = Event.on(event, callback);
+		table.insert(self.passive_event_bindings, handle);
+		return handle;
+	end
+
+	function Action:passiveOff()
+		for _,v in pairs(self.passive_event_bindings) do
+			Event.off(v);
+		end
+	end
 
 	-- Charges
 	function Action:consumeCharges(nr)
@@ -460,13 +485,15 @@ Action.__index = Action;
 		local started, duration = v:getCooldown();
 		local singles = {}
 
-		if v.cast_time > 0 then
+		if v.passive then
+			table.insert(singles, "Passive");
+		elseif v.cast_time > 0 then
 			table.insert(singles, Tools.timeFormat(v.cast_time).." cast");
 		else
 			table.insert(singles, "Instant")
 		end
 
-		if not v.self_only then
+		if not v.self_only and not v.passive then
 			if v:requiresMeleeRange() then
 				table.insert(singles, "Melee Range");
 			elseif v:requiresCastRange() then
@@ -474,8 +501,15 @@ Action.__index = Action;
 			end
 		end
 
-		if v.cooldown > 0 then
+		if v.cooldown > 0 and not v.passive then
 			table.insert(singles, Tools.timeFormat(v.cooldown).." cooldown");
+		end
+		if v.passive then
+			if v.passive_on then
+				table.insert(singles, "ENABLED");
+			else
+				table.insert(singles, "Disabled");
+			end
 		end
 
 		local c = 0.8	-- Brightness of text
@@ -753,7 +787,7 @@ Action.__index = Action;
 	end
 
 	-- Send an action, id can also be an action
-	function Action.useOnTarget(id, target, castFinish)
+	function Action.useOnTarget(id, target, castFinish, isProc)
 
 		if Action.CASTING_SPELL then
 			return Tools.reportError("You are already using an action!");
@@ -768,19 +802,31 @@ Action.__index = Action;
 			end
 		end
 
+		local isPassive = action.passive and not isProc;
+
+
 		-- Self cast actions don't need to send a message
-		if action:selfCastOnly() or not UnitExists("target") then
+		if action:selfCastOnly() or not UnitExists("target") or isPassive then
 			target = "player"
 		end
 
-		if action.charges-1 < 0 then
+		if action.charges-1 < 0 and not isPassive then
 			return Tools.reportError("Not enough charges");
 		end
 
+		
+
 		-- Validate conditions
-		local su, re = action:validate("player", target, false, true, castFinish)
-		if not su then 
-			return false 
+		if not isPassive then
+			local su, re = action:validate("player", target, false, true, castFinish)
+			if not su then 
+				return false;
+			end
+		-- Passive toggles only need to validate filtering to toggle
+		else
+			if not action:validateFiltering("player") then
+				return false;
+			end
 		end
 
 		-- Set cooldowns etc
@@ -793,9 +839,23 @@ Action.__index = Action;
 
 		ExiWoW.CAST_TARGET = ExiWoW.TARGET
 
-		if not castFinish then Action:setGlobalCooldown() end
+		if not castFinish and not isPassive then 
+			Action:setGlobalCooldown();
+		end
 
-		if action.cast_time <= 0 or castFinish then 
+		-- Toggle passive
+		if isPassive then
+			action.passive_on = not action.passive_on;
+			if action.passive_on then
+				action:passive_on_enabled(true);
+			else
+				if type(action.passive_on_disabled) == "function" then
+					action:passive_on_disabled();
+				end
+				action:passiveOff();
+			end
+			UI.actionPage.update();
+		elseif action.cast_time <= 0 or castFinish then 
 
 			Event.raise(Event.Types.ACTION_SENT, {id=action.id, target=target})
 			if type(action.fn_done) == "function" then action:fn_done(true) end

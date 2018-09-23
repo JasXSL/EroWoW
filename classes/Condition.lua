@@ -19,6 +19,7 @@ Condition.__index = Condition;
 		RTYPE_BUTT_GREATER = "butt_greater",			-- (int)size :: Butt greater than size.
 		RTYPE_RACE = "race",							-- {raceEN=true, raceEn=true...} Table of races that are accepted. Example: {Gnome=true, HighmountainTauren=true}, use UnitRace
 		RTYPE_CLASS = "class",							-- {englishClass=true, englishClass=true...} Table of classes that are accepted. Example: {DEATHKNIGHT=true, MONK=true}
+		RTYPE_SPEC = "spec",							-- {s..specNumber=true, s..specNumber=true...} Table of classes that are accepted. Example: {s0=true}, for priest this would be disc
 		RTYPE_TYPE = "type",							-- {typeOne=true, typeTwo=true...} For players this is always "player", otherwise refer to the type of NPC, such as "Humanoid"
 		RTYPE_NAME = "name",							-- {nameOne=true, nameTwo=true...} Name of targ. If used with NPCs, consider using a tag instead
 		RTYPE_TAG = "tag",								-- {a, or b, or c...}
@@ -111,6 +112,10 @@ Condition.__index = Condition;
 		[Condition.Types.RTYPE_CLASS] = {
 			"Target is not the required class.",
 			"Target race invalid."
+		},
+		[Condition.Types.RTYPE_SPEC] = {
+			"Target is not the required spec.",
+			"Target spec invalid."
 		},
 		[Condition.Types.RTYPE_TYPE] = {
 			"Target type invalid.",
@@ -299,11 +304,13 @@ Condition.__index = Condition;
 		elseif t == ty.RTYPE_BUTT_GREATER then 
 			out = targ:getButtSize() > data[1];
 		elseif t == ty.RTYPE_RACE then 
-			out = Tools.multiSearch(targ.race, data)
+			out = Tools.multiSearch(targ.race, data);
 		elseif t == ty.RTYPE_CLASS then 
-			out = Tools.multiSearch(targ.class, data)
+			out = Tools.multiSearch(targ.class, data);
+		elseif t == ty.RTYPE_SPEC then
+			out = Tools.multiSearch("s"..targ.spec, data);
 		elseif t == ty.RTYPE_TYPE then 
-			out = Tools.multiSearch(targ.type, data)
+			out = Tools.multiSearch(targ.type, data);
 		elseif t == ty.RTYPE_ZONE then
 			out = Tools.multiSearch(GetRealZoneText(), data);
 		elseif t == ty.RTYPE_SUBZONE then

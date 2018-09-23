@@ -1261,6 +1261,13 @@ UI = {}
 				else
 					f.star:Hide();
 				end
+
+				if v.passive and v.passive_on then
+					f:LockHighlight();
+				else
+					f:UnlockHighlight();
+				end
+
 				-- Generate tooltip
 				f:SetScript("OnEnter", function(self)
 					v:onTooltip(self);
