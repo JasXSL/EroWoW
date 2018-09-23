@@ -24,12 +24,6 @@ function internal.build.rptexts()
 			text_receiver = "%T tickles you!",
 			requirements = {},
 		})
-		ext:addRpText({
-			id = "TICKLE",
-			text_sender = "You tickle %T with your feather!",
-			text_receiver = "%S tickles you with %Shis feather!",
-			requirements = {getCondition("invFeathers")},
-		})
 
 	-- Tickle self
 		ext:addRpText({
@@ -39,13 +33,6 @@ function internal.build.rptexts()
 			requirements = {},
 			
 		})
-		ext:addRpText({
-			id = "TICKLE",
-			text_bystander = "%T tickles %Thimself with %This feather!",
-			text_receiver = "You use your feather to tickle yourself!",
-			requirements = {getCondition("invFeathers")},
-		});
-
 	-- Wedgie
 		ext:addRpText({
 			id = "WEDGIE",

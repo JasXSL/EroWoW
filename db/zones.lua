@@ -25,7 +25,9 @@ function internal.build.zones()
 	ext:addZone({id="Blade's Edge Mountains", tags={"SAND"}});
 	ext:addZone({id="Netherstorm", tags={"SAND"}});
 	ext:addZone({id="Shadowmoon Valley", tags={"SAND"}});
+	ext:addZone({id="Vol'Dun", tags={"SAND"}});
+	ext:addZone({id="Nazmir", tags={"MUSHROOMS","SWAMP"}});
 	
-	ext:addZone({id="Zangarmarsh", tags={"MUSHROOMS"}});
+	ext:addZone({id="Zangarmarsh", tags={"MUSHROOMS","SWAMP"}});
 
 end

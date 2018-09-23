@@ -1,29 +1,57 @@
 Screen effects:
-	- Electric
-	- Red damage
 	- Blindness
-	- Heart
-	- Cold
+	- Camera
+
+- Forage rare item nearby indicator
 
 
 Class specific actions:
 Shaman:
-	Aimed Riptide: Your next riptide will hit your target's breasts, groin, or butt
+	Aimed Riptide: Your next riptide will hit your target's breasts, groin, or butt. (Place an effect on the player, consume it on riptide or right click)
 	Nipple Shocker: Shocks your target's nipples.
 
 Monk:
 	Pleasure Touch: Instantly maxes your target's arousal. 30 min cooldown.
-	
 
 Priest:
 	Lingering Mend: The next shadow mend causes a void tentacle to linger on your target, arousing them over time.
+	Dirty Mind Control: Forces target to play with themselves.
 
 Paladin:
 	Chastise: Clear your target's arousal.
 
 Rogue:
-	Pickpocket: Slip your hands into your target's leggins and fondle their "goods". Must be stealthed and behind your target.
+	Pickpocket: Slip your hands into your target's leggings and fondle their "goods". Must be stealthed and behind your target.
 	Aphrodisiac: Slips aphrodisiac into your target's food and drink. If they eat or drink within an hour, they get poisoned increasing arousal generated.
+	Aimed Hook: Grapples your target's underwear with your grappling hook. Has a 20% chance to take them off.
+
+Warrior:
+	Flex: Flex your muscles, making nearby party members look at you.
+
+DH:
+	
+
+DK:
+
+
+Druid:
+
+
+Warlock:
+
+
+Mage:
+
+
+Hunter:
+
+
+
+
+Race specific:
+Gnome:
+	- Vibrate Setting: Vibrates your target
+
 
 - Add pagination once you manage to fill up the whole first page and/or underwear page
 - Character backup
@@ -38,5 +66,5 @@ Ideas for stuff you can do with the API:
 	- Block hearing: UI ChatFrame:AddMessageEventFilter("event", filterFunc)
 	- Auto follow
 	- Blindness via UI element
-
+	- 
 

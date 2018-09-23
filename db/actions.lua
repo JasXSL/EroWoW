@@ -89,8 +89,7 @@ function internal.build.actions()
 		name = "Disrobe",
 		description = "Removes a piece of armor from your target.",
 		texture = "ability_rogue_plunderarmor",
-		--cooldown = 120,
-		cooldown = 10,
+		cooldown = 120,
 		cast_time = 2,
 		cast_sound_loop = 6425,				-- Tailoring, see http://www.wowhead.com/sound=6425/tailoring
 		conditions = {
@@ -250,7 +249,7 @@ function internal.build.actions()
 		name = "Tickle",
 		description = "Tickle a player.",
 		texture = "Spell_shadow_fingerofdeath",
-		cooldown = 6,
+		cooldown = 30,
 		conditions = {
 			Condition.get("melee_range"),
 		},
@@ -273,7 +272,7 @@ function internal.build.actions()
 		name = "Wedgie",
 		description = "Give a player a wedgie, provided they're wearing underwear.",
 		texture = "Spell_holy_fistofjustice",
-		cooldown = 6,
+		cooldown = 20,
 		conditions = {
 			Condition.get("targetWearsUnderwear"),
 			Condition.get("melee_range"),
@@ -366,7 +365,7 @@ function internal.build.actions()
 	});
 
 
-
+	-- Arachnid scepter
 	extension:addAction({
 		id = "MORTAS_ARACHNID_SCEPTER",
 		name = "Morta's Arachnid Scepter",
@@ -389,7 +388,7 @@ function internal.build.actions()
 		end
 	});
 
-
+	-- Shocktacle
 	extension:addAction({
 		id = "SHOCKTACLE",
 		name = "Shocktacle",
@@ -397,7 +396,7 @@ function internal.build.actions()
 		charges = 0,
 		texture = "ability_thunderking_lightningwhip",
 		rarity = 3,
-		cooldown = 60,
+		cooldown = 30,
 		conditions = {
 			Condition.get("melee_range"),
 		},
@@ -427,7 +426,9 @@ function internal.build.actions()
 
 
 
-		-- Consumable --
+	-- Consumable --
+
+	-- Throw sand
 	extension:addAction({
 		id = "THROW_SAND",
 		name = "Sand",
@@ -452,6 +453,7 @@ function internal.build.actions()
 		end
 	});
 
+	-- Calming potion
 	extension:addAction({
 		id = "CALMING_POTION",
 		name = "Calming Potion",

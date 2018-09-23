@@ -229,14 +229,6 @@ UI = {}
 
 
 
-
-
-
-
-
-
-
-
 	-- Portrait
 	UI.portrait = {};
 	UI.portrait.targetHasExiWoWFrame = nil;			-- Gender display for target
@@ -1168,8 +1160,6 @@ UI = {}
 
 				local idx = col+row*UI.buttonPage.COLS;
 				local ab = CreateFrame("Button", "ExiWoWActionButton_"..tostring(idx), f, "ActionButtonTemplate");
-				ab:SetAttribute("type", "action");
-				ab:SetAttribute("action", 1);
 				ab:SetPoint("TOPLEFT", 23+col*50*UI.buttonPage.MARG, -50-row*50*UI.buttonPage.MARG);
 				ab:SetSize(50,50);
 				ab.cooldown:SetSwipeTexture('', 0, 0, 0, 0.75)
@@ -1701,7 +1691,7 @@ UI = {}
 
 export("UI", UI, {
 	talkbox = UI.talkbox,
-	refreshAll = UI.refreshAll
+	refreshAll = UI.refreshAll,
 }, UI)
 	
 
