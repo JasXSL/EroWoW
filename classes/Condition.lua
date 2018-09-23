@@ -278,11 +278,6 @@ Condition.__index = Condition;
 			end
 
 			if not senderChar then
-				print("Senderchar is missing, unit is ", senderUnit, " party status is ", UnitInParty(senderUnit));
-
-			end
-
-			if not senderChar then
 				senderChar = Character:new({}, senderUnit);
 			end
 			targ = senderChar;

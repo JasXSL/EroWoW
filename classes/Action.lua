@@ -904,7 +904,7 @@ Action.__index = Action;
 		-- Received action is invalid
 		local attempt, err = action:validate(sender, "player", suppressErrors, false, false);
 		if not attempt then 
-			return false, err
+			return false, err;
 		end
 
 		-- Returns (bool)success, (var)data

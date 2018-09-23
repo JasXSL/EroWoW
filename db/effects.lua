@@ -72,6 +72,9 @@ function internal.build.effects()
 			self:setTimer(tick, 0.1, math.huge);
 			tick();
 		end,
+		onRemove = function()
+			FollowUnit("none");
+		end
 	});
 
 

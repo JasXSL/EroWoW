@@ -200,7 +200,7 @@ local Event = {}
 			
 
 			-- Only player themselves after this point
-			if destGUID ~= UnitGUID("player") then return end 
+			if destGUID ~= UnitGUID("player") and sourceGUID ~= UnitGUID("player") then return end 
 
 
 			-- These only work for healing or damage
