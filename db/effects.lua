@@ -57,11 +57,11 @@ function internal.build.effects()
 
 
 	-- Accepts data {target=followTarget}
-	-- /run ExiWoW.require("Effect").run("FOLLOW_5_SEC", 1, false, {target="Lazziere"});
+	-- /run ExiWoW.require("Effect").run("FOLLOW_6_SEC", 1, false, {target="Lazziere"});
 	ext:addEffect({
-		id = "FOLLOW_5_SEC",
+		id = "FOLLOW_6_SEC",
 		detrimental = true,
-		duration = 5,
+		duration = 6,
 		max_stacks = 1,
 		texture = "Interface/Icons/spell_shadow_shadowworddominate",
 		name = "Allure",

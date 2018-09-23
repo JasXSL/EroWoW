@@ -508,7 +508,7 @@ function internal.build.actions()
 		name = "Allure",
 		description = "Forces your target to follow you for 5 seconds.",
 		texture = "spell_shadow_shadowworddominate",
-		cooldown = 60,
+		cooldown = 90,
 		conditions = {
 			Condition.get("caster_range"),
 			Condition.get("sender_no_combat"),
@@ -528,7 +528,7 @@ function internal.build.actions()
 		fn_receive = function(self, sender, target, args)
 			sender = Ambiguate(sender, "all");
 			if UnitExists(Ambiguate(sender, "all")) then
-				Effect.run("FOLLOW_5_SEC", 1, false, {target=sender});
+				Effect.run("FOLLOW_6_SEC", 1, false, {target=sender});
 				return self:receiveRPText(sender, target, args);
 			end
 			return false;

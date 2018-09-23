@@ -7,15 +7,8 @@ Screen effects:
 
 Class specific actions:
 Shaman:
-	Aimed Riptide: Your next riptide will hit your target's breasts, groin, or butt. (Place an effect on the player, consume it on riptide or right click)
+	Aimed Riptide: Passive: Riptide has a 25% chance to hit your target's breasts, groin, or butt.
 	Nipple Shocker: Shocks your target's nipples.
-
-Monk:
-	Pleasure Touch: Instantly maxes your target's arousal. 30 min cooldown.
-
-Priest:
-	xLingering Mend: The next shadow mend causes a void tentacle to linger on your target, arousing them over time.
-	Dirty Mind Control: Forces target to play with themselves.
 
 Paladin:
 	Chastise: Clear your target's arousal.
