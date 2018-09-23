@@ -57,6 +57,7 @@ function internal.build.effects()
 
 
 	-- Accepts data {target=followTarget}
+	-- /run ExiWoW.require("Effect").run("FOLLOW_5_SEC", 1, false, {target="Lazziere"});
 	ext:addEffect({
 		id = "FOLLOW_5_SEC",
 		detrimental = true,
@@ -69,11 +70,11 @@ function internal.build.effects()
 			local function tick()
 				FollowUnit(self.customData.target);
 			end
-			self:setTimer(tick, 0.1, math.huge);
+			self:setTimer(tick, 0.05, math.huge);
 			tick();
 		end,
 		onRemove = function()
-			FollowUnit("none");
+			FollowUnit("player");
 		end
 	});
 
