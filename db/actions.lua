@@ -508,7 +508,7 @@ function internal.build.actions()
 		name = "Allure",
 		description = "Forces your target to follow you for 5 seconds.",
 		texture = "spell_shadow_shadowworddominate",
-		cooldown = 10,	-- 60
+		cooldown = 60,
 		conditions = {
 			Condition.get("caster_range"),
 			Condition.get("sender_no_combat"),
