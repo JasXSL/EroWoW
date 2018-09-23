@@ -14,7 +14,7 @@ Monk:
 	Pleasure Touch: Instantly maxes your target's arousal. 30 min cooldown.
 
 Priest:
-	Lingering Mend: The next shadow mend causes a void tentacle to linger on your target, arousing them over time.
+	xLingering Mend: The next shadow mend causes a void tentacle to linger on your target, arousing them over time.
 	Dirty Mind Control: Forces target to play with themselves.
 
 Paladin:

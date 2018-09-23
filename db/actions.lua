@@ -499,4 +499,41 @@ function internal.build.actions()
 	});
 	
 
+
+	-- Classes --
+
+	-- Priest - Allure
+	extension:addAction({
+		id = "ALLURE",
+		name = "Allure",
+		description = "Forces your target to follow you for 5 seconds.",
+		texture = "spell_shadow_shadowworddominate",
+		cooldown = 10,	-- 60
+		conditions = {
+			Condition.get("caster_range"),
+			Condition.get("sender_no_combat"),
+			Condition.get("victim_no_combat"),
+			Condition.get("require_party"),
+			Condition.get("require_party"),
+			Condition.get("no_selfcast")
+		},
+		filters = {
+			Condition:new({
+				type = Condition.Types.RTYPE_CLASS,
+				data = {Priest=true},
+				sender = true
+			}),
+		},
+		not_defaults = {},
+		fn_send = Action.sendRPText,
+		fn_receive = function(self, sender, target, args)
+			sender = Ambiguate(sender, "all");
+			if UnitExists(Ambiguate(sender, "all")) then
+				Effect.run("FOLLOW_5_SEC", 1, false, {target=sender});
+				return self:receiveRPText(sender, target, args);
+			end
+			return false;
+		end
+	});
+
 end

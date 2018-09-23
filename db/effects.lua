@@ -56,4 +56,23 @@ function internal.build.effects()
 	});
 
 
+	-- Accepts data {target=followTarget}
+	ext:addEffect({
+		id = "FOLLOW_5_SEC",
+		detrimental = true,
+		duration = 5,
+		max_stacks = 1,
+		texture = "Interface/Icons/spell_shadow_shadowworddominate",
+		name = "Allure",
+		description = "You obey!",
+		onAdd = function(self)
+			local function tick()
+				FollowUnit(self.customData.target);
+			end
+			self:setTimer(tick, 0.1, math.huge);
+			tick();
+		end,
+	});
+
+
 end

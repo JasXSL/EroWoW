@@ -58,8 +58,12 @@ local Effect = {}
 		self.onTick = data.onTick;
 		self.onStackChange = data.onStackChange;			-- (obj)activeData, (bool)fromLogin
 		self.onRightClick = data.onRightClick;				-- Right click binding
+		self.customData = {};								-- Supplied when applying the effect
+		self.timers = {};
 
 		self.tags = type(data.tags) == "table" and data.tags or {};	-- Not a set, just id, id1, id2...
+
+		self.eventBindings = {};
 
 		-- Automatic
 		self.loopPlaying = nil
@@ -96,7 +100,7 @@ local Effect = {}
 	end
 
 	-- FromLogin is added when this is added when you login or reload UI. And it's the "out" object defined below
-	function Effect:add(stacks, fromLogin)
+	function Effect:add(stacks, fromLogin, customData)
 
 		if not stacks or stacks < 1 then stacks = 1 end
 		local expires = 0
@@ -108,17 +112,20 @@ local Effect = {}
 		local existed = exists
 		local out = {}
 		local runOnAdd = false
-		local fLogin = type(fromLogin) == "table"
+		local fLogin = type(fromLogin) == "table";
 		-- Insert the effect
 		if fLogin then
-			Effect.index = Effect.index+1
-			exists = Effect.index
-			fromLogin.effect = self
-			fromLogin.id = exists
-			Effect.applied[exists] = fromLogin
-			out = fromLogin
-			runOnAdd = true
+			Effect.index = Effect.index+1;
+			exists = Effect.index;
+			fromLogin.effect = self;
+			fromLogin.id = exists;
+			customData = fromLogin.customData;
+			Effect.applied[exists] = fromLogin;
+			out = fromLogin;
+			runOnAdd = true;
 		end
+		self.customData = customData;
+		
 		
 		-- Newly added effect
 		if exists == false then
@@ -132,7 +139,7 @@ local Effect = {}
 				ticks = 0,
 				stacks = stacks,
 				id = Effect.index
-			}
+			};
 
 			local ticking = 0
 			if self.ticking and self.ticking > 0 then
@@ -222,6 +229,25 @@ local Effect = {}
 		end
 	end
 
+	-- Binds an event that's auto removed when the effect is removed
+	function Effect:on(event, callback)
+		table.insert(self.eventBindings, Event.on(event, callback));
+	end
+	
+
+	function Effect:setTimer(...)
+		table.insert(self.timers, Timer.set(...));
+	end
+
+	-- Removes timers and event bindings
+	function Effect:off()
+		for _,v in pairs(self.eventBindings) do
+			Event.off(v);
+		end
+		for _,v in pairs(self.timers) do
+			Timer.clear(v);
+		end
+	end
 
 
 	-- Static
@@ -272,10 +298,13 @@ local Effect = {}
 
 
 	-- Runs an effect by ID
-	function Effect.run(id, stacks, fromLogin)
+	function Effect.run(id, stacks, fromLogin, customData)
 		local effect = Effect.get(id)
-		if not effect then print("Effect not found", id); return false end
-		effect:add(stacks, fromLogin);
+		if not effect then 
+			print("Effect not found", id); 
+			return false; 
+		end
+		effect:add(stacks, fromLogin, customData);
 		Effect.updatePassives();
 	end
 
@@ -285,6 +314,7 @@ local Effect = {}
 		if type(fx.onRemove) == "function" then
 			fx:onRemove();
 		end
+		fx:off();
 		if fx.loopEvent then
 			Event.off(fx.loopEvent);
 		end

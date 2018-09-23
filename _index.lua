@@ -328,6 +328,7 @@ local Index = {}
 				expires = v.expires,
 				ticks = v.ticks,
 				stacks = v.stacks,
+				customData = v.effect.customData,
 			})
 		end
 
