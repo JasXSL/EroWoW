@@ -159,7 +159,7 @@ function internal.build.rptexts()
 	-- Priest Allure
 		ext:addRpText({
 			id = "ALLURE",
-			text_bystander = "You mind control %T, forcing %Thim to follow you!",
+			text_sender = "You mind control %T, forcing %Thim to follow you!",
 			text_receiver = "%S casts a mind control spell on you, forcing you to follow!",
 			sound = 14381,
 			requirements = {}

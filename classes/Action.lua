@@ -880,6 +880,8 @@ Action.__index = Action;
 					action:consumeCharges(1);
 				elseif reason then
 					Tools.reportError(reason);
+					-- Wipe cooldown
+					action:resetCooldown();
 				end
 			end)
 			
