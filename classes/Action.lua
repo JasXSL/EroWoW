@@ -339,12 +339,14 @@ Action.__index = Action;
 		end
 
 		-- Validate filtering. Filtering is also used in if a spell should show up whatsoever
-		if isSend and not self:validateFiltering(unitCaster, suppressErrors) then return false end
+		if isSend and not self:validateFiltering(unitCaster, suppressErrors) then 
+			return false;
+		end
 
 		-- Make sure target and caster are actual units
 		unitCaster = Ambiguate(unitCaster, "all")
 		unitTarget = Ambiguate(unitTarget, "all")
-		if not UnitExists(unitCaster) then
+		if isSend and not UnitExists(unitCaster) then
 			return Tools.reportError("Caster does not exist", suppressErrors);
 		end
 		if not UnitExists(unitTarget) then
@@ -367,7 +369,7 @@ Action.__index = Action;
 
 		-- Validate the conditions
 		if #self.conditions > 0 then
-			local success, failedCondition = Condition.all(self.conditions, unitCaster, unitTarget, ExiWoW.ME, tChar, nil, nil, self);
+			local success, failedCondition = Condition.all(self.conditions, unitCaster, unitTarget, nil, ExiWoW.ME, nil, nil, self);
 			if not success then
 				return failedCondition:reportError(suppressErrors);
 			end
@@ -891,10 +893,13 @@ Action.__index = Action;
 
 	-- Receive an action
 	function Action.receive(id, sender, args, suppressErrors)
+
 		-- Default value is true
 		if suppressErrors == nil then suppressErrors = true end
 		local action = Action.get(id);
-		if not action then return false end			-- Received Action not found
+		if not action then 
+			return false; 
+		end			-- Received Action not found
 
 		-- Received action is invalid
 		local attempt, err = action:validate(sender, "player", suppressErrors, false, false);
@@ -908,6 +913,7 @@ Action.__index = Action;
 		else 
 			return true
 		end
+
 	end
 
 	-- Tools for conditions

@@ -260,20 +260,35 @@ Condition.__index = Condition;
 	end
 
 	
-
+	-- If senderChar is empty, it should only validate receiver
 	function Condition:validate(senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action, debug)
 
+		local ty = Condition.Types;
 		local t = self.type;
 		local targ = receiverChar;
 		local targUnit = receiverUnit;
 		if self.sender then 
+			-- We can disregard sender conditions if
+			if 
+				not senderChar and 						-- There's no sender char (receiving end of action)
+				t ~= ty.RTYPE_PARTY and 				-- This doens't require the player to be in our party (prevents sending party restricted actions)
+				t ~= ty.RTYPE_PARTY_RESTRICTED 		-- Same as above
+			then
+				return true;
+			end
+			if not senderChar then
+				senderChar = Character:new({}, senderUnit);
+			end
 			targ = senderChar;
 			targUnit = senderUnit;
 		end
+
+		
+
 		local data = self.data;
 		local inverse = self.inverse;
 		local name = targ:getName();
-		local ty = Condition.Types;
+		
 		local ch = ExiWoW.ME;
 
 		local isSelf =

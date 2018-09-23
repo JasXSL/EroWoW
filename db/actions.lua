@@ -514,7 +514,6 @@ function internal.build.actions()
 			Condition.get("sender_no_combat"),
 			Condition.get("victim_no_combat"),
 			Condition.get("require_party"),
-			Condition.get("require_party"),
 			Condition.get("no_selfcast")
 		},
 		filters = {
