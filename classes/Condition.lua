@@ -438,7 +438,9 @@ Condition.__index = Condition;
 			out = UnitInVehicle(targUnit);
 		end
 
-		if (Condition.DEBUG or debug) and not out then print("Failed on", t, ExiWoW.json.encode(data)) end
+		if (Condition.DEBUG or debug) and not out then 
+			print("Failed on", t, ExiWoW.json.encode(data));
+		end
 
 		if inverse then out = not out end
 		return out; 

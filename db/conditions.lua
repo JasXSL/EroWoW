@@ -74,6 +74,7 @@ function internal.build.conditions()
 	ext:addCondition({id="victimChestNotPlate", type=ty.RTYPE_EQUIPMENT, data={slot=5, type={Plate=true}}, inverse=true});
 	ext:addCondition({id="victimChestPlate", type=ty.RTYPE_EQUIPMENT, data={slot=5, type={Plate=true}}});
 	ext:addCondition({id="victimCrotchPlate", type=ty.RTYPE_EQUIPMENT, data={slot=7, type={Plate=true}}});
+	ext:addCondition({id="victimCrotchNotPlate", type=ty.RTYPE_EQUIPMENT, data={slot=7, type={Plate=true}}, inverse=true});
 	
 	ext:addCondition({id="hasChest", type=ty.RTYPE_EQUIPMENT, data={slot=5}});
 	ext:addCondition({id="hasShirt", type=ty.RTYPE_EQUIPMENT, data={slot=4}});

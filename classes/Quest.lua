@@ -147,11 +147,24 @@ Quest.__index = Quest;
 		end
 	end
 
-	function Quest:offer()
+	function Quest:activate()
+		self.active = true;
+		self:save();
+		for _,evt in pairs(self.listeners) do
+			Event.off(evt);
+		end
+		self:initialize();
+		UI.quests.update();
+	end
+
+	function Quest:offer( force )
 		local q = self;
 		local rewards = {};
 		for _,r in pairs(self.rewards) do
 			table.insert(rewards, r:getTalkboxData());
+		end
+		if force then
+			self:activate();
 		end
 		local talkbox = Talkbox:new({
 			id = self.id,
@@ -161,13 +174,9 @@ Quest.__index = Quest;
 			rewards = rewards,
 			onComplete = function(self) 
 				PlaySound(618, "Dialog");
-				q.active = true;
-				q:save();
-				UI.quests.update();
-				for _,evt in pairs(q.listeners) do
-					Event.off(evt);
+				if not force then
+					q:activate();
 				end
-				q:initialize();
 				RPText.print("Quest accepted: "..q.name);
 			end
 		});
@@ -201,15 +210,15 @@ Quest.__index = Quest;
 			ExiWoW.ME:addItem(reward.type, reward.id, reward.quant);
 		end
 
-		if self.onCompletion then
-			self:onCompletion();
-		end
-
 		PlaySound(878, "Dialog");
 		self.completed = true;
 		self:save();
 		UI.quests.update();
 		self:initialize(); -- Wipes event bindings
+
+		if self.onCompletion then
+			self:onCompletion();
+		end
 	end
 
 	-- /run ExiWoW.require("Quest").get("SHOCKTACLE"):reset();

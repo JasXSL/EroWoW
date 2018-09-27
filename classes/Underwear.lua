@@ -2,7 +2,7 @@ local appName, internal = ...;
 local export = internal.Module.export;
 local require = internal.require;
 
-local Database, Effect, Event;
+local Database, Effect, Event, Timer;
 
 local Underwear = {}
 	Underwear.__index = Underwear;
@@ -11,6 +11,7 @@ local Underwear = {}
 		Database = require("Database");
 		Effect = require("Effect");
 		Event = require("Event");
+		Timer = require("Timer");
 	end
 
 	-- RPText CLASS
@@ -40,6 +41,7 @@ local Underwear = {}
 		-- Contains effect IDs
 		self.effects = type(data.effects) == "table" and data.effects or {}
 		self.binds = {};
+		self.timers = {};
 
 		return self
 	end
@@ -62,6 +64,9 @@ local Underwear = {}
 		for _,v in pairs(self.effects) do
 			Effect.remByID(v)
 		end
+		for k,_ in pairs(self.timers) do
+			self:clearTimer(k);
+		end
 		if type(self.on_unequip) == "function" then
 			self:on_unequip();
 		end
@@ -74,10 +79,22 @@ local Underwear = {}
 		return bind;
 	end
 
+	function Underwear:setTimer(id, fn, time, repeats)
+		self:clearTimer(id);
+		self.timers[id] = Timer.set(fn, time, repeats);
+	end
+	function Underwear:clearTimer(id)
+		if self.timers[id] then
+			Timer.clear(self.timers[id]);
+			self.timers[id] = nil;
+		end
+	end
+
 	function Underwear:unbindAll()
 		for _,bind in pairs(self.binds) do
 			Event.off(bind);
 		end
+		self.binds = {};
 	end
 
 		-- TOOLTIP HANDLING --
@@ -90,10 +107,10 @@ local Underwear = {}
 			if rarity < 1 then rarity = 1 end
 			local color = ITEM_QUALITY_COLORS[rarity]
 
-			GameTooltip:SetOwner(frame, "ANCHOR_CURSOR")
-			GameTooltip:ClearLines()
-			GameTooltip:AddLine(self.name, color.r, color.g, color.b)
-			GameTooltip:AddLine(self.description, 0.9, 0.9, 0.9, true)
+			GameTooltip:SetOwner(frame, "ANCHOR_CURSOR");
+			GameTooltip:ClearLines();
+			GameTooltip:AddLine(self.name, color.r, color.g, color.b);
+			GameTooltip:AddLine(self.description, 0.9, 0.9, 0.9, true);
 			if self.flavor then
 				GameTooltip:AddLine("\""..self.flavor.."\"", 1, 0.82, 0.043, true)
 			end

@@ -293,15 +293,14 @@ Character.__index = Character;
 	function Character:useUnderwear(id)
 		local uw = Underwear.get(id)
 		if self.underwear_worn == id then
-			self.underwear_worn = false
 			if uw then 
 				PlaySound(uw.unequip_sound, "Dialog");
 				RPText.print("You take off your "..uw.name);
 				self:unequipActiveUnderwear();
 			end
+			self.underwear_worn = false
 		elseif self:ownsUnderwear(id) and uw then
-			local cur = Underwear.get(self.underwear_worn)
-			if cur then cur:onUnequip(); end
+			self:unequipActiveUnderwear();
 			self.underwear_worn = id
 			PlaySound(uw.equip_sound, "Dialog")
 			uw:onEquip();
@@ -315,8 +314,6 @@ Character.__index = Character;
 
 	function Character:unequipActiveUnderwear()
 		local uw = Underwear.get(self.underwear_worn);
-		print(self.underwear_worn);
-		print(uw);
 		if not uw then return false end
 		self.underwear_worn = false;
 		uw:onUnequip();

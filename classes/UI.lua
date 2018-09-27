@@ -727,14 +727,14 @@ UI = {}
 		local objectives = quest:getCurrentObjectives();
 		local objLevel = quest:getCurrentObjectivesLevel();
 		
-
+		right.handin:Hide();
 		right.header:SetText(quest.name);
 		local out = "";
 		if not objectives then
 			if quest:isDetachedHandin() then
 				right.progress:Hide();
 				right.handin:Show();
-			else
+			else	
 				objectives = {
 					Quest.Objective:new({
 						name = quest.end_journal,

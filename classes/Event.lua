@@ -14,6 +14,7 @@ local Event = {}
 	Event.pointTimer = nil;						-- Timer checking the POINT_REACHED event
 	Event.pointCheck = {};						-- Events for which to check points
 	Event.invCacheTimer = nil;					-- Inventory caching timer
+	Event.submerged = 0;
 	-- Custom events
 	-- Keep in mind events bound in Event.TYPES will also be raised
 	Event.Types = {
@@ -50,7 +51,10 @@ local Event = {}
 		POINT_REACHED = "POINT_REACHED",							-- Requires input: {zone=zone, sub=sub, x=x, y=y, dist=distance}, no data output
 		GOSSIP_SHOW = "GOSSIP_SHOW",								-- Blizzard event
 		ENTER_COMBAT = "ENTER_COMBAT",								-- 
-		EXIT_COMBAT = "EXIT_COMBAT"
+		EXIT_COMBAT = "EXIT_COMBAT",
+
+		SUBMERGE = "SUBMERGE",										-- {submerged=true/false} Raised when player enters or exits water
+
 	}
 
 	function Event.ini()
@@ -90,9 +94,21 @@ local Event = {}
 
 		-- Emulate an aura change event on start
 		Timer.set(function()
-			Event.onEvent(self, "UNIT_AURA", "player")
+			Event.onEvent(self, "UNIT_AURA", "player");
 		end, 0.5, 1)
+
+		Timer.set(Event.timerEventChecks, 0.5, math.huge);
 		
+	end
+
+	-- Stuff that WoW doesn't have events for, but you can check with a timer
+	function Event.timerEventChecks()
+		
+		if IsSubmerged() ~= Event.submerged then
+			Event.submerged = IsSubmerged();
+			Event.raise(Event.Types.SUBMERGE, {submerged=Event.submerged});
+		end
+
 	end
 
 	function Event.rebindPointReached()
@@ -203,8 +219,8 @@ local Event = {}
 			if destGUID ~= UnitGUID("player") and sourceGUID ~= UnitGUID("player") then return end 
 
 
-			-- These only work for healing or damage
-			if ((eventPrefix == "SPELL" or eventPrefix == "SPELL_PERIODIC") and (eventSuffix == "DAMAGE" or eventSuffix=="HEAL" or eventSuffix == "AURA_APPLIED")) or combatEvent == "SPELL_CAST_SUCCESS" then
+			-- These only work for healing or damage to the player
+			if destGUID == UnitGUID("player") and ((eventPrefix == "SPELL" or eventPrefix == "SPELL_PERIODIC") and (eventSuffix == "DAMAGE" or eventSuffix=="HEAL" or eventSuffix == "AURA_APPLIED")) or combatEvent == "SPELL_CAST_SUCCESS" then
 				
 				local npc = Character:new({}, sourceName);
 				if u then npc = Character.buildNPC(u, sourceName) end
@@ -244,7 +260,7 @@ local Event = {}
 					triggerWhisper(u, npc, trig, Condition.Types.RTYPE_SPELL_TICK)
 				end
 
-			elseif eventSuffix == "DAMAGE" and eventPrefix == "SWING" then
+			elseif destGUID == UnitGUID("player") and eventSuffix == "DAMAGE" and eventPrefix == "SWING" then
 
 				local crit = ""
 				if arguments[18] or (localStorage.tank_mode and math.random() < globalStorage.tank_mode_perc) then crit = "_CRIT" end

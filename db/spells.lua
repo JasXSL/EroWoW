@@ -66,6 +66,14 @@ function internal.build.spells()
 	ext:addSpell({id="Water Spout", tags={"SLOSH"}});
 	ext:addSpell({id="Water Blast", tags={"SLOSH"}});
 	ext:addSpell({id="Mead Blast", tags={"SLOSH"}, conditions={addCond}});
+	ext:addSpell({id="Brackish Bolt", tags={"SLOSH"}});
+	ext:addSpell({id="Riptide", tags={"SLOSH"}});
+	ext:addSpell({id="Healing Surge", tags={"SLOSH"}});
+	ext:addSpell({id="Healing Wave", tags={"SLOSH"}});
+
+
+
+
 
 	ext:addSpell({id="Crystal Shards", tags={"SHARDS"}});
 	ext:addSpell({id="Crystal Shard", tags={"SHARDS"}});
@@ -100,6 +108,7 @@ function internal.build.spells()
 	ext:addSpell({id="Slitherstrike"});
 	ext:addSpell({id="Icky Ink"});
 	ext:addSpell({id="Willbreaker"});
+	ext:addSpell({id="Wild Punch"});
 
 	ext:addSpell({id="Face Bite", tags={"HEADJUMP"}});
 	
