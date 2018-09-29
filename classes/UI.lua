@@ -518,6 +518,7 @@ UI = {}
 			rewardsTitle:SetTextColor(1,1,1,1);
 			rewardsTitle:SetPoint("TOPLEFT", desc, "BOTTOMLEFT", 0, -10);
 			rewardsTitle:SetText("Rewards");
+			scrollchild.rewardsText = rewardsTitle;
 
 			scrollchild.rewardFrames = {};
 
@@ -631,7 +632,9 @@ UI = {}
 		--if true then return end
 		local quests = Quest.getActive();
 		if #quests > 0 then
-			UI.quests.selected = quests[1].id;
+			if not UI.quests.selected then
+				UI.quests.selected = quests[1].id;
+			end
 			UI.quests.empty:Hide();
 			UI.quests.left:Show();
 			UI.quests.right:Show();
@@ -659,7 +662,9 @@ UI = {}
 				
 				
 				local obFrames = f.objectives;
-				for _,of in pairs(obFrames) do of:Hide(); end
+				for _,of in pairs(obFrames) do 
+					of:Hide(); 
+				end
 
 				local objectives = quest:getCurrentObjectives();
 
@@ -772,7 +777,12 @@ UI = {}
 		end	
 
 		right.desc:SetText(journalOut);
-		
+
+		if #quest.rewards > 0 then
+			right.rewardsText:Show();
+		else
+			right.rewardsText:Hide();
+		end		
 		--rewards
 		for i=1,6 do
 			local f = right.rewardFrames[i];
