@@ -49,6 +49,8 @@ function internal.build.functions()
 				HighmountainTaurenF = 0,
 				NightborneM = 0,
 				NightborneF = 76815,
+				MagharOrcF = 110564,
+				MagharOrcM = 110539,
 			}
 			Func.get("playCharSound")(self, sounds, race, sex);
 		end
@@ -93,6 +95,8 @@ function internal.build.functions()
 				HighmountainTaurenF = 0,
 				NightborneM = 0,
 				NightborneF = 76816,
+				MagharOrcF = 110565, -- VO_801_PC_Maghar_Orc_Female_Wound_Crit
+				MagharOrcM = 110540,
 			}
 			Func.get("playCharSound")(self, sounds, race, sex);
 		end
@@ -137,6 +141,8 @@ function internal.build.functions()
 				HighmountainTaurenF = 0,
 				NightborneM = 76806,
 				NightborneF = 76813,
+				MagharOrcF = 110558,	-- VO_801_PC_Maghar_Orc_Female_Defeat
+				MagharOrcM = 110533,
 			}
 			Func.get("playCharSound")(self, sounds, race, sex);
 		end
@@ -146,7 +152,7 @@ function internal.build.functions()
 		id = "playCharSound",
 		fn = function(self, library, race, sex)
 			if not race then
-				race = UnitRace("player");
+				_,race = UnitRace("player");
 			end
 			if not gender then
 				gender = UnitSex("player");

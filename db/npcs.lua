@@ -18,6 +18,7 @@ function internal.build.npcs()
 	ext:addNPC({id="Slumbering Nightmare",tags={"TENTACLE_FIEND", "LASHER"}});
 	ext:addNPC({id="Blighted Manifestation",tags={"TENTACLE_FIEND", "LASHER", "SMALL"}});
 	
+	ext:addNPC({id="%Boulderslide",tags={"KOBOLD", "FISTFIGHTER", "SMALL"}});
 
 	ext:addNPC({id="%Scorpid",tags={"PINCHY"}});
 	ext:addNPC({id="Desert Crawler",tags={"PINCHY"}});
@@ -123,7 +124,6 @@ function internal.build.npcs()
 	ext:addNPC({id="Pale Gloomstalker",tags={"PALE_ORC", "FISTFIGHTER","MEDIUM"},gender=2});
 	ext:addNPC({id="Pale Skinslicer",tags={"PALE_ORC", "FISTFIGHTER","MEDIUM"},gender=2});
 	ext:addNPC({id="Pale Tormentor",tags={"PALE_ORC", "FISTFIGHTER","MEDIUM"},gender=2});
-	
 	ext:addNPC({id="Pale Tormentor",tags={"PALE_ORC", "FISTFIGHTER","MEDIUM"},gender=2});
 	
 	ext:addNPC({id="Feathered Viper",tags={"CLOUD_SERPENT","LARGE"}});
