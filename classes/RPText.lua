@@ -1,7 +1,7 @@
 local appName, internal = ...
 local export = internal.Module.export;
 local require = internal.require;
-local Condition, Database, Tools, Index, Timer, Effect;
+local Condition, Database, Tools, Index, Timer, Effect, Func;
 
 local RPText = {};
 RPText.__index = RPText;
@@ -16,6 +16,7 @@ RPText.whisperCD = nil
 		Index = require("Index");
 		Timer = require("Timer");
 		Effect = require("Effect");
+		Func = require("Func");
 	end
 
 	function RPText.getTakehitCD() return RPText.takehitCD end
@@ -77,6 +78,7 @@ RPText.whisperCD = nil
 		self.fn = data.fn or nil;					-- Only supported for NPC/Spell events. Actions should use the action system instead
 		self.is_chat = data.is_chat or false		-- Makes the RP text display with chat colors instead. Set text_bystander to any non-false value to make it a say. Otherwise it's a whisper
 		self.visual = data.visual;					-- Triggers a visual from the visuals library
+		self.allow_shapeshift = false;				-- Toggle to disallow shapeshifts
 
 		-- Automatic
 		self.item = ""								-- Populated automatically when you use an item condition, contains the last valid item name
@@ -94,6 +96,10 @@ RPText.whisperCD = nil
 
 	-- Conditions are auto prepended here
 	function RPText:validate(...)
+
+		if not self.allow_shapeshift and Func.get("isShapeshifted")() then
+			return false;
+		end
 		--conditions, senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action, debug
 		return Condition.all(self.requirements, ...);
 	end

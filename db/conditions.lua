@@ -128,6 +128,9 @@ function internal.build.conditions()
 	
 	ext:addCondition({id="debug_fail_on_receive", type=ty.RTYPE_FAIL_ON_RECEIVE});
 	
+	ext:addCondition({id="victim_not_shapeshifted", type=ty.RTYPE_SHAPESHIFTED, inverse=true});
+	
+	
 	
 
 	-- Spell tick/add/rem tag conditions

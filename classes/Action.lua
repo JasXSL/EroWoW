@@ -107,6 +107,7 @@ Action.__index = Action;
 				Condition.get("sender_not_in_vehicle"),
 				Condition.get("victim_not_in_vehicle"),
 			},
+			not_shapeshifted = Condition.get("victim_not_shapeshifted")
 		};
 		if type(data.not_defaults) == "table" then
 			for _,v in pairs(data.not_defaults) do

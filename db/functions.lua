@@ -166,6 +166,110 @@ function internal.build.functions()
 		end
 	});
 
+	ext:addFunction({
+		id = "isShapeshifted",
+		fn = function(self, library, race, sex)
+
+			-- Transformation effects
+			local effect_names = {
+				["Skymirror Image"] = true,
+				["Trapped in Amber"] = true,
+				["Make Like A Tree"] = true,
+				["Barnacle-Encrusted Gem"] = true,
+				["Bloodmane Charm"] = true,
+				["Bones of Transformation"] = true,
+				["Botani Camouflage"] = true,
+				["Burgy Blackheart's Handsome Hat"] = true,
+				["Blessing of the Old God"] = true,
+				["Burning Defender"] = true,
+				["Celestial Defender"] = true,
+				["Coin of Many Faces"] = true,
+				["Twice-Cursed Arakkoa Feather"] = true,
+				["Projection of a Future Fal'dorei"] = true,
+				["Frenzyheart Brew"] = true,
+				["Gamon's Heroic Spirit"] = true,
+				["Ironbeard's Hat"] = true,
+				["Goren Disguise"] = true,
+				["Gurboggle's Gleaming Bauble"] = true,
+				["Murloc Costume"] = true,
+				["Frostborn Illusion"] = true,
+				["Memory of Mr. Smite"] = true,
+				["Observing the Cosmos"] = true,
+				["Aspect of Moonfang"] = true,
+				["Mark of the Ashtongue"] = true,
+				["Duplicate Millhouse"] = true,
+				["Mystic Image"] = true,
+				["Wyrmtongue Disguise"] = true,
+				["Leyara's Locket"] = true,
+				["Surgical Alterations"] = true,
+				["Kalytha's Haunted Locket"] = true,
+				["Jewel of Hellfire"] = true,
+				["Iron Boot "] = true,
+				["Home-Made Party Mask"] = true,
+				["Orb of Deception"] = true,
+				["Blood Elf Illusion"] = true,
+				["Warsong Orc Costume"] = true,
+				["Podling Disguise"] = true,
+				["Rime of the Time-Lost Mariner"] = true,
+				["Ring of Broken Promises"] = true,
+				["Gnomebulation"] = true,
+				["Rukhmar's Sacred Memory"] = true,
+				["Flesh to Stone"] = true,
+				["Sha'tari Defender's Medallion"] = true,
+				["Warden Guise"] = true,
+				["Furbolg Form"] = true,
+				["Stormforged Vrykul Horn"] = true,
+				["Going Ape!"] = true,
+				["Thistleleaf Disguise"] = true,
+				["Blood Ritual"] = true,
+				["Time-Lost Figurine"] = true,
+				["Secret of the Ooze"] = true,
+				["Vrykul Drinking Horn"] = true,
+				["Whole-Body Shrinka'"] = true,
+				["Will of Northrend"] = true,
+				["Snowman"] = true,
+				["Wisp Form"] = true,
+			};
+
+
+			-- Handle class based shapeshifts
+			local _, uclass = UnitClass("player")
+			-- Druid forms and ghost wolf
+			if uclass == "DRUID" or uclass == "SHAMAN" then
+				if GetShapeshiftForm() > 0 then
+					return true;
+				end
+			end
+
+			-- Iterate through effects
+			local effects = {};
+			local i = 1;
+			local buff = UnitBuff("player", i);
+			while buff do
+				table.insert(effects, buff);
+				i = i + 1;
+				buff = UnitBuff("player", i);
+			end
+			i = 1;
+			buff = UnitDebuff("player", i);
+			while buff do
+				table.insert(effects, buff);
+				i = i + 1;
+				buff = UnitDebuff("player", i);
+			end
+
+			for k,v in pairs(effects) do
+				if v:find("Costume") then
+					return true;
+				end
+				if effect_names[v] then
+					return true;
+				end
+			end
+			return false;
+		end
+	});
+
 	
 -- Reusable functions
 	-- When sent from RP texts, the args are self, sender, target

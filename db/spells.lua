@@ -24,6 +24,7 @@ function internal.build.spells()
 	ext:addSpell({id="Sleet", tags={"COLD"}});
 	ext:addSpell({id="Icy Gust", tags={"COLD"}});
 	ext:addSpell({id="Frost Breath", tags={"COLD"}});
+	ext:addSpell({id="Icy Grip", tags={"COLD"}});
 	
 	
 	ext:addSpell({id="Entangling Roots", tags={"ROOTS"}});

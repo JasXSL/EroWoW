@@ -2,7 +2,7 @@ local appName, internal = ...
 local export = internal.Module.export;
 local require = internal.require;
 
-local RPText, Character, Tools, Database, Action, Event, Zone, Event;
+local RPText, Character, Tools, Database, Action, Event, Zone, Event, Func;
 
 local Condition = {};
 Condition.__index = Condition;
@@ -46,6 +46,7 @@ Condition.__index = Condition;
 		RTYPE_REQUIRE_OTHER = "req_other",			-- Allow other must be checked in settings
 
 		RTYPE_SELF_ONLY = "self_only",					-- Requires player unit to be target unit.
+		RTYPE_SHAPESHIFTED = "not_shapeshifted",		-- Self only. No shapeshift. No transformation toys.
 		RTYPE_STEALTH = "stealth",						-- Requires player unit to be stealthed
 		RTYPE_PARTY = "party",							-- Player has to be in a party (regardless of settings, use for actions relying on methods only accessible on party members)
 		RTYPE_PARTY_RESTRICTED = "party_restricted",	-- Same as above, but can be turned off in settings
@@ -229,6 +230,10 @@ Condition.__index = Condition;
 			"Required tag missing.",
 			"Blocking tag set."
 		},		
+		[Condition.Types.RTYPE_SHAPESHIFTED] = {
+			"Target not shapeshifted",
+			"Target shapeshifted"
+		},
 	}
 
 
@@ -241,7 +246,7 @@ Condition.__index = Condition;
 		Event = require("Event");
 		Zone = require("Zone");
 		Event = require("Event");
-
+		Func = require("Func");
 	end
 
 	function Condition:new(data)
@@ -436,6 +441,12 @@ Condition.__index = Condition;
 			out = UnitIsDeadOrGhost(targUnit);
 		elseif t == ty.RTYPE_VEHICLE then
 			out = UnitInVehicle(targUnit);
+		elseif t == ty.RTYPE_SHAPESHIFTED then
+			if not targIsMe then
+				out = not inverse;
+			else
+				out = Func.get("isShapeshifted")();
+			end
 		end
 
 		if (Condition.DEBUG or debug) and not out then 
