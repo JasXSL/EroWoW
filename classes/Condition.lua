@@ -419,7 +419,7 @@ Condition.__index = Condition;
 		elseif t == ty.RTYPE_SELF_ONLY then
 			out = isSelf;
 		elseif t == ty.RTYPE_STEALTH then
-			out = IsStealthed() or not targIsMe;
+			out = IsStealthed() or (not targIsMe and not senderIsMe);
 		elseif t == ty.RTYPE_PARTY then
 			out = inParty;
 		elseif t == ty.RTYPE_PARTY_RESTRICTED then

@@ -344,6 +344,7 @@ Action.__index = Action;
 			return false;
 		end
 
+
 		-- Make sure target and caster are actual units
 		unitCaster = Ambiguate(unitCaster, "all")
 		unitTarget = Ambiguate(unitTarget, "all")
@@ -370,7 +371,10 @@ Action.__index = Action;
 
 		-- Validate the conditions
 		if #self.conditions > 0 then
-			local success, failedCondition = Condition.all(self.conditions, unitCaster, unitTarget, nil, ExiWoW.ME, nil, nil, self);
+			-- conditions, senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action, debug
+			local senderChar = nil;
+			if isSend then senderChar = ExiWoW.ME; end
+			local success, failedCondition = Condition.all(self.conditions, unitCaster, unitTarget, senderChar, ExiWoW.ME, nil, nil, self);
 			if not success then
 				return failedCondition:reportError(suppressErrors);
 			end

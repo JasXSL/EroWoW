@@ -51,6 +51,8 @@ function internal.build.functions()
 				NightborneF = 76815,
 				MagharOrcF = 110564,
 				MagharOrcM = 110539,
+				DarkIronDwarfF = 101493,
+				DarkIronDwarfM = 101511,
 			}
 			Func.get("playCharSound")(self, sounds, race, sex);
 		end
@@ -97,6 +99,8 @@ function internal.build.functions()
 				NightborneF = 76816,
 				MagharOrcF = 110565, -- VO_801_PC_Maghar_Orc_Female_Wound_Crit
 				MagharOrcM = 110540,
+				DarkIronDwarfF = 101494,
+				DarkIronDwarfM = 101512,
 			}
 			Func.get("playCharSound")(self, sounds, race, sex);
 		end
@@ -143,6 +147,8 @@ function internal.build.functions()
 				NightborneF = 76813,
 				MagharOrcF = 110558,	-- VO_801_PC_Maghar_Orc_Female_Defeat
 				MagharOrcM = 110533,
+				DarkIronDwarfF = 101486,
+				DarkIronDwarfM = 101501,
 			}
 			Func.get("playCharSound")(self, sounds, race, sex);
 		end
