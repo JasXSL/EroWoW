@@ -26,8 +26,17 @@ function internal.build.zones()
 	ext:addZone({id="Netherstorm", tags={"SANDY"}});
 	ext:addZone({id="Shadowmoon Valley", tags={"SANDY"}});
 	ext:addZone({id="Vol'Dun", tags={"SANDY"}});
+
+	ext:addZone({id="Felwood", tags={"MUSHROOMS"}});
+	ext:addZone({id="Eastern Plaguelands", tags={"MUSHROOMS"}});
+	ext:addZone({id="Western Plaguelands", tags={"MUSHROOMS"}});
+
+
 	ext:addZone({id="Nazmir", tags={"MUSHROOMS","SWAMP"}});
-	
 	ext:addZone({id="Zangarmarsh", tags={"MUSHROOMS","SWAMP"}});
+	ext:addZone({id="Swamp of Sorrows", tags={"SWAMP"}});
+	ext:addZone({id="Dustwallow Marsh", tags={"SWAMP"}});
+	ext:addZone({id="Wetlands", tags={"SWAMP"}});
+
 
 end

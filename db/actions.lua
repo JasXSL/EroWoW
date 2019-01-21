@@ -453,6 +453,31 @@ function internal.build.actions()
 		end
 	});
 
+	-- /run ExiWoW.ME:addItem("Charges", "SWAMP_MUCK", 10);
+	extension:addAction({
+		id = "SWAMP_MUCK",
+		name = "Swamp Muck",
+		description = "Throw some gooey muck at your target.",
+		max_charges = 10,
+		charges = 0,
+		texture = "Inv_misc_food_legion_gooslime_multi",
+		cooldown = 0,
+		cast_time = 0.5,
+		fn_send = function(self, sender, target, suppressErrors)
+			local race = UnitRace(target);
+			local gender = UnitSex(target);
+			return self:sendRPText(sender, target, suppressErrors, function(se, success)
+				if success and not UnitIsUnit(target, "player") then
+					Func.get("painSound")(self, race, gender);
+				end
+			end);
+		end,
+		fn_receive = function(self, sender, target, args)
+			Func.get("addExcitementMasochistic")();
+			return self:receiveRPText(sender, target, args);
+		end
+	});
+
 	-- Calming potion
 	extension:addAction({
 		id = "CALMING_POTION",

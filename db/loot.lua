@@ -471,7 +471,7 @@ function internal.build.loot()
 	})
 
 	
-	
+	-- Sandy zones
 	ext:addLoot({
 		conditions = {
 			evtIsForage,
@@ -491,7 +491,29 @@ function internal.build.loot()
 				})
 			})
 		}
-	})
+	});
+
+	-- Swamps
+	ext:addLoot({
+		conditions = {
+			evtIsForage,
+			{
+				Condition:new({type=ty.RTYPE_TAG, data="ZONE_SWAMP", sender=true}),
+				Condition:new({type=ty.RTYPE_SUBZONE, data={["%Swamp"]=true, ["%Marsh"]=true, ["%Bog"]=true}, sender=true}),
+			}
+		},
+		items={
+			Item:new({
+				type = "Charges", 
+				id = "THROW_SAND", 
+				chance = 0.8,
+				sound = 73172,
+				text = RPText:new({
+					text_receiver = "You found a handful of sand!"
+				})
+			})
+		}
+	});
 
 	-- Calming potion loot
 	ext:addLoot({

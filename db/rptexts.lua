@@ -107,8 +107,27 @@ function internal.build.rptexts()
 			text_bystander = "%T throws sand into the air, some of which falls back down on %Thim and into %This clothes!",
 			text_receiver = "You throw sand into the air, some of which falls back down on you and into your clothes!",
 			sound = 73172,
+			requirements = {},
+		});
+
+		ext:addRpText({
+			id = "SWAMP_MUCK",
+			text_bystander = "%S throws a glob of swamp muck at %T!",
+			text_sender = "You throw a glob of swamp muck at %T!",
+			text_receiver = "%S throws a glob of swamp muck at you!",
+			sound = 20674,
+			visual = "greenSplatPersistent",
 			requirements = {}
-		})
+		});
+
+		ext:addRpText({
+			id = "SWAMP_MUCK",
+			text_bystander = "%T throws a glob of swamp muck into the air, some of which falls back down on %Thim and into %This clothes!",
+			text_receiver = "You throw a glob of swamp muck into the air, some of which falls back down on you and into your clothes!",
+			sound = 20674,
+			visual = "greenSplatPersistent",
+			requirements = {}
+		});
 
 		ext:addRpText({
 			id = "THROW_SAND",
@@ -117,7 +136,7 @@ function internal.build.rptexts()
 			text_receiver = "%S throws a handful of sand at you!",
 			sound = 907,
 			requirements = {}
-		})
+		});
 
 		ext:addRpText({
 			id = "MORTAS_ARACHNID_SCEPTER",

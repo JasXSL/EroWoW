@@ -3,15 +3,18 @@ local appName, internal = ...
 local export = internal.Module.export;
 local require = internal.require;
 
-local Tools, Database, Timer;
+local Tools, Database, Timer, Event;
 
 -- /dump ExiWoW.require("Visual").get("heavyPain"):trigger()
 local Visual = {};
+Visual.persistent = {};
+
 Visual.__index = Visual;
 
 	function Visual.ini()
 		Tools = require("Tools");
 		Database = require("Database");
+		Event = require("Event");
 	end
 
 	function Visual:new(data)
@@ -24,10 +27,12 @@ Visual.__index = Visual;
 		self.onFrameCreated = data.create;
 		self.onFrameUpdate = data.update;						-- Required, otherwise it uses the template function below. Return true when the animation is done
 		self.onStart = data.start;
+		self.onRemove = data.remove;
 		self.timeTriggered = GetTime();
 		self.timer = nil;
 		self.blend = data.blend;
 		self.hold = true;
+		self.events = {};										-- IDs of bound events
 
 		if type(self.onFrameUpdate) ~= "function" then
 			self.onFrameUpdate = function()
@@ -50,7 +55,9 @@ Visual.__index = Visual;
 			self.frame:SetFrameStrata("BACKGROUND");
 			local t = self.frame:CreateTexture(nil, "BACKGROUND");
 			self.frame.bg = t;
-			t:SetTexture("Interface/AddOns/ExiWoW/media/borders/"..self.image);
+			if self.image then
+				t:SetTexture("Interface/AddOns/ExiWoW/media/borders/"..self.image);
+			end
 			t:SetAllPoints(self.frame);
 			t:SetBlendMode(self.blend and self.blend or "ADD");
 			self.frame:Hide();
@@ -64,6 +71,7 @@ Visual.__index = Visual;
 	-- Otherwise you might bork effects
 	-- Effect.triggerVisual()
 	function Visual:trigger(hold)
+		self:stop();
 		self:build();
 
 		self.frame:SetAlpha(0);
@@ -77,18 +85,36 @@ Visual.__index = Visual;
 		self.frame:SetScript("OnUpdate", function(frame, elapsed)
 			local update = self:onFrameUpdate(elapsed);
 			if type(update) ~= "number" then
-				self.frame:SetScript("OnUpdate", nil);
-				self.frame:Hide();
+				self:stop();
 			else
 				self.frame:SetAlpha(update);
 			end
 		end);
 	end
 
+
+	function Visual:on(evt, fn, data, max)
+		local bind = Event.on(evt, fn, data, max);
+		table.insert(self.events, bind);
+		return bind;
+	end
+
+	function Visual:unbind()
+		for _,v in pairs(self.events) do
+			Event.off(v);
+		end
+	end
+
 	-- Force stops a visual
 	function Visual:stop()
-		self.frame:SetScript("OnUpdate", nil);
-		self.frame:Hide();
+		if self.frame then
+			self.frame:SetScript("OnUpdate", nil);
+			self.frame:Hide();
+		end
+		if type(self.onRemove) == "function" then
+			self:onRemove();
+		end
+		self:unbind();
 	end
 
 	function Visual:fade()
