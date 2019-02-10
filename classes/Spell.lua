@@ -31,7 +31,8 @@ Spell.__index = Spell;
 		self.tags = type(data.tags) == "table" and data.tags or {};						-- Text tags of your choosing. Prefixed with TMPSPELL_
 		self.conditions = type(data.conditions) == "table" and data.conditions or {};	-- Conditions to run this
 		self.onTrigger = data.onTrigger;				-- Function. Raised with args: self, event, casterUnit, victimUnit, casterChar, victimChar
-														-- This function is ALWAYS, no RNG involved, and no conditions are checked
+														-- This function is ALWAYS triggered
+		self.onAccepted = data.onAccepted;				-- This function triggers when conditions are met
 		self.alias = data.alias;						-- Allows you to change the ID when scanning for RP texts bound to this
 		self.custom = data.custom;						-- Lets you set some custom variables
 		self.chanceMod = data.chanceMod or 1;			-- Multiplier of trigger chance

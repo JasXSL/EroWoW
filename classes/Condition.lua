@@ -27,7 +27,8 @@ Condition.__index = Condition;
 		RTYPE_HAS_AURA = "aura",						-- {{name=name, caster=casterName}...} Player has one or more of these auras
 		RTYPE_HAS_INVENTORY = "inv",					-- {{name=name, quant=min_quant}}
 		RTYPE_UNDIES = "undies",						-- false = none, true = req, {name=true, name2=true...} = limit by name
-		
+		RTYPE_HAS_ACTION_PET = "pet",					-- Has an active action pet. Sender check only.
+
 		-- The following will only validate from spell based eventData
 		RTYPE_CRIT = "crit",						-- Spell was a critical hit
 		RTYPE_DETRIMENTAL = "detrimental",			-- Spell was detrimental
@@ -37,8 +38,9 @@ Condition.__index = Condition;
 		-- These require the container open event
 		-- Name of the container opened can be checked with RTYPE_NAME
 		RTYPE_CONTAINER_ACTION = "c_action",			-- Action used to open the container, like Opening or Herb Gathering
-
-
+		RTYPE_SENDER_TALLER = "taller",					-- (bool)much_taller - Don't user sender=true on these. They're automatically checked
+		RTYPE_SENDER_SHORTER = "shorter",				-- (bool)much_shorter - The heights go from 0 to 2. So much_taller/shorter would mean a difference of 2
+		
 
 		-- These are primarily used for whisper texts
 		RTYPE_REQUIRE_MALE = "req_male",			-- Allow male must be checked in settings
@@ -234,6 +236,18 @@ Condition.__index = Condition;
 			"Target not shapeshifted",
 			"Target shapeshifted"
 		},
+		[Condition.Types.RTYPE_HAS_ACTION_PET] = {
+			"Pet not found.",
+			"Pet not allowed."
+		},
+		[Condition.Types.RTYPE_SENDER_TALLER] = {
+			"Too short",
+			"Too tall"
+		},
+		[Condition.Types.RTYPE_SENDER_SHORTER] = {
+			"Too tall",
+			"Too short"
+		}
 	}
 
 
@@ -337,6 +351,12 @@ Condition.__index = Condition;
 			out = Tools.multiSearch(GetRealZoneText(), data);
 		elseif t == ty.RTYPE_SUBZONE then
 			out = Tools.multiSearch(GetSubZoneText(), data);
+		elseif t == ty.RTYPE_HAS_ACTION_PET then
+			out = not senderIsMe or PetHasActionBar();
+		elseif t == ty.RTYPE_SENDER_TALLER then
+			out = senderChar.height > receiverChar.height  and (not data or senderChar.height-receiverChar.height > 1);
+		elseif t == ty.RTYPE_SENDER_SHORTER then
+			out = senderChar.height < receiverChar.height and (not data or receiverChar.height-senderChar.height > 1);
 		elseif t == ty.RTYPE_LOC then
 			local mapID = C_Map.GetBestMapForUnit("player");
 			local pos = C_Map.GetPlayerMapPosition(mapID,"player");

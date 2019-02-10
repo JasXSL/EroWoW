@@ -45,6 +45,7 @@ function internal.build.npcs()
 	ext:addNPC({id="Hardshell Pincher",tags={"PINCHY", "MEDIUM"}});
 	ext:addNPC({id="Hardshell Sand Shifter",tags={"PINCHY", "SMALL"}});
 	ext:addNPC({id="Spiny Kelp Clicker",tags={"PINCHY", "MEDIUM"}});
+	ext:addNPC({id="Spiny Rock Crab",tags={"PINCHY", "MEDIUM"}});
 	
 	
 	ext:addNPC({id="Feltotem Warmonger",tags={"FELTOTEM"}, gender=2});

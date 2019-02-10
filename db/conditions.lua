@@ -51,6 +51,11 @@ function internal.build.conditions()
 	ext:addCondition({id="attackerIsSaurolisk", type=ty.RTYPE_TAG, data={"NPC_SAUROLISK"}, sender=true});
 	ext:addCondition({id="attackerHasTentacleStaff", type=ty.RTYPE_TAG, data={"TENTACLE_STAFF"}, sender=true});
 	
+	ext:addCondition({id="senderTaller", type=ty.RTYPE_SENDER_TALLER, data=false});
+	ext:addCondition({id="senderMuchTaller", type=ty.RTYPE_SENDER_TALLER, data=true});
+	ext:addCondition({id="senderShorter", type=ty.RTYPE_SENDER_SHORTER, data=false});
+	ext:addCondition({id="senderMuchShorter", type=ty.RTYPE_SENDER_SHORTER, data=true});
+	
 	
 
 	ext:addCondition({id="victimIsPandaren", type=ty.RTYPE_RACE, data={Pandaren=true}});
@@ -75,6 +80,8 @@ function internal.build.conditions()
 	ext:addCondition({id="victimChestPlate", type=ty.RTYPE_EQUIPMENT, data={slot=5, type={Plate=true}}});
 	ext:addCondition({id="victimCrotchPlate", type=ty.RTYPE_EQUIPMENT, data={slot=7, type={Plate=true}}});
 	ext:addCondition({id="victimCrotchNotPlate", type=ty.RTYPE_EQUIPMENT, data={slot=7, type={Plate=true}}, inverse=true});
+	ext:addCondition({id="targetTabard", type=ty.RTYPE_EQUIPMENT, data={slot=INVSLOT_TABARD}});
+
 	
 	ext:addCondition({id="hasChest", type=ty.RTYPE_EQUIPMENT, data={slot=5}});
 	ext:addCondition({id="hasShirt", type=ty.RTYPE_EQUIPMENT, data={slot=4}});
@@ -131,6 +138,32 @@ function internal.build.conditions()
 	ext:addCondition({id="victim_not_shapeshifted", type=ty.RTYPE_SHAPESHIFTED, inverse=true});
 	
 	
+	ext:addCondition({id="sender_spec_1", type=ty.RTYPE_SPEC, data={["s1"]=true}, sender=true});
+	ext:addCondition({id="sender_spec_2", type=ty.RTYPE_SPEC, data={["s2"]=true}, sender=true});
+	ext:addCondition({id="sender_spec_3", type=ty.RTYPE_SPEC, data={["s3"]=true}, sender=true});
+	ext:addCondition({id="sender_spec_4", type=ty.RTYPE_SPEC, data={["s4"]=true}, sender=true});
+
+
+	ext:addCondition({id="sender_class_shaman", type=ty.RTYPE_CLASS, data={["Shaman"]=true}, sender=true});
+	ext:addCondition({id="sender_class_hunter", type=ty.RTYPE_CLASS, data={["Hunter"]=true}, sender=true});
+	ext:addCondition({id="sender_class_priest", type=ty.RTYPE_CLASS, data={["Priest"]=true}, sender=true});
+	ext:addCondition({id="sender_class_mage", type=ty.RTYPE_CLASS, data={["Mage"]=true}, sender=true});
+	ext:addCondition({id="sender_class_warlock", type=ty.RTYPE_CLASS, data={["Warlock"]=true}, sender=true});
+	ext:addCondition({id="sender_class_demonhunter", type=ty.RTYPE_CLASS, data={["Demon Hunter"]=true}, sender=true});
+	ext:addCondition({id="sender_class_rogue", type=ty.RTYPE_CLASS, data={["Rogue"]=true}, sender=true});
+	ext:addCondition({id="sender_class_monk", type=ty.RTYPE_CLASS, data={["Monk"]=true}, sender=true});
+	ext:addCondition({id="sender_class_druid", type=ty.RTYPE_CLASS, data={["Druid"]=true}, sender=true});
+	ext:addCondition({id="sender_class_warrior", type=ty.RTYPE_CLASS, data={["Warrior"]=true}, sender=true});
+	ext:addCondition({id="sender_class_deathknight", type=ty.RTYPE_CLASS, data={["Deathknight"]=true}, sender=true});
+	ext:addCondition({id="sender_class_paladin", type=ty.RTYPE_CLASS, data={["Paladin"]=true}, sender=true});
+
+
+	ext:addCondition({id="sender_race_pandaren", type=ty.RTYPE_RACE, data={Pandaren=true}, sender=true});
+	ext:addCondition({id="sender_race_tauren", type=ty.RTYPE_RACE, data={Tauren=true}, sender=true});
+	ext:addCondition({id="sender_race_worgen", type=ty.RTYPE_RACE, data={Worgen=true}, sender=true});
+	ext:addCondition({id="sender_race_undead", type=ty.RTYPE_RACE, data={Scourge=true}, sender=true});
+
+	ext:addCondition({id="sender_has_pet", type=ty.RTYPE_HAS_ACTION_PET, sender=true});
 	
 
 	-- Spell tick/add/rem tag conditions

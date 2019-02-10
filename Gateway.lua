@@ -12,7 +12,7 @@ function internal.Gateway()
 	local Database = require("Database");
 	local Timer = require("Timer");
 	local Index = require("Index");
-	
+	local Condition = require("Condition");
 
 	-- Swing
 	local function onSwing(unit, sender, crit)
@@ -69,6 +69,11 @@ function internal.Gateway()
 		for _,sp in pairs(all) do
 			if type(sp.onTrigger) == "function" then
 				sp:onTrigger(event, unit, "player", npc, ExiWoW.ME);
+			end
+		end
+		for _,sp in pairs(spells) do
+			if type(sp.onAccepted) == "function" then
+				sp:onAccepted(event, unit, "player", npc, ExiWoW.ME);
 			end
 		end
 

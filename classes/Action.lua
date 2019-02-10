@@ -637,7 +637,13 @@ Action.__index = Action;
 
 				-- Play receiving sound if not self cast
 				if data.so then 
-					PlaySound(data.so, "SFX");
+					local sounds = data.so;
+					if type(data.so) ~= "table" then
+						sounds = {data.so};
+					end
+					for _,sound in pairs(sounds) do
+						PlaySound(sound, "SFX");
+					end
 				end
 
 				if type(callback) == "function" then
@@ -648,7 +654,8 @@ Action.__index = Action;
 		end
 	end
 
-	function Action:receiveRPText( sender, target, args )
+	-- Callback is triggered with text if text was successfully received
+	function Action:receiveRPText( sender, target, args, callback )
 
 		if 
 			type(args) ~= "table" or 
@@ -667,14 +674,11 @@ Action.__index = Action;
 		local out = {
 			t=rptext.text_sender,
 			so=rptext.sound,
+			tc=rptext.custom,
 		};
-		-- Self cast doesn't need to send any data
-		if UnitIsUnit(Ambiguate(sender, "ALL"), "player") then 
-			out = nil;
-		end
 
 		rptext:convertAndReceive(senderPlayer, ExiWoW.ME);
-
+		callback(rptext);
 		return true, out;
 
 	end

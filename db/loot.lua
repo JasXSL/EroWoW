@@ -505,11 +505,11 @@ function internal.build.loot()
 		items={
 			Item:new({
 				type = "Charges", 
-				id = "THROW_SAND", 
+				id = "SWAMP_MUCK", 
 				chance = 0.8,
 				sound = 73172,
 				text = RPText:new({
-					text_receiver = "You found a handful of sand!"
+					text_receiver = "You found a handful of swamp muck!"
 				})
 			})
 		}

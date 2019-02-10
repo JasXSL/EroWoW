@@ -182,10 +182,12 @@ Character.__index = Character;
 		
 		-- These are automatically set on export if full is set.
 		-- They still need to be fetched from settings though when received by a unit for an RP text
+		local _, race = UnitRace("player");
 		self.class = settings.cl or UnitClass("player");
-		self.race = settings.ra or UnitRace("player");
-		self.spec = type(settings.sp) == "number" and settings.sp or GetInspectSpecialization("player");
-		
+		self.race = settings.ra or race;
+		self.spec = type(settings.sp) == "number" and settings.sp or GetSpecialization();
+		self.height = settings.ht or self:getHeight();	-- 0 for short races, 1 for average, 2 for big
+
 		-- These are not sent on export, but can be used locally for NPC events
 		self.type = "player";				-- Can be overridden like humanoid etc. 
 		
@@ -237,7 +239,8 @@ Character.__index = Character;
 			fat = self.fat,
 			int = self.intelligence,
 			str = self.muscle_tone,
-			wis = self.wisdom
+			wis = self.wisdom,
+			ht  = self.height
 		};
 		-- Should only be used for "player"
 		if full then
@@ -396,6 +399,33 @@ Character.__index = Character;
 
 		print("Base", out)
 
+	end
+
+	function Character:getHeight()
+		local heightChart = {
+			Dwarf = 0,
+			DarkIronDwarf = 0,
+			Gnome = 0,
+			Draenei = 2,
+			Human = 1,
+			LightforgedDraenei = 2,
+			NightElf = 2,
+			Pandaren = 2,
+			VoidElf = 1,
+			Worgen = 2,
+			BloodElf = 1,
+			Goblin = 0,
+			HighmountainTauren = 2,
+			MagharOrc = 2,
+			Orc = 2,
+			Tauren = 2,
+			Troll = 2,
+			Scourge = 1,
+		};
+		if heightChart[self.race] then
+			return heightChart[self.race];
+		end
+		return 1;
 	end
 
 	-- Raised when you max or drop off max excitement --

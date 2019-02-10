@@ -9,6 +9,8 @@ function internal.build.spells()
 	local Spell = require("Spell");
 	local Database = require("Database");
 	local Condition = require("Condition");
+	local Func = require("Func");
+	local Visual = require("Visual");
 	local ext = internal.ext;
 
 	local addCond = Condition.get("is_spell_add");
@@ -63,7 +65,16 @@ function internal.build.spells()
 	ext:addSpell({id="Shield Bash", tags={"SHIELD_BASH"}});
 	
 	ext:addSpell({id="Water Bolt", tags={"SLOSH"}});
-	ext:addSpell({id="Slime Spray", tags={"SLOSH"}});
+	ext:addSpell({id="Slime Spray", tags={"SLOSH"}, onAccepted=
+		function(self)
+			if not self._last_trigger or self._last_trigger+5000 > GetTime() then
+				Visual.get("greenSplatPersistent"):trigger();
+				Visual.get("greenSplat"):trigger(false);
+				self._last_trigger = GetTime();
+			end
+		end, 
+		conditions={addCond}
+	});
 	ext:addSpell({id="Water Spout", tags={"SLOSH"}});
 	ext:addSpell({id="Water Blast", tags={"SLOSH"}});
 	ext:addSpell({id="Mead Blast", tags={"SLOSH"}, conditions={addCond}});

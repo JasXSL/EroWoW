@@ -74,11 +74,12 @@ RPText.whisperCD = nil
 		self.text_receiver = data.text_receiver or ""; 		-- RP Text
 		self.text_bystander = data.text_bystander or false;	-- RP Text for bystanders
 		self.requirements = type(data.requirements) == "table" and data.requirements or {};
-		self.sound = data.sound;					-- Play this sound when sending or receiving this
+		self.sound = data.sound;					-- Play this sound when sending or receiving this. Can also be a table of many sounds
 		self.fn = data.fn or nil;					-- Only supported for NPC/Spell events. Actions should use the action system instead
 		self.is_chat = data.is_chat or false		-- Makes the RP text display with chat colors instead. Set text_bystander to any non-false value to make it a say. Otherwise it's a whisper
 		self.visual = data.visual;					-- Triggers a visual from the visuals library
 		self.allow_shapeshift = false;				-- Toggle to disallow shapeshifts
+		self.custom = data.custom;					-- Lets you put custom data on this text
 
 		-- Automatic
 		self.item = ""								-- Populated automatically when you use an item condition, contains the last valid item name
@@ -167,10 +168,16 @@ RPText.whisperCD = nil
 		end
 
 		if self.sound and not noSound then
-			if type(self.sound) == "number" then
-				PlaySound(self.sound, "SFX");
-			else
-				PlaySoundFile(self.sound, "SFX");
+			local sounds = self.sound;
+			if type(sounds) ~= "table" then
+				sounds = {sounds};
+			end
+			for _,sound in pairs(sounds) do
+				if type(sound) == "number" then
+					PlaySound(sound, "SFX");
+				else
+					PlaySoundFile(sound, "SFX");
+				end
 			end
 		end
 
