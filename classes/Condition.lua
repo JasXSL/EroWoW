@@ -343,7 +343,7 @@ Condition.__index = Condition;
 			out = Tools.multiSearch(targ.race, data);
 		elseif t == ty.RTYPE_CLASS then 
 			out = Tools.multiSearch(targ.class, data);
-		elseif t == ty.RTYPE_SPEC then
+		elseif t == ty.RTYPE_SPEC and targ.spec then
 			out = Tools.multiSearch("s"..targ.spec, data);
 		elseif t == ty.RTYPE_TYPE then 
 			out = Tools.multiSearch(targ.type, data);
@@ -403,6 +403,8 @@ Condition.__index = Condition;
 			elseif targ == ExiWoW.TARGET then unit = "target"
 			end
 			-- /dump GetItemInfo(GetInventoryItemID("player", 7))
+			-- /dump GetInventoryItemID("target", 7)
+			
 			if unit then 
 				local id = GetInventoryItemID(unit, data.slot)
 				if not id then 

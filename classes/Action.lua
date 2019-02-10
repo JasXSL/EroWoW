@@ -678,7 +678,9 @@ Action.__index = Action;
 		};
 
 		rptext:convertAndReceive(senderPlayer, ExiWoW.ME);
-		callback(rptext);
+		if callback then
+			callback(rptext);
+		end
 		return true, out;
 
 	end
