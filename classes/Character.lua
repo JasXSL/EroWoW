@@ -240,13 +240,14 @@ Character.__index = Character;
 			int = self.intelligence,
 			str = self.muscle_tone,
 			wis = self.wisdom,
-			ht  = self.height
+			ht  = self.height,
+			sp = self.spec,
 		};
 		-- Should only be used for "player"
 		if full then
 			out.cl = UnitClass("player");
 			out.ra = UnitRace("player");
-			out.sp = GetInspectSpecialization("player");
+			out.sp = GetSpecialization();
 		end
 		return out;
 	end

@@ -91,6 +91,7 @@ local Event = {}
 		evtFrame:RegisterEvent("ZONE_CHANGED");
 		evtFrame:RegisterEvent("GET_ITEM_INFO_RECEIVED");
 		evtFrame:RegisterEvent("BAG_UPDATE");
+		evtFrame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED");
 
 		-- Emulate an aura change event on start
 		Timer.set(function()
@@ -181,6 +182,10 @@ local Event = {}
 				Character.recacheInventory();
 				UI.refreshAll();
 			end, 0.25);
+		end
+
+		if event == "ACTIVE_TALENT_GROUP_CHANGED" then
+			ExiWoW.ME.spec = GetSpecialization();
 		end
 
 		if event == "BAG_UPDATE" then 
