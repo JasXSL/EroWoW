@@ -139,6 +139,10 @@ function internal.Gateway()
 						end
 						if item.sound then PlaySound(item.sound, "Dialog") end
 						table.insert(out, item);
+
+						if event == Event.Types.FORAGE then
+							return out;
+						end
 					end
 				end
 			end

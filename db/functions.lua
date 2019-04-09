@@ -53,6 +53,10 @@ function internal.build.functions()
 				MagharOrcM = 110539,
 				DarkIronDwarfF = 101493,
 				DarkIronDwarfM = 101511,
+				ZandalariTrollF = 126971,
+				ZandalariTrollM = 127343,
+				KulTiranF = 127063,
+				KulTiranM = 127160,
 			}
 			Func.get("playCharSound")(self, sounds, race, sex);
 		end
@@ -101,6 +105,10 @@ function internal.build.functions()
 				MagharOrcM = 110540,
 				DarkIronDwarfF = 101494,
 				DarkIronDwarfM = 101512,
+				ZandalariTrollF = 126970,
+				ZandalariTrollM = 127342,
+				KulTiranF = 127062,
+				KulTiranM = 127159,
 			}
 			Func.get("playCharSound")(self, sounds, race, sex);
 		end
@@ -149,6 +157,10 @@ function internal.build.functions()
 				MagharOrcM = 110533,
 				DarkIronDwarfF = 101486,
 				DarkIronDwarfM = 101501,
+				ZandalariTrollF = 126968,
+				ZandalariTrollM = 127340,
+				KulTiranF = 127060,
+				KulTiranM = 127157,
 			}
 			Func.get("playCharSound")(self, sounds, race, sex);
 		end
