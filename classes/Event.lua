@@ -204,6 +204,12 @@ local Event = {}
 
 			-- See if a viable unit exists
 			local u = "none"
+			for i=1,16 do
+				if sourceGUID == UnitGUID("nameplate"..i) then
+					u = "nameplate"..i;
+				end
+			end
+
 			if sourceGUID == UnitGUID("target") then u = "target"
 			elseif sourceGUID == UnitGUID("focus") then u = "focus"
 			elseif sourceGUID == UnitGUID("mouseover") then u = "mouseover"
@@ -390,7 +396,7 @@ local Event = {}
 				if not auraExists(Event.AURAS, aura) then
 					Event.raise(Event.Types.SPELL_ADD, {
 						aura = aura,
-						unit = unit,
+						unit = unitCaster,
 						name = uc
 					});
 				end

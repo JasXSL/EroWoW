@@ -94,7 +94,7 @@ local RPText, Action, Effect, Underwear, Database, Func, NPC, Zone, Spell, Loot,
 	Extension.addRPText = Extension.addRpText;
 
 	function Extension:addAction(data)
-		table.insert(self.actions, Action:new(data))
+		table.insert(self.actions, Action:new(data));
 	end
 
 	function Extension:addEffect(data)

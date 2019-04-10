@@ -32,6 +32,9 @@ function internal.build.spells()
 	ext:addSpell({id="Entangling Roots", tags={"ROOTS"}});
 	ext:addSpell({id="Strangling Roots", tags={"ROOTS"}});
 	ext:addSpell({id="Creeping Vines", tags={"ROOTS"}});
+
+	ext:addSpell({id="Dazed", tags={"DAZE","FROM_BEHIND"}});
+
 	
 	
 	ext:addSpell({id="Stormstrike", tags={"ELECTRIC"}});
@@ -75,6 +78,18 @@ function internal.build.spells()
 		end, 
 		conditions={addCond}
 	});
+
+	ext:addSpell({id="Foul Juice", tags={"SLOSH"}, onAccepted=
+		function(self)
+			if not self._last_trigger or self._last_trigger+5000 > GetTime() then
+				Visual.get("orangeSplatPersistent"):trigger();
+				Visual.get("orangeSplat"):trigger(false);
+				self._last_trigger = GetTime();
+			end
+		end, 
+		conditions={addCond}
+	});
+
 	ext:addSpell({id="Water Spout", tags={"SLOSH"}});
 	ext:addSpell({id="Water Blast", tags={"SLOSH"}});
 	ext:addSpell({id="Mead Blast", tags={"SLOSH"}, conditions={addCond}});

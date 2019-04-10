@@ -252,6 +252,90 @@ function internal.build.visuals()
 		end
 	});
 
+	-- /dump ExiWoW.require("Visual").get("orangeSplat"):trigger();
+	ext:addVisual({
+		id="orangeSplat",
+		create = function(self)
+
+			self.frame.splats = {};
+			local positions = {};
+
+			for i=0,1 do
+				table.insert(positions, {
+					pos = "center",
+					offset ={0,0},
+					scale = 1
+				});
+			end
+
+			local i =0;
+			for _,v in pairs(positions) do
+				local h = CreateFrame("Frame", nil, self.frame);
+				h:SetPoint(v.pos, v.offset[1], v.offset[2]);
+
+				h.texture = h:CreateTexture(nil, "BACKGROUND");
+				h.texture:SetVertexColor(1,0.6,0.1);
+
+				h.texture:SetTexture("Interface/AddOns/ExiWoW/media/borders/splat_anim.tga");
+				h.texture:SetAllPoints(h);
+				h.texture:SetBlendMode("ADD");
+				h.start = i*0.05;
+				i = i+1;
+				table.insert(self.frame.splats, h);
+			end
+
+
+		end,
+		start = function(self)
+			for i,v in pairs(self.frame.splats) do
+
+				self.frame.bg:SetAlpha(0.25);
+				
+				-- Resets texture
+				v.texture.frame = nil;
+				ATC(v.texture, 1024, 1024, 128, 256, 32, nil, 0.02125+random()*0.02);
+
+				v:SetPoint("center",
+					random()*1600-800,
+					random()*800-400
+				);
+				local rand = (random()*0.5+0.5);
+				v:SetWidth(300*rand);
+				v:SetHeight(600*rand);
+				v:SetAlpha(random()*0.75+0.25);
+
+			end
+		end,
+		update = function(self, elapsed)
+
+			local delta = GetTime()-self.timeTriggered;
+			local duration = 2.5;
+			for _,v in pairs(self.frame.splats) do
+				local el = elapsed;
+				local d = delta-v.start;
+				if d > 0 then
+					if v.texture.frame > 30 then
+						v.texture.frame = 31;
+						el = 0;
+					end
+					AnimateTexCoords(v.texture, 1024, 256, 64, 128, 32, el, 0.02125+random()*0.02);
+				end
+			end
+
+			if self.hold or delta < duration/2 then
+				return 1;
+			end
+
+			if delta > duration then
+				return true;
+			end
+
+			local d = delta-duration/2;
+			return min(1,max(0,ExiWoW.Easing.inQuart(d/(duration/2), 1, -1, 1)));
+
+		end
+	});
+
 
 	-- /dump ExiWoW.require("Visual").get("quickWet"):trigger();
 	ext:addVisual({
@@ -340,7 +424,7 @@ function internal.build.visuals()
 		id="greenSplatPersistent",
 		create = function(self)
 			
-			self._timeout = 300;
+			self._timeout = 1800;
 			self.frame.splats = {};
 			
 		end,
@@ -462,8 +546,8 @@ function internal.build.visuals()
 		id="whiteSplatPersistent",
 		create = function(self)
 			
-			self._timeout = 300;
-			self.frame = {};
+			self._timeout = 1800;
+			self.frame.splats = {};
 			
 		end,
 		start = function(self)
@@ -494,6 +578,127 @@ function internal.build.visuals()
 				h.texture = h:CreateTexture(nil, "BACKGROUND");
 				local bright = random()*0.25+0.75;
 				h.texture:SetVertexColor(1*bright,1*bright,1*bright);
+				h.texture:SetTexture("Interface/AddOns/ExiWoW/media/borders/splat_anim.tga");
+				h.texture:SetAllPoints(h);
+				h.texture:SetBlendMode("BLEND");
+				v = h;
+				table.insert(self.frame.splats, v);
+			end
+
+			v._started = GetTime();
+
+			-- Resets texture
+			v.texture.frame = nil;
+			ATC(v.texture, 1024, 1024, 128, 256, 32, nil, 0.02125+random()*0.02);
+			v:SetPoint("center", random()*1600-800, random()*800-400);
+			local rand = (random()*0.5+0.5);
+			v:SetWidth(200*rand);
+			v:SetHeight(400*rand);
+			v:Show();
+
+			-- Bind removal events, as these get unbound before start
+			local function rem()
+				self:stop();
+				for _,v in pairs(self.frame.splats) do
+					v._started = 0;
+					v:Hide();
+				end
+				Visual.get("quickWet"):trigger();
+			end
+			self:on(Event.Types.SUBMERGE, rem);
+			self:on(Event.Types.SPELL_RAN, function(data)
+				local aura = data.aura;
+				local all = Database.getIDs("Spell", aura.name);
+				local eventData = RPText.buildSpellData(aura.spellId, aura.name, aura.harmful, data.name);
+				for _,sp in pairs(all) do
+					eventData.tags = sp:exportTags();
+					if Condition.get("ts_slosh"):validate("player", "player", ExiWoW.ME, ExiWoW.ME, eventData) then
+						rem();
+					end
+				end
+			end);
+			
+
+		end,
+		update = function(self, elapsed)
+
+			local active = 0;
+			for _,v in pairs(self.frame.splats) do
+
+				-- Ignore something that has finished
+				if v._started ~= 0 then
+					-- Animate
+					local el = elapsed;
+					if v.texture.frame > 29 then
+						v.texture.frame = 31;
+						el = 0;
+					end
+					if v.texture.frame ~= 31 then
+						AnimateTexCoords(v.texture, 1024, 256, 64, 128, 32, el, 0.02125+random()*0.02);
+					end
+
+					local started = v._started;
+					local delta = GetTime()-started;
+					-- Timed out
+					if delta > started+self._timeout then
+						v._started = 0;
+						v:Hide();
+					else
+						-- Update alpha
+						v:SetAlpha( 0.25*min(1,max(0,ExiWoW.Easing.inQuart(delta, 1, -1, self._timeout))) );
+						active = active+1;
+					end
+
+				end
+				
+			end
+
+			
+			if active == 0 then
+				return true;
+			end
+
+			return 1;
+		end
+	});
+
+	-- /dump ExiWoW.require("Visual").get("orangeSplatPersistent"):trigger();
+	ext:addVisual({
+		id="orangeSplatPersistent",
+		create = function(self)
+			
+			self._timeout = 1800;
+			self.frame.splats = {};
+			
+		end,
+		start = function(self)
+
+			local v;
+			for _,splat in pairs(self.frame.splats) do
+				if splat._started+self._timeout < GetTime() then
+					v = splat;
+					break;
+				end
+			end
+
+			-- No viable splats. We'll have to replace one
+			if #self.frame.splats >= 8 and not v then
+				local lowest = -1;
+				for _,splat in pairs(self.frame.splats) do
+					if splat._started < lowest or lowest == -1 then
+						v = splat;
+						lowest = splat._started;
+					end
+				end
+			end
+
+			-- Create a new splat
+			if not v then
+				local h = CreateFrame("Frame", nil, self.frame);
+				h:SetPoint("center", 0, 0);
+				h.texture = h:CreateTexture(nil, "BACKGROUND");
+				local bright = random()*0.25+0.75;
+				h.texture:SetVertexColor(1*bright,0.75*bright,0.5*bright);
 				h.texture:SetTexture("Interface/AddOns/ExiWoW/media/borders/splat_anim.tga");
 				h.texture:SetAllPoints(h);
 				h.texture:SetBlendMode("BLEND");

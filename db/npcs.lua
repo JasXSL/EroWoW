@@ -97,6 +97,7 @@ function internal.build.npcs()
 	ext:addNPC({id="Fel Secretion",tags={"OOZE"}});
 	ext:addNPC({id="Boiling Springbubble",tags={"OOZE"}});
 	ext:addNPC({id="Undulating Boneslime",tags={"OOZE"}});
+	ext:addNPC({id="Unholy Corpuscle",tags={"OOZE"}});
 	
 	ext:addNPC({id="Withervine Creeper",tags={"BOG_SHAMBLER"}});
 	ext:addNPC({id="Withervine Rager",tags={"BOG_SHAMBLER"}});
@@ -110,6 +111,7 @@ function internal.build.npcs()
 	
 	ext:addNPC({id="Bonegnasher Skullcrusher",tags={"TROGG", "FISTFIGHTER", "MEDIUM"}});
 	ext:addNPC({id="Bonegnasher Earthcaller",tags={"TROGG", "FISTFIGHTER", "MEDIUM"}});
+	ext:addNPC({id="Pome Wraith",tags={"SKELETON", "FISTFIGHTER", "MEDIUM"}});
 	
 	ext:addNPC({id="%Saurolisk",tags={"SAUROLISK"}});
 	

@@ -89,7 +89,6 @@ RPText.whisperCD = nil
 			id[self.id] = true;
 			self.id = id;
 		end
-
 		Condition.checkSyntax(self, self.requirements);
 
 		return self
@@ -190,6 +189,9 @@ RPText.whisperCD = nil
 	function RPText.get(id, senderUnit, receiverUnit, senderChar, receiverChar, eventData, event, action, debug)
 
 		local viable = {};
+		if not senderUnit then
+			return false;
+		end
 		senderUnit = Ambiguate(senderUnit, "all");
 		local isSelfCast = UnitIsUnit(senderUnit, receiverUnit);		
 		local lib = Database.filter("RPText");

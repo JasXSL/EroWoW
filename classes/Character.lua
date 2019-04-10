@@ -50,7 +50,7 @@ Character.__index = Character;
 	end
 
 	-- Builds an NPC from a unit
-	function Character.buildNPC(u, name)
+	function Character.buildNPC(u, name, debug)
 
 		if not name then 
 			name = "???";

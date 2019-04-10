@@ -24,6 +24,7 @@ function internal.build.conditions()
 	ext:addCondition({id="rand90", type=ty.RTYPE_RANDOM, data={chance=0.9}});
 
 	ext:addCondition({id="attackerHumanoid", type = ty.RTYPE_TYPE,sender = true,data = {Humanoid = true}});
+	ext:addCondition({id="attackerBeast", type = ty.RTYPE_TYPE,sender = true,data = {Beast = true}});
 	ext:addCondition({id="attackerHumanoidish", type = ty.RTYPE_TYPE, sender = true, data = {Humanoid = true, Undead = true, Demon=true}});
 	ext:addCondition({id="victimBreasts", type = ty.RTYPE_HAS_BREASTS});
 	ext:addCondition({id="victimPenis", type = ty.RTYPE_HAS_PENIS});
@@ -43,6 +44,7 @@ function internal.build.conditions()
 	ext:addCondition({id="attackerIsFeltotem", type=ty.RTYPE_TAG, data={"NPC_FELTOTEM"}, sender=true});
 	ext:addCondition({id="attackerIsBogshambler", type=ty.RTYPE_TAG, data={"NPC_BOG_SHAMBLER"}, sender=true});
 	ext:addCondition({id="attackerNotLarge", type=ty.RTYPE_TAG, data={"NPC_LARGE", "NPC_GIANT"}, sender=true, inverse=true});
+	ext:addCondition({id="attackerSmallOrMedium", type=ty.RTYPE_TAG, data={"NPC_SMALL", "NPC_MEDIUM"}, sender=true, inverse=true});
 	ext:addCondition({id="attackerIsSmall", type=ty.RTYPE_TAG, data={"NPC_SMALL"}, sender=true});
 	ext:addCondition({id="attackerIsFistfighter", type=ty.RTYPE_TAG, data={"NPC_FISTFIGHTER"}, sender=true});
 	ext:addCondition({id="attackerIsMogu", type=ty.RTYPE_TAG, data={"NPC_MOGU"}, sender=true});

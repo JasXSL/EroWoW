@@ -174,7 +174,6 @@ function internal.build.rptexts()
 			requirements = {}
 		})
 
-
 	-- Priest Allure
 		ext:addRpText({
 			id = "ALLURE",
@@ -184,6 +183,16 @@ function internal.build.rptexts()
 			requirements = {}
 		})
 
+
+	-- Slosh
+		ext:addRpText({
+			text_receiver = "%spell splashes across your face!",
+			requirements = {
+				getCondition("ts_slosh"),
+				getCondition("rand10"),
+				getCondition("spellDetrimental")
+			},
+		});
 	
 	-- RP VOICE LINES
 
