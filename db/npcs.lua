@@ -21,6 +21,8 @@ function internal.build.npcs()
 	ext:addNPC({id="%Boulderslide",tags={"KOBOLD", "FISTFIGHTER", "SMALL"}});
 
 	ext:addNPC({id="%Scorpid",tags={"PINCHY"}});
+	ext:addNPC({id="%Chitterspine",tags={"PINCHY"}});
+	ext:addNPC({id="%Glimmershell",tags={"PINCHY"}});
 	ext:addNPC({id="Desert Crawler",tags={"PINCHY"}});
 	ext:addNPC({id="%Duneclaw",tags={"PINCHY"}});
 	ext:addNPC({id="Duneshore Crab",tags={"PINCHY"}});
@@ -38,6 +40,15 @@ function internal.build.npcs()
 	ext:addNPC({id="%Bogstrok",tags={"PINCHY"}});
 	ext:addNPC({id="%Drysnap",tags={"PINCHY"}});
 	ext:addNPC({id="Deepwater Spikeback",tags={"PINCHY"}});
+
+	ext:addNPC({id="Sabreclaw Skitterer",tags={"PINCHY"}});
+	ext:addNPC({id="Splitclaw Skitterer",tags={"PINCHY"}});
+	ext:addNPC({id="Sandskin Pincer",tags={"PINCHY"}});
+	ext:addNPC({id="Pyreshell Scuttler",tags={"PINCHY"}});
+	ext:addNPC({id="%Crab",tags={"PINCHY"}});
+	ext:addNPC({id="Spikeshell Scuttler",tags={"PINCHY"}});
+	ext:addNPC({id="Sand Scuttler",tags={"PINCHY"}});
+
 	ext:addNPC({id="Coastal Spikeback",tags={"PINCHY"}});
 	ext:addNPC({id="Leyscar Scuttler",tags={"PINCHY"}});
 	ext:addNPC({id="Derelict Hexapod",tags={"PINCHY", "MEDIUM"}});
