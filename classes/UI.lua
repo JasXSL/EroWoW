@@ -122,7 +122,7 @@ UI = {}
 					alertFrame.hyperlink = ""
 					alertFrame:SetScript("OnEnter", function(frame)	end);
 					alertFrame:SetScript("Onleave", function() end);
-					alertFrame.Icon:SetTexture("Interface/Icons/"..icon);
+					alertFrame.lootItem.Icon:SetTexture("Interface/Icons/"..icon);
 					table.remove(UI.lootQueue, 1)
 					if #UI.lootQueue == 0 then return end
 				end
