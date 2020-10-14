@@ -1,4 +1,4 @@
-## Interface: 80300
+## Interface: 90100
 ## Title: ExiWoW
 ## Notes: Improving your RP by adding RP actions and more detailed descriptions of your character!
 ## Version: 0.0.1
